@@ -102,3 +102,107 @@ class MyProfileView(APIView):
         account = Account.objects.get(user=user)
         serializer = AccountSerializer(account)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+class CourseView(APIView):
+    def post(self, request):
+        try:
+            user = request.user
+            author = Account.objects.get(user=user)
+            course = Course()
+            course.author = author
+            if name := request.data.get("name"):
+                course.name = name
+            if description := request.data.get("description"):
+                course.description = description
+            if image := request.data.get("image"):
+                course.image = image
+            if language := request.data.get("language"):
+                course.language = language
+            if duration := request.data.get("duration"):
+                course.duration = duration
+            if is_public := request.data.get("is_public"):
+                course.is_public = is_public
+            if price_currency := request.data.get("price_currency"):
+                course.price_currency = price_currency
+            if price := request.data.get("price"):
+                course.price = price
+            if promo_price := request.data.get("promo_price"):
+                course.promo_price = promo_price
+            if promo_expires := request.data.get("promo_expires"):
+                course.promo_expires = promo_expires
+            course.save()
+            return Response({"message": "Course successfully created."}, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(e)
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self, request, id):
+        try:
+            user = request.user
+            account = Account.objects.get(user=user)
+            course = Course.objects.get(id=id)
+            if account != course.author:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            if name := request.data.get("name"):
+                course.name = name
+            if description := request.data.get("description"):
+                course.description = description
+            if image := request.data.get("image"):
+                course.image = image
+            if language := request.data.get("language"):
+                course.language = language
+            if duration := request.data.get("duration"):
+                course.duration = duration
+            if is_public := request.data.get("is_public"):
+                course.is_public = is_public
+            if price_currency := request.data.get("price_currency"):
+                course.price_currency = price_currency
+            if price := request.data.get("price"):
+                course.price = price
+            if promo_price := request.data.get("promo_price"):
+                course.promo_price = promo_price
+            if promo_expires := request.data.get("promo_expires"):
+                course.promo_expires = promo_expires
+            course.save()
+            return Response({"message": "Course successfully created."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "Bad request."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def delete(self, request, id):
+        try:
+            user = request.user
+            try:
+                account = Account.objects.get(user=user)
+            except Account.DoesNotExist:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            try:
+                course = Course.objects.get(id=id)
+            except Course.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            if account != course.author:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            course.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+    def get(self, request, id):
+        try:
+            try:
+                course = Course.objects.get(id=id)
+            except Course.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            if not course.is_public:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            serializer = CourseSerializer(course)
+            return Response(serializer.data)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class MyCoursesView(APIView):
+    def get(self, request):
+        user = request.user
+        author = Account.objects.get(user=user)
+        courses = Course.objects.filter(author=author)
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)

@@ -23,11 +23,11 @@ class Course(models.Model):
     name = models.CharField(max_length=255, default="Unnammed Course")
     description = models.CharField(max_length=4095, default="No description provided.")
     image = models.FileField(upload_to='courses_imgs/', blank=True, null=True)
-    language = models.CharField(max_length=31, default="EN")
+    language = models.CharField(max_length=31, default="en")
     duration = models.IntegerField(default=0)
     last_updated = models.DateTimeField(default=timezone.now)
     is_public = models.BooleanField(default=False)
-    price_currency = models.CharField(max_length=7, default="PLN")
+    price_currency = models.CharField(max_length=7, default="USD")
     price = models.IntegerField(default=0)
     promo_price = models.IntegerField(default=0)
     promo_expires = models.DateTimeField(default=timezone.now)
@@ -74,6 +74,23 @@ class ExampleElement(Element):
     image = models.FileField(upload_to='elem_example/', blank=True, null=True)
     explanation = models.CharField(max_length=4095, default="")
 
+# class AbstractAssignmentElement(Element):
+#     question = models.CharField(max_length=1023, default="")
+#     image = models.FileField(upload_to='elem_assignment/', blank=True, null=True)
+#     answers = models.JSONField()
+#     correct_answer_indices = models.JSONField()
+#     is_multiple_choice = models.BooleanField(default=False)
+#     explanation = models.CharField(max_length=4095, default="")
+
+# class AssignmentElement(AbstractAssignmentElement):
+#     is_multi_step = models.BooleanField(default=False)
+
+# class AssignmentStep(AbstractAssignmentElement):
+#     assignment = models.ForeignKey(AssignmentElement, on_delete=models.CASCADE)
+#     order = models.IntegerField(default=0)
+#     class Meta:
+#         ordering = ['order']
+
 class AssignmentElement(Element):
     question = models.CharField(max_length=1023, default="")
     image = models.FileField(upload_to='elem_assignment/', blank=True, null=True)
@@ -81,6 +98,19 @@ class AssignmentElement(Element):
     correct_answer_indices = models.JSONField()
     is_multiple_choice = models.BooleanField(default=False)
     explanation = models.CharField(max_length=4095, default="")
+    explanation_image = models.FileField('elem_assignment/', blank=True, null=True)
+
+# class AssignmentStep(models.Model):
+#     assignment = models.ForeignKey(AssignmentElement, on_delete=models.CASCADE)
+#     question = models.CharField(max_length=1023, default="")
+#     image = models.FileField(upload_to='elem_assignment_multistep/', blank=True, null=True)
+#     answers = models.JSONField()
+#     correct_answer_indices = models.JSONField()
+#     is_multiple_choice = models.BooleanField(default=False)
+#     explanation = models.CharField(max_length=4095, default="")
+#     order = models.IntegerField(default=0)
+#     class Meta:
+#         ordering = ['order']
 
 class ExamElement(Element):
     description = models.CharField(max_length=1023, default="")
@@ -112,3 +142,22 @@ class CourseAccess(models.Model):
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     expires = models.DateTimeField(default=timezone.now)
+
+class CourseTopic(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    topic = models.CharField(max_length=127, default="")
+
+# class AssignmentWeight(models.Model):
+#     assignment = models.ForeignKey(AbstractAssignmentElement, on_delete=models.CASCADE)
+#     topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE)
+#     weight = models.FloatField(default=0.0)
+
+class AssignmentWeight(models.Model):
+    assignment = models.ForeignKey(AssignmentElement, on_delete=models.CASCADE)
+    topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE)
+    weight = models.FloatField(default=0.0)
+
+# class AssignmentStepWeight(models.Model):
+#     step = models.ForeignKey(AssignmentStep, on_delete=models.CASCADE)
+#     topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE)
+#     weight = models.FloatField(default=0.0)

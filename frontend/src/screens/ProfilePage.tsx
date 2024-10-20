@@ -44,7 +44,8 @@ export default function ProfilePage() {
             {account.socials.tiktok}
             <br />
             you joined {timeAgo(new Date(account.user.date_joined))}
-
+            <br />
+            <a href="/logout">Logout</a>
         </>
     );
 }

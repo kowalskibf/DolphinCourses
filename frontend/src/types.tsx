@@ -91,11 +91,12 @@ interface ExampleElement extends CourseElement {
 interface AssignmentElement extends CourseElement {
     type: 'assignment';
     question: string;
+    image?: string;
     answers: string[];
     correct_number_indices: number[];
     is_multiple_choice: boolean;
     explanation: string;
-    image?: string;
+    explanation_image?: string;
 }
 
 interface ExamElement extends CourseElement {
@@ -131,4 +132,17 @@ type CourseAccess = {
     account: Account;
     course: Course;
     expires: Date;
+}
+
+type CourseTopic = {
+    id: number;
+    course: Course;
+    topic: string;
+}
+
+type AssignmentWeight = {
+    id: number;
+    assignment: AssignmentElement;
+    topic: CourseTopic;
+    weight: number;
 }

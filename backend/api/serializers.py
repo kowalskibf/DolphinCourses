@@ -95,7 +95,7 @@ class ExampleElementSerializer(ElementSerializer):
 class AssignmentElementSerializer(ElementSerializer):
     class Meta(ElementSerializer.Meta):
         model = AssignmentElement
-        fields = ElementSerializer.Meta.fields + ('question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'explanation')
+        fields = ElementSerializer.Meta.fields + ('question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'explanation' + 'explanation_image')
     
 class ExamElementSerializer(ElementSerializer):
     class Meta(ElementSerializer.Meta):
@@ -145,3 +145,22 @@ class CourseAccessSerializer(serializers.ModelSerializer):
         return AccountSerializer(obj.account).data
     def get_course(self, obj):
         return CourseSerializer(obj.course).data
+    
+class CourseTopicSerializer(serializers.ModelSerializer):
+    course = serializers.SerializerMethodField()
+    class Meta:
+        model = CourseTopic
+        fields = ('id', 'course', 'topic')
+    def get_course(self, obj):
+        return CourseSerializer(obj.course).data
+    
+class AssignmentWeightSerializer(serializers.ModelSerializer):
+    assignment = serializers.SerializerMethodField()
+    topic = serializers.SerializerMethodField()
+    class Meta:
+        model = AssignmentWeight
+        fields = ('id', 'assignment', 'topic', 'weight')
+    def get_assignment(self, obj):
+        return AssignmentElementSerializer(obj.assignment).data
+    def get_topic(self, obj):
+        return CourseTopicSerializer(obj.topic).data
