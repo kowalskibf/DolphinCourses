@@ -9,4 +9,5 @@ urlpatterns = [
     path('course/<int:id>', CourseView.as_view(), name='course'),
     path('courses/my', MyCoursesView.as_view(), name='my_courses'),
     path('course', CourseView.as_view(), name='course'),
+    path('profile/avatar', ProfileAvatarView.as_view(), name='my_avatar_edit'),
 ]

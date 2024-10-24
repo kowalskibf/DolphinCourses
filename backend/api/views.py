@@ -95,6 +95,19 @@ class ProfileSetupView(APIView):
         except Exception as e:
             return Response({"error": "Bad Request."}, status=status.HTTP_400_BAD_REQUEST)
         
+class ProfileAvatarView(APIView):
+    def put(self, request):
+        try:
+            user = request.user
+            account = Account.objects.get(user=user)
+            account.avatar = request.data.get("avatar")
+            account.save()
+            print("ok")
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
+        
 class MyProfileView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):

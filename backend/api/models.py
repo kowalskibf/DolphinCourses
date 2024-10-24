@@ -161,3 +161,8 @@ class AssignmentWeight(models.Model):
 #     step = models.ForeignKey(AssignmentStep, on_delete=models.CASCADE)
 #     topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE)
 #     weight = models.FloatField(default=0.0)
+
+class ModuleWeight(models.Model):
+    module = models.ForeignKey(ModuleElement, on_delete=models.CASCADE)
+    topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE)
+    weight = models.FloatField(default=0.0)
