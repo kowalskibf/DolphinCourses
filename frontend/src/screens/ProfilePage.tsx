@@ -83,6 +83,7 @@ export default function ProfilePage() {
             {account.user.first_name} {account.user.last_name}
             <br />
             your email
+            <br />
             {account.user.email}
             <br />
             tt:
