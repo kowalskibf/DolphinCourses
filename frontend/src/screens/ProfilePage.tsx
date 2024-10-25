@@ -75,6 +75,8 @@ export default function ProfilePage() {
 
     return (
         <>
+            <a href="/courses/my">My courses</a>
+            <a href="/elements/my">My elements</a>
             <img src={MEDIA_URL + (account.avatar ? account.avatar : "/media/default_avatar.png")} />
             hello, {account.user.username}
             <br />
