@@ -13,154 +13,152 @@ class AccountSocialsSerializer(serializers.ModelSerializer):
         fields = ('facebook', 'instagram', 'tiktok', 'linkedin')
 
 class AccountSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    socials = serializers.SerializerMethodField()
+    user = UserSerializer(read_only=True)
+    socials = AccountSocialsSerializer(read_only=True)
+
     class Meta:
         model = Account
         fields = ('id', 'user', 'avatar', 'is_admin', 'bio', 'socials', 'is_banned')
-    def get_user(self, obj):
-        return UserSerializer(obj.user).data
-    def get_socials(self, obj):
-        return AccountSocialsSerializer(obj.socials).data
-    
+
 class CourseSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
+    author = AccountSerializer(read_only=True)
+
     class Meta:
         model = Course
         fields = ('id', 'author', 'name', 'description', 'image', 'language', 'duration', 'last_updated', 'is_public', 'price_currency', 'price', 'promo_price', 'promo_expires')
-    def get_author(self, obj):
-        return AccountSerializer(obj.author).data
-    
+
 class ReviewSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
-    course = serializers.SerializerMethodField()
+    author = AccountSerializer(read_only=True)
+    course = CourseSerializer(read_only=True)
+
     class Meta:
         model = Review
         fields = ('id', 'author', 'course', 'rating', 'comment', 'date')
-    def get_author(self, obj):
-        return AccountSerializer(obj.author).data
-    def get_course(self, obj):
-        return CourseSerializer(obj.course).data
-    
+
 class ElementSerializer(serializers.ModelSerializer):
-    author = serializers.SerializerMethodField()
+    author = AccountSerializer(read_only=True)
+    data = serializers.SerializerMethodField()
+
     class Meta:
         model = Element
-        fields = ('id', 'name', 'author', 'type')
-    def get_author(self, obj):
-        return AccountSerializer(obj.author).data
-    def to_representation(self, instance):
-        if instance.type == 'text':
-            return TextElementSerializer(instance).data
-        elif instance.type == 'image':
-            return ImageElementSerializer(instance).data
-        elif instance.type == 'video':
-            return VideoElementSerializer(instance).data
-        elif instance.type == 'example':
-            return ExampleElementSerializer(instance).data
-        elif instance.type == 'assignment':
-            return AssignmentElementSerializer(instance).data
-        elif instance.type == 'exam':
-            return ExamElementSerializer(instance).data
-        elif instance.type == 'module':
-            return ModuleElementSerializer(instance).data
-        else:
-            return super().to_representation(instance)
-    
-class ModuleElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+        fields = ('id', 'name', 'author', 'type', 'data')
+
+    def get_data(self, obj):
+        if obj.type == 'text':
+            return TextElementSerializer(obj.textelement).data
+        elif obj.type == 'image':
+            return ImageElementSerializer(obj.imageelement).data
+        elif obj.type == 'video':
+            return VideoElementSerializer(obj.videoelement).data
+        elif obj.type == 'example':
+            return ExampleElementSerializer(obj.exampleelement).data
+        elif obj.type == 'assignment':
+            return AssignmentElementSerializer(obj.assignmentelement).data
+        elif obj.type == 'exam':
+            return ExamElementSerializer(obj.examelement).data
+        elif obj.type == 'module':
+            return ModuleElementSerializer(obj.moduleelement).data
+        return None
+
+
+class ModuleElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = ModuleElement
-        fields = ElementSerializer.Meta.fields + ('title', 'description', 'image')
+        fields = ('title', 'description', 'image')
 
-class TextElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+
+class TextElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = TextElement
-        fields = ElementSerializer.Meta.fields + ('content',)
+        fields = ('content',)
 
-class ImageElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+
+class ImageElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = ImageElement
-        fields = ElementSerializer.Meta.fields + ('image', 'description')
+        fields = ('image', 'description')
 
-class VideoElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+
+class VideoElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = VideoElement
-        fields = ElementSerializer.Meta.fields + ('video', 'description')
+        fields = ('video', 'description')
 
-class ExampleElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+
+class ExampleElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = ExampleElement
-        fields = ElementSerializer.Meta.fields + ('question', 'image', 'explanation')
+        fields = ('question', 'explanation', 'image')
 
-class AssignmentElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+
+class AssignmentElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = AssignmentElement
-        fields = ElementSerializer.Meta.fields + ('question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'explanation' + 'explanation_image')
-    
-class ExamElementSerializer(ElementSerializer):
-    class Meta(ElementSerializer.Meta):
+        fields = ('question', 'answers', 'correct_number_indices', 'is_multiple_choice', 'explanation', 'explanation_image')
+
+
+class ExamElementSerializer(serializers.ModelSerializer):
+    class Meta:
         model = ExamElement
-        fields = ElementSerializer.Meta.fields + ('description', 'duration', 'total_marks')
+        fields = ('description', 'duration', 'total_marks')
+
 
 class ExamQuestionSerializer(serializers.ModelSerializer):
-    exam = serializers.SerializerMethodField()
-    question = serializers.SerializerMethodField()
+    exam = ExamElementSerializer(read_only=True)
+    question = AssignmentElementSerializer(read_only=True)
+
     class Meta:
         model = ExamQuestion
         fields = ('id', 'exam', 'question', 'order')
-    def get_exam(self, obj):
-        return ExamElementSerializer(obj.exam).data
-    def get_question(self, obj):
-        return AssignmentElementSerializer(obj.question).data
-    
+
+
 class CourseModuleSerializer(serializers.ModelSerializer):
-    course = serializers.SerializerMethodField()
-    module = serializers.SerializerMethodField()
+    course = CourseSerializer(read_only=True)
+    module = ModuleElementSerializer(read_only=True)
+
     class Meta:
         model = CourseModule
         fields = ('id', 'course', 'module', 'order')
-    def get_course(self, obj):
-        return CourseSerializer(obj.course).data
-    def get_module(self, obj):
-        return ModuleElementSerializer(obj.module).data
-    
+
+
 class ModuleToElementSerializer(serializers.ModelSerializer):
-    module = serializers.SerializerMethodField()
-    element = serializers.SerializerMethodField()
+    module = ModuleElementSerializer(read_only=True)
+    element = ElementSerializer(read_only=True)
+
     class Meta:
         model = ModuleToElement
         fields = ('id', 'module', 'element', 'order')
-    def get_module(self, obj):
-        return ModuleElementSerializer(obj.module).data
-    def get_element(self, obj):
-        return ElementSerializer(obj.element).data
+
 
 class CourseAccessSerializer(serializers.ModelSerializer):
-    account = serializers.SerializerMethodField()
-    course = serializers.SerializerMethodField()
+    account = AccountSerializer(read_only=True)
+    course = CourseSerializer(read_only=True)
+
     class Meta:
         model = CourseAccess
         fields = ('id', 'account', 'course', 'expires')
-    def get_account(self, obj):
-        return AccountSerializer(obj.account).data
-    def get_course(self, obj):
-        return CourseSerializer(obj.course).data
-    
+
+
 class CourseTopicSerializer(serializers.ModelSerializer):
-    course = serializers.SerializerMethodField()
+    course = CourseSerializer(read_only=True)
+
     class Meta:
         model = CourseTopic
         fields = ('id', 'course', 'topic')
-    def get_course(self, obj):
-        return CourseSerializer(obj.course).data
-    
+
+
 class AssignmentWeightSerializer(serializers.ModelSerializer):
-    assignment = serializers.SerializerMethodField()
-    topic = serializers.SerializerMethodField()
+    assignment = AssignmentElementSerializer(read_only=True)
+    topic = CourseTopicSerializer(read_only=True)
+
     class Meta:
         model = AssignmentWeight
         fields = ('id', 'assignment', 'topic', 'weight')
-    def get_assignment(self, obj):
-        return AssignmentElementSerializer(obj.assignment).data
-    def get_topic(self, obj):
-        return CourseTopicSerializer(obj.topic).data
+
+class ModuleWeightSerializer(serializers.ModelSerializer):
+    module = ModuleElementSerializer(read_only=True)
+    topic = CourseTopicSerializer(read_only=True)
+
+    class Meta:
+        model = ModuleWeight
+        fields = ('id', 'module', 'topic', 'weight')

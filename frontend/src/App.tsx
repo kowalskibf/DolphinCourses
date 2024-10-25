@@ -11,6 +11,8 @@ import ProfilePage from './screens/ProfilePage';
 import LoginPage from './screens/LoginPage';
 import MyCoursesPage from './screens/MyCoursesPage';
 import CreateCoursePage from './screens/CreateCoursePage';
+import MyElementsPage from './screens/MyElementsPage';
+import NewElementPage from './screens/NewElementPage';
 
 export default function App() {
   return (
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/courses/my" element={<MyCoursesPage />} />
           <Route path="/course/new" element={<CreateCoursePage />} />
+          <Route path="/elements/my" element={<MyElementsPage />} />
+          <Route path="/element/new" element={<NewElementPage />} />
         </Routes>
       </Router>
     </div>

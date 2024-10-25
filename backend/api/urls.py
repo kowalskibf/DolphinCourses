@@ -10,4 +10,6 @@ urlpatterns = [
     path('courses/my', MyCoursesView.as_view(), name='my_courses'),
     path('course', CourseView.as_view(), name='course'),
     path('profile/avatar', ProfileAvatarView.as_view(), name='my_avatar_edit'),
+    path('elements/my', MyElementsView.as_view(), name='my_elements'),
+    path('element', ElementView.as_view(), name='element'),
 ]

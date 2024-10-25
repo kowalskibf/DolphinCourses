@@ -55,6 +55,7 @@ interface CourseElement {
     name: string;
     author: Account;
     type: 'text' | 'image' | 'video' | 'example' | 'assignment' | 'exam' | 'module';
+    data: ModuleElement | TextElement | ImageElement | VideoElement | ExampleElement | AssignmentElement | ExamElement;
 }
 
 interface ModuleElement extends CourseElement {

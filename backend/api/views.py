@@ -219,3 +219,44 @@ class MyCoursesView(APIView):
         courses = Course.objects.filter(author=author)
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
+    
+class MyElementsView(APIView):
+    def get(self, request):
+        user = request.user
+        account = Account.objects.get(user=user)
+        elements = Element.objects.filter(author=account)
+        serializer = ElementSerializer(elements, many=True)
+        return Response(serializer.data)
+    
+class ElementView(APIView):
+    def post(self, request):
+        try:
+            try:
+                user = request.user
+                account = Account.objects.get(user=user)
+            except:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            if type_ := request.data.get("type"):
+                if type_ == 'text':
+                    textElement = TextElement(
+                        name=request.data.get("name"),
+                        author=account,
+                        type="text",
+                        content=request.data.get("content")
+                    )
+                    textElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'image':
+                    pass
+                elif type_ == 'video':
+                    pass
+                elif type_ == 'example':
+                    pass
+                elif type_ == 'assignment':
+                    pass
+                elif type_ == 'exam':
+                    pass
+                elif type_ == 'module':
+                    pass
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
