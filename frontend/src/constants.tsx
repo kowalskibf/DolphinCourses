@@ -48,3 +48,13 @@ export const CURRENCIES = [
     ["BRL", "🇧🇷"],
     ["AED", "🇦🇪"],
 ];
+
+export const TYPES = [
+    "text",
+    "image",
+    "video",
+    "example",
+    "assignment",
+    "exam",
+    "module"
+];

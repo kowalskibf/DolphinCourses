@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
 import { LANGUAGES, CURRENCIES } from '../constants';
+import { formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt } from '../functions';
 
 export default function CreateCoursePage() {
     const [name, setName] = useState<string>("");
@@ -49,31 +50,6 @@ export default function CreateCoursePage() {
         }
     }
 
-    function priceToInt(value: string | number): number {
-        if (typeof value === 'number') {
-            return value * 100;
-        }
-        value = value.replace(',', '.');
-        return Math.round(parseFloat(value) * 100);
-    }
-
-    function intToPrice(value: number): string {
-        const zl = Math.floor(value / 100);
-        const gr = value % 100;
-        return `${zl},${gr.toString().padStart(2, '0')}`;
-    }
-    function formatDateToBackend(date: Date): string {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0'); // Miesiące są 0-indeksowane
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        const seconds = String(date.getSeconds()).padStart(2, '0');
-
-        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // Możesz dodać strefę czasową, jeśli to potrzebne
-    }
-
-
     const handleCreateCourse = async () => {
         const formData = new FormData();
         formData.append("name", name);
@@ -112,10 +88,6 @@ export default function CreateCoursePage() {
         else
             window.location.replace("/courses/my");
     }
-    const formatDateTimeLocal = (date: Date): string => {
-        const isoString = date.toISOString();
-        return isoString.substring(0, 16); // Zwraca format 'YYYY-MM-DDTHH:mm'
-    };
 
     const handleNext = async () => {
         resetErrors();

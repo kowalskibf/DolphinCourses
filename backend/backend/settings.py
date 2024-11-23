@@ -178,3 +178,5 @@ CORS_ALLOW_METHODS = (
     'POST',
     'PUT',
 )
+
+USE_TZ = False

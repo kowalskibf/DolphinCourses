@@ -44,4 +44,176 @@
   color: #888;
 }*/
 
-/* Whole app */
+/* App */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "poppins", sans-serif;
+}
+
+a,
+a:focus,
+a:hover,
+a:visited {
+  text-decoration: none;
+}
+
+:root {
+  --text-element-color: #2196F3;
+  --image-element-color: #4CAF50;
+  --video-element-color: #F44336;
+  --example-element-color: #FF9800;
+  --assignment-element-color: #9C27B0;
+  --exam-element-color: #795548;
+  --module-element-color: #e27297;
+  --element-border-width: 4px;
+}
+
+/* Navbar */
+
+#navbar-container {
+  width: 100%;
+  height: 80px;
+  background-color: #222222;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#navbar-left {
+  width: 30%;
+  float: left;
+  font-size: 20px;
+}
+
+#navbar-right {
+  float: right;
+}
+
+.navbar-link {
+  margin: 20px;
+  color: white;
+  float: left;
+}
+
+.navbar-link-ahref {
+  color: white;
+}
+
+/* Everything */
+
+#main-container {
+  width: 100%;
+  max-width: 1280px;
+  margin: auto;
+}
+
+.main-half {
+  width: 40%;
+  margin: 4%;
+  float: left;
+}
+
+#main-left {
+  width: 30%;
+  margin: 4%;
+  float: left;
+}
+
+#main-right {
+  width: 50%;
+  margin: 4%;
+  float: left;
+}
+
+/* Elements */
+
+.any-element {
+  border-radius: 24px;
+  padding: 10px;
+}
+
+.text-element {
+  border: var(--element-border-width) solid var(--text-element-color);
+}
+
+.image-element {
+  border: var(--element-border-width) solid var(--image-element-color);
+}
+
+.video-element {
+  border: var(--element-border-width) solid var(--video-element-color);
+}
+
+.example-element {
+  border: var(--element-border-width) solid var(--example-element-color);
+}
+
+.assignment-element {
+  border: var(--element-border-width) solid var(--assignment-element-color);
+}
+
+.exam-element {
+  border: var(--element-border-width) solid var(--exam-element-color);
+}
+
+.module-element {
+  border: var(--element-border-width) solid var(--module-element-color);
+}
+
+.text-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--text-element-color);
+}
+
+.image-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--image-element-color);
+}
+
+.video-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--video-element-color);
+}
+
+.example-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--example-element-color);
+}
+
+.assignment-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--assignment-element-color);
+}
+
+.exam-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--exam-element-color);
+}
+
+.module-element-border-bottom {
+  border-bottom: var(--element-border-width) solid var(--module-element-color);
+}
+
+.width-100 {
+  width: 100%;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.margin-bottom-10px {
+  margin-bottom: 10px;
+}
+
+.drop-zone {
+  border: 2px dashed black;
+  padding: 40px;
+}
+
+.assignment-to-drop {
+  border: 2px dashed green;
+  padding: 10px;
+  margin: 5px;
+  max-width: 400px;
+}

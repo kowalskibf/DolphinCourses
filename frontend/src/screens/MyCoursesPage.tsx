@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
-import { timeAgo } from '../functions';
+import "../styles/MyCoursesPage.css";
+import { formatAmount, timeAgo } from '../functions';
+import { LANGUAGES, MEDIA_URL } from '../constants';
 
 export default function MyCoursesPage() {
     const [courses, setCourses] = useState<Course[]>([]);
     const [account, setAccount] = useState<Account>();
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const fetchAccount = async () => {
         fetch("http://127.0.0.1:8000/api/profile/me", {
@@ -53,29 +57,50 @@ export default function MyCoursesPage() {
     }
 
     return (
-        <>
+        <div id="main-container">
             <h1>My courses</h1>
-            {courses.map((course) => (
-                <>
-                    <div>
-                        id: {course.id} <br />
-                        author: {course.author.user.first_name} {course.author.user.last_name} {"(" + course.author.user.username + ")"} <br />
-                        author img: {course.author.avatar ? "ma awatar" : "nie ma awataru"} <br />
-                        name: {course.name} <br />
-                        description: {course.description} <br />
-                        image: {course.image ? "jest zdj" : "nie ma zdj"} <br />
-                        language: {course.language} <br />
-                        duration: {course.duration} <br />
-                        last updated: {timeAgo(new Date(course.last_updated))} <br />
-                        is public: {course.is_public ? "yes" : "no"} <br />
-                        price currency: {course.price_currency} <br />
-                        price: {course.price} <br />
-                        promo price: {course.promo_price} <br />
-                        promo expires: {course.promo_expires} <br />
-                    </div>
-                </>
-            ))}
-        </>
+            <div id="header">
+                <div id="header-left">
+                    Search by course name
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search"
+                        className="search-input"
+                    />
+                </div>
+                <div id="header-right">
+                    <a href="/course/new">
+                        <button type="button" className="create-new-button">+ Create a new course</button>
+                    </a>
+                </div>
+            </div>
+            <div id="courses-container">
+                {courses.filter((c) => c.name.includes(searchQuery)).map((course) => (
+                    <a href={`/course/${course.id}/edit/info`}>
+                        <div className="course">
+                            <div className="course-img-container">
+                                <img
+                                    className="course-img"
+                                    src={MEDIA_URL + course.image}
+                                />
+                            </div>
+                            <span className="course-name">
+                                {course.name}
+                            </span>
+                            <br />
+                            <span className="course-minor-text">
+                                Language: {LANGUAGES.find(lang => lang[0] === course.language)?.[2]} {LANGUAGES.find(lang => lang[0] === course.language)?.[1]} <br />
+                                Duration: {course.duration} hours <br />
+                                Last updated {timeAgo(new Date(course.last_updated))} <br />
+                                {course.is_public ? "Public" : "Private"} <br />
+                            </span>
+                        </div>
+                    </a>
+                ))}
+            </div>
+        </div>
     )
 
 }

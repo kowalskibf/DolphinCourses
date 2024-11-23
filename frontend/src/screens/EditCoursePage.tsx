@@ -1,14 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
-import "../styles/MyElementsPage.css";
-import { MEDIA_URL, TYPES } from '../constants';
+import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, timeAgo } from '../functions';
+import { CURRENCIES, LANGUAGES, MEDIA_URL, TYPES } from '../constants';
+import { useParams } from 'react-router-dom';
+
+type Params = {
+    id: string;
+}
+
+export default function EditCoursePage() {
+
+    const { id } = useParams<Params>();
+    const [courseStructure, setCourseStructure] = useState<CourseStructure>();
+    const [view, setView] = useState<ModuleElementStructure | "root">("root");
+    const [path, setPath] = useState<ModuleElementStructure[]>([]);
 
 
 
-export default function MyElementsPage() {
-    const [elements, setElements] = useState<CourseElement[]>([]);
-
+    const [myElements, setMyElements] = useState<CourseElement[]>([]);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterTypes, setFilterTypes] = useState<string[]>(["text", "image", "video", "example", "assignment", "exam", "module"]);
 
@@ -17,10 +27,21 @@ export default function MyElementsPage() {
             setFilterTypes([...filterTypes, type]);
         else
             setFilterTypes(filterTypes.filter(item => item !== type));
-        console.log(filterTypes);
     }
 
-    const fetchElements = async () => {
+    const fetchCourseStructure = async () => {
+        fetch(`http://127.0.0.1:8000/api/course/${id}/structure`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => setCourseStructure(data));
+    };
+
+    const fetchMyElements = async () => {
         fetch("http://127.0.0.1:8000/api/elements/my", {
             method: "GET",
             headers: {
@@ -29,38 +50,27 @@ export default function MyElementsPage() {
             },
         })
             .then((response) => response.json())
-            .then((data) => setElements(data));
+            .then((data) => setMyElements(data));
     };
 
+
+
+
+
     useEffect(() => {
-        fetchElements();
+        fetchCourseStructure();
+        fetchMyElements();
     }, []);
 
-    if (!elements) {
+    if (courseStructure === undefined || myElements === undefined) {
         return (
-            <>
-                Loading...
-            </>
-        )
-    }
-
-    if (elements.length === 0) {
-        return (
-            <>
-                You have no elements. <a href="/element/new">Create a new element!</a>
-            </>
+            <>Loading...</>
         )
     }
 
     return (
         <div id="main-container">
             <div id="main-left">
-                <a href="/element/new">
-                    <div className="add-button">
-                        <img src="/media/icon_plus.png" className="add-button-img" />
-                        <div className="add-button-text">Create a new element</div>
-                    </div>
-                </a>
                 <div className="search-container">
                     Search by name
                     <input type="text" className="search-input" placeholder="Enter the name to search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
@@ -79,9 +89,7 @@ export default function MyElementsPage() {
                         ))}
                     </div>
                 </div>
-            </div>
-            <div id="main-right">
-                {elements
+                {myElements
                     .filter((element) =>
                         element.name.includes(searchQuery)
                         &&
@@ -166,7 +174,26 @@ export default function MyElementsPage() {
                         </div>
                     ))}
             </div>
+            <div id="main-right">
+                {view == "root" ?
+                    <>
+                        <h1>{courseStructure.name}</h1>
+                        <br />
+                        {courseStructure.modules
+                            .sort((a, b) => a.order - b.order)
+                            .map((module, i) => (
+                                <div key={i}>
+                                    {module.module.name}
+                                </div>
+                            ))}
 
+                    </>
+                    :
+                    <>
+                        nie root
+                    </>
+                }
+            </div>
         </div>
     )
 

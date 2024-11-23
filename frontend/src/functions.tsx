@@ -1,62 +1,3 @@
-function getCSRFToken(): string | null {
-    const csrfTokenMatch = document.cookie.match(/csrftoken=([^;]+)/);
-    return csrfTokenMatch ? csrfTokenMatch[1] : null;
-}
-
-
-// Zmieniona funkcja makeRequest
-export async function makeRequest(
-    url: string,
-    method: string,
-    body?: any,
-    includeToken: boolean = true
-): Promise<any> {
-    // Przygotowanie nagłówków
-    const headers: HeadersInit = {
-        'Content-Type': 'application/json',
-    };
-    headers['Accept'] = 'application/json';
-
-    // Dodanie tokena CSRF, jeśli metoda to POST, PUT lub DELETE
-    if (['POST', 'PUT', 'DELETE'].includes(method)) {
-        const csrfToken = getCSRFToken();
-        if (csrfToken) {
-            headers['X-CSRFToken'] = csrfToken;
-        }
-    }
-
-    // Dodanie nagłówka Authorization, jeśli wymagany
-    if (includeToken) {
-        const token = localStorage.getItem('token');
-        if (token) {
-            headers['Authorization'] = `Token ${token}`;
-        }
-    }
-
-    // Przygotowanie opcji zapytania
-    const options: RequestInit = {
-        method: method,
-        headers: headers,
-    };
-
-    // Dodanie body w przypadku zapytań POST, PUT, DELETE
-    if (body) {
-        options.body = JSON.stringify(body);
-    }
-
-    // Wysłanie żądania
-    const response = await fetch(url, options);
-    const data = await response.json();
-
-    // Zwrócenie odpowiedzi
-    return {
-        response: data,
-        status: response.status,
-        message: response.ok ? "Success" : "Error",
-    };
-};
-
-
 export const timeAgo = (date: Date) => {
     const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
 
@@ -84,4 +25,46 @@ export const timeAgo = (date: Date) => {
         return interval + " minutes ago";
     }
     return Math.floor(seconds) + " seconds ago";
+};
+
+export function formatAmount(amount: number): string {
+    if (isNaN(amount)) {
+        throw new Error("Invalid input: amount must be a number.");
+    }
+
+    // Podziel na złote i grosze
+    const zl = Math.floor(amount / 100);
+    const gr = amount % 100;
+
+    // Zwróć w formacie "1 234,56"
+    return `${zl.toLocaleString("pl-PL")},${gr.toString().padStart(2, "0")}`;
+}
+
+export function priceToInt(value: string | number): number {
+    if (typeof value === 'number') {
+        return value * 100;
+    }
+    value = value.replace(',', '.');
+    return Math.round(parseFloat(value) * 100);
+}
+
+export function intToPrice(value: number): string {
+    const zl = Math.floor(value / 100);
+    const gr = value % 100;
+    return `${zl},${gr.toString().padStart(2, '0')}`;
+}
+export function formatDateToBackend(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Miesiące są 0-indeksowane
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`; // Możesz dodać strefę czasową, jeśli to potrzebne
+}
+
+export const formatDateTimeLocal = (date: Date): string => {
+    const isoString = date.toISOString();
+    return isoString.substring(0, 16);
 };

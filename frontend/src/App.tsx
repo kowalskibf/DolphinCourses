@@ -13,10 +13,15 @@ import MyCoursesPage from './screens/MyCoursesPage';
 import CreateCoursePage from './screens/CreateCoursePage';
 import MyElementsPage from './screens/MyElementsPage';
 import NewElementPage from './screens/NewElementPage';
+import Navbar from './components/Navbar';
+import EditCourseInfoPage from './screens/EditCourseInfoPage';
+import EditCourseTopicsPage from './screens/EditCourseTopicsPage';
+import EditCoursePage from './screens/EditCoursePage';
 
 export default function App() {
   return (
     <div className="App">
+      <Navbar />
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -29,6 +34,9 @@ export default function App() {
           <Route path="/course/new" element={<CreateCoursePage />} />
           <Route path="/elements/my" element={<MyElementsPage />} />
           <Route path="/element/new" element={<NewElementPage />} />
+          <Route path="/course/:id/edit/info" element={<EditCourseInfoPage />} />
+          <Route path="/course/:id/edit/topics" element={<EditCourseTopicsPage />} />
+          <Route path="/course/:id/edit" element={<EditCoursePage />} />
         </Routes>
       </Router>
     </div>

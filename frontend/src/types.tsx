@@ -50,67 +50,90 @@ type Review = {
     date: Date;
 }
 
-interface CourseElement {
+interface BaseCourseElement {
     id: number;
     name: string;
     author: Account;
-    type: 'text' | 'image' | 'video' | 'example' | 'assignment' | 'exam' | 'module';
-    data: ModuleElement | TextElement | ImageElement | VideoElement | ExampleElement | AssignmentElement | ExamElement;
 }
 
-interface ModuleElement extends CourseElement {
-    type: 'module';
-    title: string;
-    description: string;
-    image?: string;
-}
-
-interface TextElement extends CourseElement {
+interface TextElement extends BaseCourseElement {
     type: 'text';
-    content: string;
+    data: {
+        content: string;
+    };
 }
 
-interface ImageElement extends CourseElement {
+interface ImageElement extends BaseCourseElement {
     type: 'image';
-    image: string;
-    description: string;
+    data: {
+        image: string;
+        description: string;
+    };
 }
 
-interface VideoElement extends CourseElement {
+interface VideoElement extends BaseCourseElement {
     type: 'video';
-    video: string;
-    description: string;
+    data: {
+        video: string;
+        description: string;
+    };
 }
 
-interface ExampleElement extends CourseElement {
+interface ExampleElement extends BaseCourseElement {
     type: 'example';
-    question: string;
-    explanation: string;
-    image?: string;
+    data: {
+        question: string;
+        image?: string;
+        explanation: string;
+        explanation_image?: string;
+    };
 }
 
-interface AssignmentElement extends CourseElement {
+interface AssignmentElement extends BaseCourseElement {
     type: 'assignment';
-    question: string;
-    image?: string;
-    answers: string[];
-    correct_number_indices: number[];
-    is_multiple_choice: boolean;
-    explanation: string;
-    explanation_image?: string;
+    data: {
+        question: string;
+        image?: string;
+        answers: string[];
+        correct_answer_indices: number[];
+        is_multiple_choice: boolean;
+        explanation: string;
+        explanation_image?: string;
+    };
 }
 
-interface ExamElement extends CourseElement {
+interface ExamElement extends BaseCourseElement {
     type: 'exam';
-    description: string;
-    duration: number;
-    total_marks: number;
+    data: {
+        description: string;
+        duration: number;
+        total_marks: number;
+    };
 }
+
+interface ModuleElement extends BaseCourseElement {
+    type: 'module';
+    data: {
+        title: string;
+        description: string;
+        image?: string;
+    };
+}
+
+type CourseElement =
+    | TextElement
+    | ImageElement
+    | VideoElement
+    | ExampleElement
+    | AssignmentElement
+    | ExamElement
+    | ModuleElement;
 
 type ExamQuestion = {
     id: number;
     exam: ExamElement;
     question: AssignmentElement;
+    marks: number;
     order: number;
 }
 
@@ -125,6 +148,7 @@ type ModuleToElement = {
     id: number;
     module: ModuleElement;
     element: CourseElement;
+    course: Course;
     order: number;
 }
 
@@ -147,3 +171,126 @@ type AssignmentWeight = {
     topic: CourseTopic;
     weight: number;
 }
+
+type AccountTopic = {
+    id: number;
+    account: Account;
+    topic: CourseTopic;
+    value: number;
+}
+
+// CourseStructure
+
+type CourseTopicStructure = {
+    id: number;
+    topic: string;
+};
+
+type AssignmentWeightStructure = {
+    id: number;
+    topic: CourseTopicStructure;
+    weight: number;
+};
+
+type AssignmentElementStructure = {
+    id: number;
+    question: string;
+    image?: string;
+    answers: string[];
+    correct_answer_indices: number[];
+    is_multiple_choice: boolean;
+    explanation: string;
+    explanation_image?: string;
+    weights: AssignmentWeightStructure[];
+};
+
+type ExamQuestionStructure = {
+    id: number;
+    question: AssignmentElementStructure;
+    marks: number;
+    order: number;
+};
+
+type ExamElementStructure = {
+    id: number;
+    description: string;
+    duration: number;
+    total_marks: number;
+    questions: ExamQuestionStructure[];
+};
+
+type ModuleWeightStructure = {
+    id: number;
+    topic: CourseTopicStructure;
+    weight: number;
+};
+
+type ElementDataStructure =
+    | {
+        type: 'module';
+        data: ModuleElementStructure;
+    }
+    | {
+        type: 'text';
+        data: TextElement;
+    }
+    | {
+        type: 'image';
+        data: ImageElement;
+    }
+    | {
+        type: 'video';
+        data: VideoElement;
+    }
+    | {
+        type: 'example';
+        data: ExampleElement;
+    }
+    | {
+        type: 'assignment';
+        data: AssignmentElementStructure;
+    }
+    | {
+        type: 'exam';
+        data: ExamElementStructure;
+    };
+
+type ElementToModuleStructure = {
+    id: number;
+    order: number;
+    element_data: ElementDataStructure;
+};
+
+type ModuleElementStructure = {
+    id: number;
+    name: string;
+    type: string;
+    title: string;
+    description: string;
+    image?: string;
+    elements: ElementToModuleStructure[];
+    weights: ModuleWeightStructure[];
+};
+
+type ModuleToCourseStructure = {
+    id: number;
+    order: number;
+    module: ModuleElementStructure;
+};
+
+type CourseStructure = {
+    id: number;
+    author: Account;
+    name: string;
+    description: string;
+    image: string;
+    language: string;
+    duration: string;
+    last_updated: string;
+    is_public: boolean;
+    price_currency: string;
+    price: number;
+    promo_price: number;
+    promo_expires: number;
+    modules: ModuleToCourseStructure[];
+};
