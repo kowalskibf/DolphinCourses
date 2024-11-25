@@ -16,4 +16,6 @@ urlpatterns = [
     path('course/<int:course_id>/topic', CourseTopicView.as_view(), name='course_topic_post'),
     path('course/<int:course_id>/topics', CourseTopicsView.as_view(), name='course_topics'),
     path('course/<int:id>/structure', CourseStructureView.as_view(), name='course_structure'),
+    path('course/<int:course_id>/structure/<int:module_id>', ModuleToCourseView.as_view(), name='module_to_course'),
+    path('course/<int:course_id>/module/<int:module_id>/structure/<int:element_id>', ElementToModuleView.as_view(), name='element_to_module'),
 ]

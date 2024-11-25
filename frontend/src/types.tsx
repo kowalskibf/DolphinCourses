@@ -225,6 +225,12 @@ type ModuleWeightStructure = {
     weight: number;
 };
 
+type BaseElementDataStructure = {
+    id: number;
+    name: string;
+    type: 'module' | 'text' | 'image' | 'video' | 'example' | 'assignment' | 'exam';
+}
+
 type ElementDataStructure =
     | {
         type: 'module';
@@ -255,16 +261,16 @@ type ElementDataStructure =
         data: ExamElementStructure;
     };
 
+type ElementStructure = BaseElementDataStructure & ElementDataStructure;
+
 type ElementToModuleStructure = {
     id: number;
     order: number;
-    element_data: ElementDataStructure;
+    element_data: ElementStructure //ElementDataStructure;
 };
 
 type ModuleElementStructure = {
     id: number;
-    name: string;
-    type: string;
     title: string;
     description: string;
     image?: string;
@@ -275,7 +281,7 @@ type ModuleElementStructure = {
 type ModuleToCourseStructure = {
     id: number;
     order: number;
-    module: ModuleElementStructure;
+    module: ElementStructure //ElementDataStructure //ModuleElementStructure;
 };
 
 type CourseStructure = {

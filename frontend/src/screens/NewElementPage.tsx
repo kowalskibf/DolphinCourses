@@ -400,7 +400,7 @@ export default function NewElementPage() {
                 : ""}
             {elementType == "module" ?
                 <>
-                    Title: <input type="number" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
+                    Title: <input type="text" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
                     <br />
                     Description: <textarea value={moduleElementDescription} onChange={(e) => setModuleElementDescription(e.target.value)} />
                     <br />

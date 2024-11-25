@@ -1,0 +1,9 @@
+#drop-here-field {
+    width: 100%;
+    margin: 10px;
+    padding: 30px 10px 30px 10px;
+    border: 4px dashed #aaa;
+    border-radius: 24px;
+    text-align: center;
+    color: #aaa;
+}

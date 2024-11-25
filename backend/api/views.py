@@ -327,6 +327,8 @@ class ElementView(APIView):
                         examQuestion.save()
                     return Response(status=status.HTTP_201_CREATED)
                 elif type_ == 'module':
+                    print("robie modul")
+                    print(f'otrzymany tytul: {request.data.get("title")}')
                     module_data = {
                         "name": request.data.get("name"),
                         "author": account,
@@ -337,6 +339,7 @@ class ElementView(APIView):
                     if request.data.get("image"):
                         module_data["image"] = request.data.get("image")
                     moduleElement = ModuleElement(**module_data)
+                    print(f'nowo utworzony element name: {moduleElement.name} title: {moduleElement.title}')
                     moduleElement.save()
                     return Response(status=status.HTTP_201_CREATED)
         except:
@@ -435,3 +438,61 @@ class CourseStructureView(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         serializer = CourseStructureSerializer(course)
         return Response(serializer.data)
+    
+class ModuleToCourseView(APIView):
+    def post(self, request, course_id, module_id):
+        user = request.user
+        account = Account.objects.get(user=user)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            module = ModuleElement.objects.get(id=module_id)
+        except ModuleElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if module.type != "module":
+            return Response({"error": "Element is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not course.author == account or not module.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if ModuleToCourse.objects.filter(course=course, module=module).exists():
+            return Response({"message": "Module is already added to the course"}, status=status.HTTP_400_BAD_REQUEST)
+        moduleToCourse = ModuleToCourse(
+            course=course,
+            module=module,
+            order=ModuleToCourse.objects.filter(course=course, module=module).count() + 1
+        )
+        moduleToCourse.save()
+        return Response(status=status.HTTP_200_OK)
+
+    
+class ElementToModuleView(APIView):
+    def post(self, request, course_id, module_id, element_id):
+        user = request.user
+        account = Account.objects.get(user=user)
+        try:
+            module = ModuleElement.objects.get(id=module_id)
+        except ModuleElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            element = Element.objects.get(id=element_id)
+        except Element.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if module.type != "module":
+            return Response({"error": "Module is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not module.author == account or not element.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if ElementToModule.objects.filter(module=module, element=element).exists():
+            return Response({"message": "Element is already added to this module"}, status=status.HTTP_400_BAD_REQUEST)
+        elementToModule = ElementToModule(
+            module=module,
+            element=element,
+            course=course,
+            order=ElementToModule.objects.filter(module=module, element=element).count() + 1
+        )
+        elementToModule.save()
+        return Response(status=status.HTTP_200_OK)

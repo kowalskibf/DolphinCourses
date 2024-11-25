@@ -237,11 +237,11 @@ class ElementToModuleStructureSerializer(serializers.ModelSerializer):
         return ElementStructureSerializer(obj.element).data
 
 class ModuleElementStructureSerializer(serializers.ModelSerializer):
-    elements = ElementToModuleStructureSerializer(source='elements', many=True, read_only=True)
+    elements = ElementToModuleStructureSerializer(many=True, read_only=True)
     weights = ModuleWeightStructureSerializer(source='module_weights', many=True, read_only=True)
     class Meta:
         model = ModuleElement
-        fields = ('id', 'name', 'type', 'title', 'description', 'image', 'elements', 'weights')
+        fields = ('id', 'title', 'description', 'image', 'elements', 'weights')
 
 class ElementStructureSerializer(serializers.ModelSerializer):
     data = serializers.SerializerMethodField()
@@ -252,8 +252,9 @@ class ElementStructureSerializer(serializers.ModelSerializer):
 
     def get_data(self, obj):
         if obj.type == 'module':
-            element_to_module = ElementToModule.objects.filter(element=obj).first()
-            return ModuleElementStructureSerializer(element_to_module).data
+            #element_to_module = ElementToModule.objects.filter(element=obj).first()
+            #return ModuleElementStructureSerializer(element_to_module).data
+            return ModuleElementStructureSerializer(obj.moduleelement).data
         elif obj.type == 'text':
             return TextElementSerializer(obj.textelement).data
         elif obj.type == 'image':
@@ -269,7 +270,8 @@ class ElementStructureSerializer(serializers.ModelSerializer):
         return None
 
 class ModuleToCourseStructureSerializer(serializers.ModelSerializer):
-    module = ModuleElementStructureSerializer(read_only=True)
+    #module = ModuleElementStructureSerializer(read_only=True)
+    module = ElementStructureSerializer(read_only=True)
     class Meta:
         model = ModuleToCourse
         fields = ('id', 'order', 'module')
