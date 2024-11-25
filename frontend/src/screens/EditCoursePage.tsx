@@ -26,12 +26,8 @@ export default function EditCoursePage() {
 
     const query = new URLSearchParams(useLocation().search);
     const viewParam = query.get("v");
-    const viewArray: number[] = viewParam ? JSON.parse(viewParam) : [];
-
-    const navigate = useNavigate();
-    const handleChangeURL = (url: string) => {
-        navigate(url);
-    }
+    //const viewArray: number[] = viewParam ? JSON.parse(viewParam) : [];
+    const [viewArray, setViewArray] = useState<number[]>(viewParam ? JSON.parse(viewParam) : []);
 
     function assertModuleElementStructure(
         obj: any
@@ -39,6 +35,19 @@ export default function EditCoursePage() {
         if (!obj || typeof obj !== 'object' || !('elements' in obj)) {
             throw new Error('Object is not of type ModuleElementStructure');
         }
+    }
+
+    const navigate = useNavigate();
+
+    const handleChangeLocationBack = (i: number) => {
+        const updatedViewArray = viewArray.slice(0, i + 1);
+        const updatedPath = path.slice(0, i + 1);
+        query.set("v", `[${updatedViewArray.join(",")}]`);
+        const newPath = `${location.pathname}?${query.toString()}`;
+        navigate(newPath);
+        setViewArray(updatedViewArray);
+        setView(path[i]);
+        setPath(updatedPath);
     }
 
     const handleViewArray = () => {
@@ -321,9 +330,10 @@ export default function EditCoursePage() {
                     </>
                     :
                     <>
+                        {courseStructure.name}
                         {path.map((module, i) => (
                             <div key={i}>
-                                {" > "}{module.title}
+                                {" > "}<span onClick={() => handleChangeLocationBack(i)}>{module.title}</span>
                             </div>
                         ))}
                         <h1>{view.title}</h1>
