@@ -460,10 +460,77 @@ class ModuleToCourseView(APIView):
         moduleToCourse = ModuleToCourse(
             course=course,
             module=module,
-            order=ModuleToCourse.objects.filter(course=course, module=module).count() + 1
+            order=ModuleToCourse.objects.filter(course=course).count() + 1
         )
         moduleToCourse.save()
         return Response(status=status.HTTP_200_OK)
+    
+    def put(self, request, course_id, module_id):
+        user = request.user
+        account = Account.objects.get(user=user)
+        body = json.loads(request.body)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            module = ModuleElement.objects.get(id=module_id)
+        except ModuleElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if module.type != "module":
+            return Response({"error": "Element is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not course.author == account or not module.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not ModuleToCourse.objects.filter(course=course, module=module).exists():
+            return Response({"message": "Module is not even added to the course"}, status=status.HTTP_400_BAD_REQUEST)
+        moduleToCourse = ModuleToCourse.objects.get(course=course, module=module)
+        if not body["action"] in ("up", "down"):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if body["action"] == "up":
+            if moduleToCourse.order == 1:
+                print(moduleToCourse.order)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            prev = ModuleToCourse.objects.get(course=course, order=moduleToCourse.order-1)
+            prev.order += 1
+            prev.save()
+            moduleToCourse.order -= 1
+            moduleToCourse.save()
+        elif body["action"] == "down":
+            if moduleToCourse.order == ModuleToCourse.objects.filter(course=course).count():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            next = ModuleToCourse.objects.get(course=course, order=moduleToCourse.order+1)
+            next.order -= 1
+            next.save()
+            moduleToCourse.order += 1
+            moduleToCourse.save()
+        return Response(status=status.HTTP_200_OK)
+    
+    def delete(self, request, course_id, module_id):
+        user = request.user
+        account = Account.objects.get(user=user)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            module = ModuleElement.objects.get(id=module_id)
+        except ModuleElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if module.type != "module":
+            return Response({"error": "Element is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not course.author == account or not module.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not ModuleToCourse.objects.filter(course=course, module=module).exists():
+            return Response({"message": "Module is not even added to the course"}, status=status.HTTP_400_BAD_REQUEST)
+        moduleToCourse = ModuleToCourse.objects.get(course=course, module=module)
+        for mtc in ModuleToCourse.objects.filter(course=course, order__gt=moduleToCourse.order):
+            mtc.order -= 1
+            mtc.save()
+        moduleToCourse.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+
 
     
 class ElementToModuleView(APIView):
@@ -492,7 +559,7 @@ class ElementToModuleView(APIView):
             module=module,
             element=element,
             course=course,
-            order=ElementToModule.objects.filter(module=module, element=element).count() + 1
+            order=ElementToModule.objects.filter(module=module).count() + 1
         )
         elementToModule.save()
         return Response(status=status.HTTP_200_OK)

@@ -27,8 +27,9 @@ export default function EditCoursePage() {
     const query = new URLSearchParams(useLocation().search);
     const viewParam = query.get("v");
     //const viewArray: number[] = viewParam ? JSON.parse(viewParam) : [];
-    const [viewArray, setViewArray] = useState<number[]>(viewParam ? JSON.parse(viewParam) : []);
-
+    //const [viewArray, setViewArray] = useState<number[]>(viewParam ? JSON.parse(viewParam) : []);
+    const [viewArray, setViewArray] = useState<number[]>(viewParam ? viewParam.split("/").filter(Boolean).map(Number) : []);
+    console.log(viewArray);
     function assertModuleElementStructure(
         obj: any
     ): asserts obj is ModuleElementStructure {
@@ -39,7 +40,7 @@ export default function EditCoursePage() {
 
     const navigate = useNavigate();
 
-    const handleChangeLocationBack = (i: number) => {
+    /*const handleChangeLocationBack = (i: number) => {
         const updatedViewArray = viewArray.slice(0, i + 1);
         const updatedPath = path.slice(0, i + 1);
         query.set("v", `[${updatedViewArray.join(",")}]`);
@@ -48,7 +49,28 @@ export default function EditCoursePage() {
         setViewArray(updatedViewArray);
         setView(path[i]);
         setPath(updatedPath);
-    }
+    }*/
+
+    const handleChangeLocationBack = (i: number) => {
+        if (i == -1) {
+            query.delete("v");
+            navigate(`${location.pathname}`);
+            setViewArray([]);
+            setView("root");
+            setPath([]);
+        } else {
+            const updatedViewArray = viewArray.slice(0, i + 1);
+            const updatedPath = path.slice(0, i + 1);
+            const updatedViewParam = updatedViewArray.join("/");
+            query.set("v", updatedViewParam);
+            const newPath = `${location.pathname}?${query.toString()}`;
+            navigate(newPath);
+            setViewArray(updatedViewArray);
+            setView(path[i]);
+            setPath(updatedPath);
+        }
+    };
+
 
     const handleViewArray = () => {
         if (!viewArray || viewArray === undefined || viewArray.length === 0) {
@@ -151,6 +173,22 @@ export default function EditCoursePage() {
     }
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
+    }
+
+    const handleMoveModule = async (module_id: number, action: "up" | "down") => {
+        const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/structure/${module_id}`, {
+            method: "PUT",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                action: action,
+            }),
+        })
+            .then((response) => {
+                fetchCourseStructure();
+            })
     }
 
 
@@ -300,23 +338,27 @@ export default function EditCoursePage() {
                         {courseStructure.modules
                             .sort((a, b) => a.order - b.order)
                             .map((module, i) => (
-                                <div
-                                    key={i}
-                                    className={module.module.type + '-element any-element element-margin'}
-                                >
+                                <div key={i}>
+                                    <div
+                                        className={module.module.type + '-element any-element element-margin'}
+                                    >
 
-                                    <div className={module.module.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
-                                        {module.module.name}
+                                        <div className={module.module.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
+                                            {module.module.name}
+                                        </div>
+                                        {module.module.type == "module" ?
+                                            <>
+                                                Title: {module.module.data.title}
+                                                <br />
+                                                Description: {module.module.data.description}
+                                            </>
+                                            : ""}
+
+                                        <br />
                                     </div>
-                                    {module.module.type == "module" ?
-                                        <>
-                                            Title: {module.module.data.title}
-                                            <br />
-                                            Description: {module.module.data.description}
-                                        </>
-                                        : ""}
-
+                                    <button onClick={() => handleMoveModule(module.module.id, "up")}>^</button>
                                     <br />
+                                    <button onClick={() => handleMoveModule(module.module.id, "down")}>v</button>
                                 </div>
                             ))}
                         <br />
@@ -330,7 +372,7 @@ export default function EditCoursePage() {
                     </>
                     :
                     <>
-                        {courseStructure.name}
+                        <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
                         {path.map((module, i) => (
                             <div key={i}>
                                 {" > "}<span onClick={() => handleChangeLocationBack(i)}>{module.title}</span>
