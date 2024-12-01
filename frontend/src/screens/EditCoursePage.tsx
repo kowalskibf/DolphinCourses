@@ -71,6 +71,27 @@ export default function EditCoursePage() {
         }
     };
 
+    const handleChangeLocationInto = (i: number) => {
+        if (courseStructure && view) {
+            if (view == "root") {
+                setViewArray([i]);
+                const currentModule = courseStructure.modules[i - 1].module.data;
+                assertModuleElementStructure(currentModule);
+                setPath([currentModule]);
+                setView(currentModule);
+            } else {
+                const newModule = view.elements[i - 1].element_data.data;
+                setViewArray([...viewArray, i]);
+                query.set("v", query.get("v") + `/${i}`);
+                const newPath = `${location.pathname}?${query.toString()}`;
+                navigate(newPath);
+                assertModuleElementStructure(newModule);
+                setView(newModule);
+                setPath([...path, newModule]);
+            }
+        }
+    }
+
 
     const handleViewArray = () => {
         if (!viewArray || viewArray === undefined || viewArray.length === 0) {
@@ -190,6 +211,23 @@ export default function EditCoursePage() {
                 fetchCourseStructure();
             })
     }
+
+    const handleMoveElement = async (module_id: number, element_id: number, action: "up" | "down") => {
+        const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/module/${module_id}/structure/${element_id}`, {
+            method: "PUT",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                action: action,
+            }),
+        })
+            .then((response) => {
+                fetchCourseStructure();
+            })
+    }
+
 
 
     useEffect(() => {
@@ -359,6 +397,8 @@ export default function EditCoursePage() {
                                     <button onClick={() => handleMoveModule(module.module.id, "up")}>^</button>
                                     <br />
                                     <button onClick={() => handleMoveModule(module.module.id, "down")}>v</button>
+                                    <br />
+                                    <button onClick={() => handleChangeLocationInto(module.order)}>Enter</button>
                                 </div>
                             ))}
                         <br />
@@ -399,7 +439,15 @@ export default function EditCoursePage() {
                                         : ""}
 
                                     <br />
+                                    <button onClick={() => handleMoveElement(view.id, element.element_data.id, "up")}>^</button>
                                     <br />
+                                    <button onClick={() => handleMoveElement(view.id, element.element_data.id, "down")}>v</button>
+                                    <br />
+                                    {element.element_data.type == "module" ?
+                                        <>
+                                            <button onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
+                                        </>
+                                        : ""}
                                 </div>
                             ))}
                         <br />

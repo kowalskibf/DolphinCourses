@@ -563,3 +563,42 @@ class ElementToModuleView(APIView):
         )
         elementToModule.save()
         return Response(status=status.HTTP_200_OK)
+    
+    def put(self, request, course_id, module_id, element_id):
+        user = request.user
+        account = Account.objects.get(user=user)
+        body = json.loads(request.body)
+        try:
+            module = ModuleElement.objects.get(id=module_id)
+        except ModuleElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            element = Element.objects.get(id=element_id)
+        except Element.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if module.type != "module":
+            return Response({"error": "Module is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
+        if not module.author == account or not element.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not ElementToModule.objects.filter(module=module, element=element).exists():
+            return Response({"message": "This element is not even assigned to this module"}, status=status.HTTP_400_BAD_REQUEST)
+        elementToModule = ElementToModule.objects.get(module=module, element=element)
+        if not body["action"] in ("up", "down"):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if body["action"] == "up":
+            if elementToModule.order == 1:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            prev = ElementToModule.objects.get(module=module, order=elementToModule.order-1)
+            prev.order += 1
+            prev.save()
+            elementToModule.order -= 1
+            elementToModule.save()
+        elif body["action"] == "down":
+            if elementToModule.order == ElementToModule.objects.filter(module=module).count():
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            next = ElementToModule.objects.get(module=module, order=elementToModule.order+1)
+            next.order -= 1
+            next.save()
+            elementToModule.order += 1
+            elementToModule.save()
+        return Response(status=status.HTTP_200_OK)
