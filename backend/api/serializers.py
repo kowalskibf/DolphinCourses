@@ -204,17 +204,19 @@ class AssignmentWeightStructureSerializer(serializers.ModelSerializer):
 
 class AssignmentElementStructureSerializer(serializers.ModelSerializer):
     #weights = AssignmentWeightSerializer(source='assignment_weights', many=True, read_only=True)
-    weights = AssignmentWeightStructureSerializer(source='assignment_weights', many=True, read_only=True)
-    #weights = serializers.SerializerMethodField()
+    #weights = AssignmentWeightStructureSerializer(source='assignment_weights', many=True, read_only=True)
+    weights = serializers.SerializerMethodField()
 
     class Meta:
         model = AssignmentElement
         fields = ('id', 'question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'explanation', 'explanation_image', 'weights')
 
-    # def get_weights(self, obj):
-    #     course_id = self.context.get('course_id')
-    #     weights = obj.assignment_weights.filter(topic__course_id=course_id)
-    #     return AssignmentWeightStructureSerializer(weights, many=True).data
+    def get_weights(self, obj):
+        course_id = self.context.get('course_id')
+        weights = obj.assignment_weights.filter(topic__course_id=course_id)
+        return AssignmentWeightStructureSerializer(weights, many=True).data
+        
+        
 
 class ExamQuestionStructureSerializer(serializers.ModelSerializer):
     question = AssignmentElementStructureSerializer(read_only=True)
@@ -222,12 +224,26 @@ class ExamQuestionStructureSerializer(serializers.ModelSerializer):
         model = ExamQuestion
         fields = ('id', 'question', 'marks', 'order')
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if 'question' in representation:
+            question_serializer = AssignmentElementStructureSerializer(instance.question, context=self.context)
+            representation['question'] = question_serializer.data
+        return representation
+
 class ExamElementStructureSerializer(serializers.ModelSerializer):
     #questions = ExamQuestionDetailSerializer(many=True, read_only=True)
     questions = ExamQuestionStructureSerializer(many=True, read_only=True)
     class Meta:
         model = ExamElement
         fields = ('id', 'description', 'duration', 'total_marks', 'questions')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if 'questions' in representation:
+            questions_serializer = ExamQuestionStructureSerializer(instance.questions, many=True, context=self.context)
+            representation['questions'] = questions_serializer.data
+        return representation
 
 class ModuleWeightStructureSerializer(serializers.ModelSerializer):
     topic = CourseTopicStructureSerializer(read_only=True)
@@ -244,7 +260,7 @@ class ElementToModuleStructureSerializer(serializers.ModelSerializer):
         fields = ('id', 'order', 'element_data', 'uses')
 
     def get_element_data(self, obj):
-        return ElementStructureSerializer(obj.element).data
+        return ElementStructureSerializer(obj.element, context=self.context).data
     
     def get_uses(self, obj):
         return ElementToModule.objects.filter(element=obj.element).count()
@@ -266,9 +282,7 @@ class ElementStructureSerializer(serializers.ModelSerializer):
 
     def get_data(self, obj):
         if obj.type == 'module':
-            #element_to_module = ElementToModule.objects.filter(element=obj).first()
-            #return ModuleElementStructureSerializer(element_to_module).data
-            return ModuleElementStructureSerializer(obj.moduleelement).data
+            return ModuleElementStructureSerializer(obj.moduleelement, context=self.context).data
         elif obj.type == 'text':
             return TextElementSerializer(obj.textelement).data
         elif obj.type == 'image':
@@ -278,9 +292,9 @@ class ElementStructureSerializer(serializers.ModelSerializer):
         elif obj.type == 'example':
             return ExampleElementSerializer(obj.exampleelement).data
         elif obj.type == 'assignment':
-            return AssignmentElementStructureSerializer(obj.assignmentelement).data
+            return AssignmentElementStructureSerializer(obj.assignmentelement, context=self.context).data
         elif obj.type == 'exam':
-            return ExamElementStructureSerializer(obj.examelement).data
+            return ExamElementStructureSerializer(obj.examelement, context=self.context).data
         return None
 
 class ModuleToCourseStructureSerializer(serializers.ModelSerializer):
@@ -293,6 +307,12 @@ class ModuleToCourseStructureSerializer(serializers.ModelSerializer):
 
     def get_uses(self, obj):
         return ModuleToCourse.objects.filter(module=obj.module).count()
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        module_serializer = ElementStructureSerializer(instance.module, context=self.context)
+        representation['module'] = module_serializer.data
+        return representation
 
 class CourseStructureSerializer(serializers.ModelSerializer):
     author = AccountSerializer(read_only=True)
