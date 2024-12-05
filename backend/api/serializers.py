@@ -223,7 +223,8 @@ class ExamQuestionStructureSerializer(serializers.ModelSerializer):
         fields = ('id', 'question', 'marks', 'order')
 
 class ExamElementStructureSerializer(serializers.ModelSerializer):
-    questions = ExamQuestionDetailSerializer(many=True, read_only=True)
+    #questions = ExamQuestionDetailSerializer(many=True, read_only=True)
+    questions = ExamQuestionStructureSerializer(many=True, read_only=True)
     class Meta:
         model = ExamElement
         fields = ('id', 'description', 'duration', 'total_marks', 'questions')
