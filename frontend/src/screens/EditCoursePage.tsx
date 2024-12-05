@@ -26,10 +26,14 @@ export default function EditCoursePage() {
 
     const query = new URLSearchParams(useLocation().search);
     const viewParam = query.get("v");
-    //const viewArray: number[] = viewParam ? JSON.parse(viewParam) : [];
-    //const [viewArray, setViewArray] = useState<number[]>(viewParam ? JSON.parse(viewParam) : []);
     const [viewArray, setViewArray] = useState<number[]>(viewParam ? viewParam.split("/").filter(Boolean).map(Number) : []);
-    console.log(viewArray);
+
+    const [m_ModalIsOpen, setM_ModalIsOpen] = useState<boolean>(false);
+    const [m_ImportType, setM_ImportType] = useState<"m" | "e">("m");
+    const [m_CourseId, setM_CourseId] = useState<number>(0);
+    const [m_ModuleId, setM_ModuleId] = useState<number>(0);
+    const [m_ElementId, setM_ElementId] = useState<number>(0);
+
     function assertModuleElementStructure(
         obj: any
     ): asserts obj is ModuleElementStructure {
@@ -39,17 +43,6 @@ export default function EditCoursePage() {
     }
 
     const navigate = useNavigate();
-
-    /*const handleChangeLocationBack = (i: number) => {
-        const updatedViewArray = viewArray.slice(0, i + 1);
-        const updatedPath = path.slice(0, i + 1);
-        query.set("v", `[${updatedViewArray.join(",")}]`);
-        const newPath = `${location.pathname}?${query.toString()}`;
-        navigate(newPath);
-        setViewArray(updatedViewArray);
-        setView(path[i]);
-        setPath(updatedPath);
-    }*/
 
     const handleChangeLocationBack = (i: number) => {
         if (i == -1) {
@@ -382,7 +375,7 @@ export default function EditCoursePage() {
                                     >
 
                                         <div className={module.module.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
-                                            {module.module.name}
+                                            {module.module.name} {module.uses > 1 ? `(${module.uses - 1} use${module.uses > 2 ? "s" : ""} in other place${module.uses > 2 ? "s" : ""})` : ""}
                                         </div>
                                         {module.module.type == "module" ?
                                             <>
@@ -428,7 +421,7 @@ export default function EditCoursePage() {
                                     className={element.element_data.type + '-element any-element element-margin'}
                                 >
                                     <div className={element.element_data.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
-                                        {element.element_data.name}
+                                        {element.element_data.name} {element.uses > 1 ? `(used in ${element.uses - 1} other modules)` : ""}
                                     </div>
                                     {element.element_data.type == "module" ?
                                         <>

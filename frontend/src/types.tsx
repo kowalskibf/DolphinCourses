@@ -267,6 +267,7 @@ type ElementToModuleStructure = {
     id: number;
     order: number;
     element_data: ElementStructure //ElementDataStructure;
+    uses: number; //
 };
 
 type ModuleElementStructure = {
@@ -282,6 +283,7 @@ type ModuleToCourseStructure = {
     id: number;
     order: number;
     module: ElementStructure //ElementDataStructure //ModuleElementStructure;
+    uses: number; //
 };
 
 type CourseStructure = {

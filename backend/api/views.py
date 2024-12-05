@@ -436,7 +436,7 @@ class CourseStructureView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         if course.author != account and not course.is_public:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-        serializer = CourseStructureSerializer(course)
+        serializer = CourseStructureSerializer(course, context={'course_id': id})
         return Response(serializer.data)
     
 class ModuleToCourseView(APIView):
@@ -562,6 +562,21 @@ class ElementToModuleView(APIView):
             order=ElementToModule.objects.filter(module=module).count() + 1
         )
         elementToModule.save()
+        if element.type == "assignment":
+            assignment = AssignmentElement.objects.get(id=element_id)
+            assignmentWeightsView = AssignmentWeightsView()
+            try:
+                assignmentWeightsView.initialize_weights(assignment, course)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        elif element.type == "exam":
+            assignmentWeightsView = AssignmentWeightsView()
+            try:
+                examQuestions = ExamQuestion.objects.filter(exam=element)
+                for examQuestion in examQuestions:
+                    assignmentWeightsView.initialize_weights(examQuestion.question, course)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_200_OK)
     
     def put(self, request, course_id, module_id, element_id):
@@ -602,3 +617,109 @@ class ElementToModuleView(APIView):
             elementToModule.order += 1
             elementToModule.save()
         return Response(status=status.HTTP_200_OK)
+
+
+class AssignmentWeightView(APIView):
+    def post(self, request, assignment_id, topic_id):
+        user = request.user
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        body = json.loads(request.body)
+        try:
+            weight = body["weight"]
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            topic = CourseTopic.objects.get(id=topic_id)
+        except CourseTopic.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            assignment = AssignmentElement.objects.get(id=assignment_id)
+        except AssignmentElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not topic.course.author == account or not assignment.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if AssignmentWeight.objects.get(assignment=assignment, topic=topic).exists():
+            return Response(status=status.HTTP_409_CONFLICT)
+        assignmentWeight = AssignmentWeight(
+            assignment=assignment,
+            topic=topic,
+            weight=weight
+        )
+        assignmentWeight.save()
+        return Response(status=status.HTTP_201_CREATED)
+    
+class AssignmentWeightsView(APIView):
+    # def post(self, request, assignment_id):
+    #     user = request.user
+    #     try:
+    #         account = Account.objects.get(user=user)
+    #     except Account.DoesNotExist:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
+    #     body = json.loads(request.body)
+    #     try:
+    #         weights = body["weights"] # struktura [{topic_id, weight}, {topic_id, weight}, ...]
+    #     except:
+    #         return Response(status=status.HTTP_400_BAD_REQUEST)
+    #     try:
+    #         assignment = AssignmentElement.objects.get(id=assignment_id)
+    #     except AssignmentElement.DoesNotExist:
+    #         return Response(status=status.HTTP_404_NOT_FOUND)
+    #     if not assignment.author == account:
+    #         return Response(status=status.HTTP_401_UNAUTHORIZED)
+    #     for pair in weights:
+    #         topic_id = pair["topic_id"]
+    #         try:
+    #             topic = CourseTopic.objects.get(id=topic_id)
+    #             if not topic.course.author == account:
+    #                 return Response(status=status.HTTP_401_UNAUTHORIZED)
+    #         except CourseTopic.DoesNotExist:
+    #             return Response(status=status.HTTP_404_NOT_FOUND)
+    #     for pair in weights:
+    #         topic_id = pair["topic_id"]
+    #         weight = pair["weight"]
+
+    def initialize_weights(self, assignment, course):
+        try:
+            topics = CourseTopic.objects.filter(course=course)
+            for topic in topics:
+                if not AssignmentWeight.objects.filter(assignment=assignment, topic=topic).exists():
+                    try:
+                        assignmentWeight = AssignmentWeight(
+                        assignment=assignment,
+                        topic=topic,
+                        weight=0.0
+                        )
+                        assignmentWeight.save()
+                    except Exception as e:
+                        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def post(self, request, course_id, assignment_id): # dodanie zadania do kursu, zrobienie wag
+        user = request.user
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            assignment = AssignmentElement.objects.get(id=assignment_id)
+        except AssignmentElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not assignment.author == account or not course.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        topics = CourseTopic.objects.filter(course=course)
+        try:
+            self.initialize_weights(assignment, course)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_200_OK)
+        
+        
