@@ -32,6 +32,21 @@ export default function MyElementsPage() {
             .then((data) => setElements(data));
     };
 
+    const handleCopyElement = async (element_id: number) => {
+        fetch("http://127.0.0.1:8000/api/element", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                copy: true,
+                element_id: element_id,
+            }),
+        })
+            .then((response) => fetchElements());
+    }
+
     useEffect(() => {
         fetchElements();
     }, []);
@@ -163,6 +178,7 @@ export default function MyElementsPage() {
 
                                 </>
                                 : ""}
+                            <button type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
                         </div>
                     ))}
             </div>
