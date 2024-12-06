@@ -69,16 +69,17 @@ export default function EditCoursePage() {
             if (view == "root") {
                 setViewArray([i]);
                 const currentModule = courseStructure.modules[i - 1].module.data;
+                navigate(`${location.pathname}?v=${i}`);
                 assertModuleElementStructure(currentModule);
                 setPath([currentModule]);
                 setView(currentModule);
             } else {
                 const newModule = view.elements[i - 1].element_data.data;
+                assertModuleElementStructure(newModule);
                 setViewArray([...viewArray, i]);
                 query.set("v", query.get("v") + `/${i}`);
                 const newPath = `${location.pathname}?${query.toString()}`;
                 navigate(newPath);
-                assertModuleElementStructure(newModule);
                 setView(newModule);
                 setPath([...path, newModule]);
             }
