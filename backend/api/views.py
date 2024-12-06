@@ -367,8 +367,11 @@ class CourseTopicView(APIView):
             topic=body["topic"]
         )
         courseTopic.save()
-        assignmentWeightsView = AssignmentWeightsView()
-        assignmentWeightsView.initialize_weights_for_topic(courseTopic.id, course)
+        try:
+            assignmentWeightsView = AssignmentWeightsView()
+            assignmentWeightsView.initialize_weights_for_topic(courseTopic.id, course)
+        except Exception as e:
+            print(str(e))
         return Response(status=status.HTTP_201_CREATED)
 
     def get(self, request, id):
@@ -692,22 +695,25 @@ class AssignmentWeightsView(APIView):
 
     def initialize_weights_for_topic(self, topic_id, course):
         try:
-            topic = CourseTopic.objects.get(id=topic_id)
-        except CourseTopic.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        courseStructureView = CourseStructureView()
-        for assignment_id in courseStructureView.get_all_assignments(course):
             try:
-                assignment = AssignmentElement.objects.get(id=assignment_id)
-            except AssignmentElement.DoesNotExist:
+                topic = CourseTopic.objects.get(id=topic_id)
+            except CourseTopic.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            if not AssignmentWeight.objects.get(assignment=assignment, topic=topic).exists():
-                assignmentWeight = AssignmentWeight(
-                    assignment=assignment,
-                    topic=topic,
-                    weight=0.0
-                )
-                assignmentWeight.save()
+            courseStructureView = CourseStructureView()
+            for assignment_id in courseStructureView.get_all_assignments(course):
+                try:
+                    assignment = AssignmentElement.objects.get(id=assignment_id)
+                except AssignmentElement.DoesNotExist:
+                    return Response(status=status.HTTP_404_NOT_FOUND)
+                if not AssignmentWeight.objects.filter(assignment=assignment, topic=topic).exists():
+                    assignmentWeight = AssignmentWeight(
+                        assignment=assignment,
+                        topic=topic,
+                        weight=0.0
+                    )
+                    assignmentWeight.save()
+        except Exception as e:
+            print(str(e))
         
 
 
