@@ -201,11 +201,15 @@ export default function NewElementPage() {
             formData.append("description", videoElementDescription);
         }
         if (elementType == "example") {
-            if (!exampleElementImage || !exampleElementExplanationImage) return 1;
+            if (exampleElementImage)
+                formData.append("image", exampleElementImage);
+            if (exampleElementExplanationImage)
+                formData.append("explanation_image", exampleElementExplanationImage);
+            //if (!exampleElementImage || !exampleElementExplanationImage) return 1;
             formData.append("question", exampleElementQuestion);
-            formData.append("image", exampleElementImage);
+            //formData.append("image", exampleElementImage);
             formData.append("explanation", exampleElementExplanation);
-            formData.append("explanation_image", exampleElementExplanationImage);
+            //formData.append("explanation_image", exampleElementExplanationImage);
         }
         if (elementType == "assignment") {
             if (!assignmentElementImage || !assignmentElementExplanationImage) return 1;

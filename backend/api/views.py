@@ -241,131 +241,142 @@ class ElementView(APIView):
                 account = Account.objects.get(user=user)
             except:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
-            if not request.data.get("copy"):
-                if type_ := request.data.get("type"):
-                    if type_ == 'text':
-                        textElement = TextElement(
-                            name=request.data.get("name"),
-                            author=account,
-                            type="text",
-                            content=request.data.get("content")
-                        )
-                        textElement.save()
-                        return Response(status=status.HTTP_201_CREATED)
-                    elif type_ == 'image':
-                        imageElement = ImageElement(
-                            name=request.data.get("name"),
-                            author=account,
-                            type="image",
-                            image=request.data.get("image"),
-                            description=request.data.get("description")
-                        )
-                        imageElement.save()
-                        return Response(status=status.HTTP_201_CREATED)
-                    elif type_ == 'video':
-                        videoElement = VideoElement(
-                            name=request.data.get("name"),
-                            author=account,
-                            type="video",
-                            video=request.data.get("video"),
-                            description=request.data.get("description")
-                        )
-                        videoElement.save()
-                        return Response(status=status.HTTP_201_CREATED)
-                    elif type_ == 'example':
-                        exampleElement = ExampleElement(
-                            name=request.data.get("name"),
-                            author=account,
-                            type="example",
-                            question=request.data.get("question"),
-                            image=request.data.get("image"),
-                            explanation=request.data.get("explanation"),
-                            explanation_image=request.data.get("explanation_image")
-                        )
-                        exampleElement.save()
-                        return Response(status=status.HTTP_201_CREATED)
-                    elif type_ == 'assignment':
-                        assignmentElement = AssignmentElement(
-                            name=request.data.get("name"),
-                            author=account,
-                            type="assignment",
-                            question=request.data.get("question"),
-                            image=request.data.get("image"),
-                            answers=json.loads(request.data.get("answers")),
-                            correct_answer_indices=json.loads(request.data.get("correct_answer_indices")),
-                            is_multiple_choice=request.data.get("is_multiple_choice")=="true",
-                            explanation=request.data.get("explanation"),
-                            explanation_image=request.data.get("explanation_image")
-                        )
-                        assignmentElement.save()
-                        return Response(status=status.HTTP_201_CREATED)
-                    elif type_ == 'exam':
-                        examElement = ExamElement(
-                            name=request.data.get("name"),
-                            author=account,
-                            type="exam",
-                            description=request.data.get("description"),
-                            duration=int(request.data.get("duration")),
-                            total_marks=int(request.data.get("total_marks"))
-                        )
-                        examElement.save()
-                        for assignment in json.loads(request.data.get("exam_assignments")):
-                            try:
-                                assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]))
-                            except AssignmentElement.DoesNotExist:
-                                return Response(status=status.HTTP_404_NOT_FOUND)
-                            try:
-                                assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]), author=account)
-                            except AssignmentElement.DoesNotExist:
-                                return Response(status=status.HTTP_401_UNAUTHORIZED)
-                            examQuestion = ExamQuestion(
-                                exam=examElement,
-                                question=assignmentElement,
-                                marks=assignment["marks"],
-                                order=assignment["order"]
-                            )
-                            examQuestion.save()
-                        return Response(status=status.HTTP_201_CREATED)
-                    elif type_ == 'module':
-                        print("robie modul")
-                        print(f'otrzymany tytul: {request.data.get("title")}')
-                        module_data = {
-                            "name": request.data.get("name"),
-                            "author": account,
-                            "type": "module",
-                            "title": request.data.get("title"),
-                            "description": request.data.get("description"),
-                        }
-                        if request.data.get("image"):
-                            module_data["image"] = request.data.get("image")
-                        moduleElement = ModuleElement(**module_data)
-                        print(f'nowo utworzony element name: {moduleElement.name} title: {moduleElement.title}')
-                        moduleElement.save()
-                        return Response(status=status.HTTP_201_CREATED)
-            else:
-                try:
-                    if element_id := request.data.get("element_id"):
+            if type_ := request.data.get("type"):
+                if type_ == 'text':
+                    textElement = TextElement(
+                        name=request.data.get("name"),
+                        author=account,
+                        type="text",
+                        content=request.data.get("content")
+                    )
+                    textElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'image':
+                    imageElement = ImageElement(
+                        name=request.data.get("name"),
+                        author=account,
+                        type="image",
+                        image=request.data.get("image"),
+                        description=request.data.get("description")
+                    )
+                    imageElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'video':
+                    videoElement = VideoElement(
+                        name=request.data.get("name"),
+                        author=account,
+                        type="video",
+                        video=request.data.get("video"),
+                        description=request.data.get("description")
+                    )
+                    videoElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'example':
+                    example_data = {
+                        "name": request.data.get("name"),
+                        "author": account,
+                        "type": "example",
+                        "question": request.data.get("question"),
+                        "explanation": request.data.get("explanation")
+                    }
+                    if request.data.get("image"):
+                        example_data["image"] = request.data.get("image")
+                    if request.data.get("explanation_image"):
+                        example_data["explanation_image"] = request.data.get("explanation_image")
+                    exampleElement = ExampleElement(**example_data)
+                    exampleElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'assignment':
+                    assignment_data = {
+                        "name": request.data.get("name"),
+                        "author": account,
+                        "type": "assignment",
+                        "question": request.data.get("question"),
+                        "answers": json.loads(request.data.get("answers")),
+                        "correct_answer_indices": json.loads(request.data.get("correct_answer_indices")),
+                        "is_multiple_choice": request.data.get("is_multiple_choice")=="true",
+                        "explanation": request.data.get("explanation")
+                    }
+                    if request.data.get("image"):
+                        assignment_data["image"] = request.data.get("image")
+                    if request.data.get("explanation_image"):
+                        assignment_data["explanation_image"] = request.data.get("explanation_image")
+                    assignmentElement = AssignmentElement(**assignment_data)
+                    assignmentElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'exam':
+                    examElement = ExamElement(
+                        name=request.data.get("name"),
+                        author=account,
+                        type="exam",
+                        description=request.data.get("description"),
+                        duration=int(request.data.get("duration")),
+                        total_marks=int(request.data.get("total_marks"))
+                    )
+                    examElement.save()
+                    for assignment in json.loads(request.data.get("exam_assignments")):
                         try:
-                            element = Element.objects.get(id=element_id)
-                        except Element.DoesNotExist:
+                            assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]))
+                        except AssignmentElement.DoesNotExist:
                             return Response(status=status.HTTP_404_NOT_FOUND)
-                        for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
-                            if Type.objects.filter(id=element_id).exists():
-                                element = Type.objects.get(id=element_id)
-                                break
-                        newElement = element
-                        newElement.pk = None
-                        newElement.id = None
-                        newElement.name += ' (copy)'
-                        newElement.save()
-                        elementSerializer = ElementSerializer(newElement)
-                        return Response(elementSerializer.data, status=status.HTTP_201_CREATED)
-                    else:
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
-                except Exception as e:
-                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+                        try:
+                            assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]), author=account)
+                        except AssignmentElement.DoesNotExist:
+                            return Response(status=status.HTTP_401_UNAUTHORIZED)
+                        examQuestion = ExamQuestion(
+                            exam=examElement,
+                            question=assignmentElement,
+                            marks=assignment["marks"],
+                            order=assignment["order"]
+                        )
+                        examQuestion.save()
+                    return Response(status=status.HTTP_201_CREATED)
+                elif type_ == 'module':
+                    module_data = {
+                        "name": request.data.get("name"),
+                        "author": account,
+                        "type": "module",
+                        "title": request.data.get("title"),
+                        "description": request.data.get("description"),
+                    }
+                    if request.data.get("image"):
+                        module_data["image"] = request.data.get("image")
+                    moduleElement = ModuleElement(**module_data)
+                    moduleElement.save()
+                    return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+class ElementCopyView(APIView):
+    def post(self, request, element_id):
+        try:
+            user = request.user
+            account = Account.objects.get(user=user)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            try:
+                element = Element.objects.get(id=element_id)
+            except Element.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            if not element.author == account:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
+                if Type.objects.filter(id=element_id).exists():
+                    element = Type.objects.get(id=element_id)
+                    if Type in (ExamElement, ModuleElement):
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                    break
+            newElement = element
+            newElement.pk = None
+            newElement.id = None
+            newElement.name += ' (copy)'
+            newElement.save()
+            elementSerializer = ElementSerializer(newElement)
+            return Response(elementSerializer.data, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class CourseTopicView(APIView):
     def post(self, request, course_id):

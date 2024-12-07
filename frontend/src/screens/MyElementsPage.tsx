@@ -178,7 +178,9 @@ export default function MyElementsPage() {
 
                                 </>
                                 : ""}
-                            <button type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
+                            {['text', 'image', 'video', 'example', 'assignment'].includes(element.type) ?
+                                <button type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
+                                : ""}
                         </div>
                     ))}
             </div>
