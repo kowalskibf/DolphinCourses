@@ -17,6 +17,7 @@ import Navbar from './components/Navbar';
 import EditCourseInfoPage from './screens/EditCourseInfoPage';
 import EditCourseTopicsPage from './screens/EditCourseTopicsPage';
 import EditCoursePage from './screens/EditCoursePage';
+import EditElementPage from './screens/EditElementPage';
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/course/:id/edit/info" element={<EditCourseInfoPage />} />
           <Route path="/course/:id/edit/topics" element={<EditCourseTopicsPage />} />
           <Route path="/course/:id/edit" element={<EditCoursePage />} />
+          <Route path="/element/:id/edit" element={<EditElementPage />} />
         </Routes>
       </Router>
     </div>

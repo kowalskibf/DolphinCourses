@@ -12,6 +12,7 @@ urlpatterns = [
     path('profile/avatar', ProfileAvatarView.as_view(), name='my_avatar_edit'),
     path('elements/my', MyElementsView.as_view(), name='my_elements'),
     path('element', ElementView.as_view(), name='element'),
+    path('element/<int:element_id>', ElementView.as_view(), name='specific_element'),
     path('coursetopic/<int:id>', CourseTopicView.as_view(), name='course_topic'),
     path('course/<int:course_id>/topic', CourseTopicView.as_view(), name='course_topic_post'),
     path('course/<int:course_id>/topics', CourseTopicsView.as_view(), name='course_topics'),

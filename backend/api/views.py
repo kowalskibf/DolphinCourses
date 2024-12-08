@@ -347,6 +347,119 @@ class ElementView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+    def get(self, request, element_id):
+        try:
+            user = request.user
+            account = Account.objects.get(user=user)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not Element.objects.filter(id=element_id).exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not Element.objects.filter(id=element_id, author=account).exists():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        element = Element.objects.get(id=element_id, author=account)
+        serializer = DetailElementSerializer(element)
+        return Response(serializer.data)
+
+    def put(self, request, element_id):
+        try:
+            user = request.user
+            account = Account.objects.get(user=user)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            element = Element.objects.get(id=element_id)
+        except Element.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
+            if Type.objects.filter(id=element_id).exists():
+                element = Type.objects.get(id=element_id)
+                break
+        if not element.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            element.name = request.data.get("name")
+            if element.type == 'text':
+                element.content = request.data.get("content")
+            elif element.type == 'image':
+                element.description = request.data.get("description")
+                if request.data.get("image"):
+                    element.image = request.data.get("image")
+            elif element.type == 'video':
+                element.description = request.data.get("description")
+                if request.data.get("video"):
+                    element.video = request.data.get("video")
+            elif element.type == 'example':
+                element.question = request.data.get("question")
+                element.explanation = request.data.get("explanation")
+                if request.data.get("image"):
+                    element.image = request.data.get("image")
+                if request.data.get("explanation_image"):
+                    element.explanation_image = request.data.get("explanation_image")
+            elif element.type == 'assignment':
+                element.question = request.data.get("question")
+                element.answers = json.loads(request.data.get("answers"))
+                element.correct_answer_indices = json.loads(request.data.get("correct_answer_indices"))
+                element.is_multiple_choice = request.data.get("is_multiple_choice") == "true"
+                element.explanation = request.data.get("explanation")
+                if request.data.get("image"):
+                    element.image = request.data.get("image")
+                if request.data.get("explanation_image"):
+                    element.explanation_image = request.data.get("explanation_image")
+            elif element.type == 'exam':
+                element.description = request.data.get("description")
+                element.duration = request.data.get("duration")
+                element.total_marks = request.data.get("total_marks")
+                for examQuestion in ExamQuestion.objects.filter(exam=element):
+                    examQuestion.delete()
+                for assignment in json.loads(request.data.get("exam_assignments")):
+                    try:
+                        assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]))
+                    except AssignmentElement.DoesNotExist:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                    try:
+                        assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]), author=account)
+                    except AssignmentElement.DoesNotExist:
+                        return Response(status=status.HTTP_401_UNAUTHORIZED)
+                    examQuestion = ExamQuestion(
+                        exam=element,
+                        question=assignmentElement,
+                        marks=assignment["marks"],
+                        order=assignment["order"]
+                    )
+                    examQuestion.save()
+            elif element.type == 'module':
+                element.title = request.data.get("title")
+                element.description = request.data.get("description")
+                if request.data.get("image"):
+                    element.image = request.data.get("image")
+                for elementOfModule in ElementToModule.objects.filter(module=element):
+                    elementOfModule.delete()
+                for elementOfModule in json.loads(request.data.get("module_elements")):
+                    try:
+                        elem = Element.objects.get(id=int(elementOfModule["id"]))
+                    except Element.DoesNotExist:
+                        return Response(status=status.HTTP_404_NOT_FOUND)
+                    try:
+                        elem = Element.objects.get(id=int(elementOfModule["id"]), author=account)
+                    except Element.DoesNotExist:
+                        return Response(status=status.HTTP_401_UNAUTHORIZED)
+                    elementToModule = ElementToModule(
+                        module=element,
+                        element=elem,
+                        course=Course.objects.get(id=1), # TODO
+                        order=elementOfModule["order"]
+                    )
+                    elementToModule.save()
+                return Response({"message": "Not yet"}, status=status.HTTP_200_OK)
+            element.save()
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+            
+        
 
 class ElementCopyView(APIView):
     def post(self, request, element_id):
@@ -373,8 +486,7 @@ class ElementCopyView(APIView):
             newElement.id = None
             newElement.name += ' (copy)'
             newElement.save()
-            elementSerializer = ElementSerializer(newElement)
-            return Response(elementSerializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -598,64 +710,78 @@ class ModuleToCourseView(APIView):
 
 class ElementToModuleView(APIView):
     def post(self, request, course_id, module_id, element_id):
-        user = request.user
-        account = Account.objects.get(user=user)
-        body = json.loads(request.body)
         try:
-            module = ModuleElement.objects.get(id=module_id)
-        except ModuleElement.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        try:
-            element = Element.objects.get(id=element_id)
-        except Element.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        try:
-            course = Course.objects.get(id=course_id)
-        except Course.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        if module.type != "module":
-            return Response({"error": "Module is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
-        if not module.author == account or not element.author == account:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-        if ElementToModule.objects.filter(module=module, element=element).exists():
-            return Response({"message": "Element is already added to this module"}, status=status.HTTP_400_BAD_REQUEST)
-        if not body["copy"]:
-            elementToModule = ElementToModule(
-                module=module,
-                element=element,
-                course=course,
-                order=ElementToModule.objects.filter(module=module).count() + 1
-            )
-            elementToModule.save()
-        else:
-            newElement = element
-            newElement.pk = None
-            newElement.name += ' (copy)'
-            newElement.save()
-            elementToModule = ElementToModule(
-                module=module,
-                element=newElement,
-                course=course,
-                order=ElementToModule.objects.filter(module=module).count() + 1
-            )
-            elementToModule.save()
+            user = request.user
+            account = Account.objects.get(user=user)
+            try:
+                #print("\n" * 20 + "ok" + "\n" *20)
+                #body = json.loads(request.body)
+                body={}
+                print("\n" * 20 + "ok" + "\n" *20)
+            except Exception as e:
+                print("="*20)
+                print(str(e))
+                print("="*20)
+                return Response(status=status.HTTP_409_CONFLICT)
+            try:
+                module = ModuleElement.objects.get(id=module_id)
+            except ModuleElement.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            try:
+                element = Element.objects.get(id=element_id)
+            except Element.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            try:
+                course = Course.objects.get(id=course_id)
+            except Course.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            if module.type != "module":
+                return Response({"error": "Module is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
+            if not module.author == account or not element.author == account:
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            if ElementToModule.objects.filter(module=module, element=element).exists():
+                return Response({"message": "Element is already added to this module"}, status=status.HTTP_400_BAD_REQUEST)
+            #if not body["copy"]:
+            if True:
+                elementToModule = ElementToModule(
+                    module=module,
+                    element=element,
+                    course=course,
+                    order=ElementToModule.objects.filter(module=module).count() + 1
+                )
+                elementToModule.save()
+            else:
+                newElement = element
+                newElement.pk = None
+                newElement.name += ' (copy)'
+                newElement.save()
+                elementToModule = ElementToModule(
+                    module=module,
+                    element=newElement,
+                    course=course,
+                    order=ElementToModule.objects.filter(module=module).count() + 1
+                )
+                elementToModule.save()
 
-        if element.type == "assignment":
-            assignment = AssignmentElement.objects.get(id=element_id)
-            assignmentWeightsView = AssignmentWeightsView()
-            try:
-                assignmentWeightsView.initialize_weights_for_assignment(assignment, course)
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        elif element.type == "exam":
-            assignmentWeightsView = AssignmentWeightsView()
-            try:
-                examQuestions = ExamQuestion.objects.filter(exam=element)
-                for examQuestion in examQuestions:
-                    assignmentWeightsView.initialize_weights_for_assignment(examQuestion.question, course)
-            except Exception as e:
-                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(status=status.HTTP_200_OK)
+            if element.type == "assignment":
+                assignment = AssignmentElement.objects.get(id=element_id)
+                assignmentWeightsView = AssignmentWeightsView()
+                try:
+                    assignmentWeightsView.initialize_weights_for_assignment(assignment, course)
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            elif element.type == "exam":
+                assignmentWeightsView = AssignmentWeightsView()
+                try:
+                    examQuestions = ExamQuestion.objects.filter(exam=element)
+                    for examQuestion in examQuestions:
+                        assignmentWeightsView.initialize_weights_for_assignment(examQuestion.question, course)
+                except Exception as e:
+                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     def put(self, request, course_id, module_id, element_id):
         user = request.user

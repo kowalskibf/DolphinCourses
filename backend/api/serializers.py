@@ -111,24 +111,34 @@ class ExamQuestionSerializer(serializers.ModelSerializer):
         model = ExamQuestion
         fields = ('id', 'exam', 'question', 'marks', 'order')
 
-class ExamQuestionDetailSerializer(serializers.ModelSerializer):
+class DetailExamQuestionSerializer(serializers.ModelSerializer):
     question = AssignmentElementSerializer(read_only=True)
 
     class Meta:
         model = ExamQuestion
         fields = ('id', 'question', 'marks', 'order')
 
-class DetailedExamElementSerializer(serializers.ModelSerializer):
-    questions = ExamQuestionDetailSerializer(source='examquestion_set', many=True, read_only=True)
+class DetailExamElementSerializer(serializers.ModelSerializer):
+    questions = DetailExamQuestionSerializer(many=True, read_only=True)
 
     class Meta:
         model = ExamElement
         fields = ('description', 'duration', 'total_marks', 'questions')
 
+class DetailElementToModuleSerializer(serializers.ModelSerializer):
+    element = ElementSerializer(read_only=True)
+
+    class Meta:
+        model = ElementToModule
+        fields = ('id', 'element', 'order')
+
 class DetailElementSerializer(ElementSerializer):
     def get_data(self, obj):
         if obj.type == 'exam':
-            return DetailedExamElementSerializer(obj.examelement).data
+            return DetailExamElementSerializer(obj.examelement).data
+        if obj.type == 'module':
+            module_elements = ElementToModule.objects.filter(module=obj)
+            return DetailElementToModuleSerializer(module_elements, many=True).data
         return super().get_data(obj)
 
 class ModuleToCourseSerializer(serializers.ModelSerializer):
@@ -232,7 +242,6 @@ class ExamQuestionStructureSerializer(serializers.ModelSerializer):
         return representation
 
 class ExamElementStructureSerializer(serializers.ModelSerializer):
-    #questions = ExamQuestionDetailSerializer(many=True, read_only=True)
     questions = ExamQuestionStructureSerializer(many=True, read_only=True)
     class Meta:
         model = ExamElement

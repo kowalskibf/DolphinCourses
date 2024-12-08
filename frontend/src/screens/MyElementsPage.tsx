@@ -33,16 +33,12 @@ export default function MyElementsPage() {
     };
 
     const handleCopyElement = async (element_id: number) => {
-        fetch("http://127.0.0.1:8000/api/element", {
+        fetch(`http://127.0.0.1:8000/api/element/${element_id}/copy`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Token ${localStorage.getItem("token")}`,
             },
-            body: JSON.stringify({
-                copy: true,
-                element_id: element_id,
-            }),
         })
             .then((response) => fetchElements());
     }
@@ -178,6 +174,7 @@ export default function MyElementsPage() {
 
                                 </>
                                 : ""}
+                            <a href={`/element/${element.id}/edit`}>Edit</a>
                             {['text', 'image', 'video', 'example', 'assignment'].includes(element.type) ?
                                 <button type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
                                 : ""}
