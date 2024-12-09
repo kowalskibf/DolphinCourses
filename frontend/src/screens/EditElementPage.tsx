@@ -77,12 +77,21 @@ export default function EditElementPage() {
     }
 
     const handleChange = (key: string, value: any) => {
-        setFormData((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
-        console.log(formData)
+        setFormData((prev) => {
+            if (Array.isArray(prev[key])) {
+                return {
+                    ...prev,
+                    [key]: Array.isArray(value) ? value : [...prev[key], value],
+                };
+            }
+            return {
+                ...prev,
+                [key]: value,
+            };
+        });
+        console.log(formData);
     };
+
 
     const handleFileChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -133,12 +142,20 @@ export default function EditElementPage() {
     };
 
     const handleRemoveAnswer = (index: number) => {
-        const updatedAnswers = formData.answers.filter((_: string, i: number) => i !== index);
-        const updatedCorrectAnswers = formData.correct_answer_indices.filter((i: number) => i !== index)
-            .map((i: number) => (i > index ? i - 1 : i));
+        setFormData((prev) => {
+            const updatedAnswers = [...prev.answers];
+            updatedAnswers.splice(index, 1);
 
-        handleChange('answers', updatedAnswers);
-        handleChange('correct_answer_indices', updatedCorrectAnswers);
+            const updatedCorrectAnswers = prev.correct_answer_indices
+                .filter((i: number) => i !== index)
+                .map((i: number) => (i > index ? i - 1 : i));
+
+            return {
+                ...prev,
+                answers: updatedAnswers,
+                correct_answer_indices: updatedCorrectAnswers,
+            };
+        });
     };
 
     const handleToggleAnswer = (index: number) => {
@@ -149,6 +166,31 @@ export default function EditElementPage() {
 
         handleChange('correct_answer_indices', updatedCorrectAnswers);
     };
+
+    const handleEditElement = async () => {
+
+        const formDataToSend = new FormData();
+
+        Object.entries(formData).forEach(([key, value]) => {
+            if ((key.includes("image") || key.includes("video")) && value === null) {
+                return;
+            }
+            if (Array.isArray(value)) {
+                formDataToSend.append(key, JSON.stringify(value));
+            } else {
+                formDataToSend.append(key, value ?? "");
+            }
+        });
+        const response = await fetch(`http://127.0.0.1:8000/api/element/${id}`, {
+            method: "PUT",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+            body: formDataToSend,
+        })
+            .then((response) => { console.log(formDataToSend); fetchElement(); });
+    }
 
     useEffect(() => {
         fetchElement();
@@ -187,7 +229,7 @@ export default function EditElementPage() {
                     Description:
                     <textarea
                         value={formData.description || ''}
-                        onChange={(e) => handleChange('image', e.target.value)}
+                        onChange={(e) => handleChange('description', e.target.value)}
                     />
                 </>
                 : ""}
@@ -201,7 +243,7 @@ export default function EditElementPage() {
                     Description:
                     <textarea
                         value={formData.description || ''}
-                        onChange={(e) => handleChange('video', e.target.value)}
+                        onChange={(e) => handleChange('description', e.target.value)}
                     />
                 </>
                 : ""}
@@ -225,7 +267,7 @@ export default function EditElementPage() {
                     />
                     <br />
                     Explanation image:
-                    <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.image} />
+                    <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
                     Change image:
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'explanation')} />
                     <br />
@@ -309,6 +351,7 @@ export default function EditElementPage() {
                     module
                 </>
                 : ""}
+            <button type="button" onClick={handleEditElement}>Save</button>
 
         </>
     )

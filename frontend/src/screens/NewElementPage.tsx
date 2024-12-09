@@ -213,15 +213,16 @@ export default function NewElementPage() {
             //formData.append("explanation_image", exampleElementExplanationImage);
         }
         if (elementType == "assignment") {
-            if (!assignmentElementImage || !assignmentElementExplanationImage) return 1;
             formData.append("question", assignmentElementQuestion);
-            formData.append("image", assignmentElementImage);
+            if (assignmentElementImage)
+                formData.append("image", assignmentElementImage);
             formData.append("answers", JSON.stringify(assignmentElementAnswers));
             formData.append("correct_answer_indices", JSON.stringify(assignmentElementCorrectAnswerIndices));
             formData.append("is_multiple_choice", assignmentElementIsMultipleChoice ? "true" : "false");
             formData.append("hide_answers", assignmentElementHideAnswers ? "true" : "false");
             formData.append("explanation", assignmentElementExplanation);
-            formData.append("explanation_image", assignmentElementExplanationImage);
+            if (assignmentElementExplanationImage)
+                formData.append("explanation_image", assignmentElementExplanationImage);
         }
         if (elementType == "exam") {
             formData.append("description", examElementDescription);
