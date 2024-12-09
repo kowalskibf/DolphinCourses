@@ -81,6 +81,7 @@ class AssignmentElement(Element):
     answers = models.JSONField()
     correct_answer_indices = models.JSONField()
     is_multiple_choice = models.BooleanField(default=False)
+    hide_answers = models.BooleanField(default=False)
     explanation = models.CharField(max_length=4095, default="")
     explanation_image = models.FileField('elem_assignment/', blank=True, null=True)
 
@@ -107,7 +108,6 @@ class ModuleToCourse(models.Model):
 class ElementToModule(models.Model):
     module = models.ForeignKey(ModuleElement, on_delete=models.CASCADE, related_name='elements')
     element = models.ForeignKey(Element, on_delete=models.CASCADE, related_name='modules')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='element_to_module_course', default=None)
     order = models.IntegerField(default=0)
     class Meta:
         ordering = ['order']
@@ -129,9 +129,4 @@ class AccountTopic(models.Model):
 class AssignmentWeight(models.Model):
     assignment = models.ForeignKey(AssignmentElement, on_delete=models.CASCADE, related_name='assignment_weights')
     topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE, related_name='assignment_weights')
-    weight = models.FloatField(default=0.0)
-
-class ModuleWeight(models.Model):
-    module = models.ForeignKey(ModuleElement, on_delete=models.CASCADE, related_name='module_weights')
-    topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE, related_name='module_weights')
     weight = models.FloatField(default=0.0)

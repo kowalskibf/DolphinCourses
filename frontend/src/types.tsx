@@ -97,6 +97,7 @@ interface AssignmentElement extends BaseCourseElement {
         answers: string[];
         correct_answer_indices: number[];
         is_multiple_choice: boolean;
+        hide_answers: boolean;
         explanation: string;
         explanation_image?: string;
     };
@@ -199,6 +200,7 @@ type AssignmentElementStructure = {
     answers: string[];
     correct_answer_indices: number[];
     is_multiple_choice: boolean;
+    hide_answers: boolean;
     explanation: string;
     explanation_image?: string;
     weights: AssignmentWeightStructure[];

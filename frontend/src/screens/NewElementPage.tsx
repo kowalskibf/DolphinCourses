@@ -24,6 +24,7 @@ export default function NewElementPage() {
     const [assignmentElementAnswers, setAssignmentElementAnswers] = useState<string[]>([]);
     const [assignmentElementCorrectAnswerIndices, setAssignmentElementCorrectAnswerIndices] = useState<number[]>([]);
     const [assignmentElementIsMultipleChoice, setAssignmentElementIsMultipleChoice] = useState<boolean>(false);
+    const [assignmentElementHideAnswers, setAssignmentElementHideAnswers] = useState<boolean>(false);
     const [assignmentElementExplanation, setAssignmentElementExplanation] = useState<string>("");
     const [assignmentElementExplanationImage, setAssignmentElementExplanationImage] = useState<File | null>(null);
     const [assignmentElementNewAnswer, setAssignmentElementNewAnswer] = useState<string>("");
@@ -218,6 +219,7 @@ export default function NewElementPage() {
             formData.append("answers", JSON.stringify(assignmentElementAnswers));
             formData.append("correct_answer_indices", JSON.stringify(assignmentElementCorrectAnswerIndices));
             formData.append("is_multiple_choice", assignmentElementIsMultipleChoice ? "true" : "false");
+            formData.append("hide_answers", assignmentElementHideAnswers ? "true" : "false");
             formData.append("explanation", assignmentElementExplanation);
             formData.append("explanation_image", assignmentElementExplanationImage);
         }
@@ -327,7 +329,14 @@ export default function NewElementPage() {
                         onChange={() => setAssignmentElementIsMultipleChoice(!assignmentElementIsMultipleChoice)}
                     />
                     <br />
-                    <h6>Answers:</h6>
+                    Hide answers?
+                    <input
+                        type="checkbox"
+                        checked={assignmentElementHideAnswers}
+                        onChange={() => setAssignmentElementHideAnswers(!assignmentElementHideAnswers)}
+                    />
+                    <br />
+                    <h3>Answers:</h3>
                     {assignmentElementAnswers.map((answer, index) => (
                         <li key={index}>
                             {answer}

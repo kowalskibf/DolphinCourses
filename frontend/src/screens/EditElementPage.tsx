@@ -251,6 +251,13 @@ export default function EditElementPage() {
                         onChange={() => handleChange('is_multiple_choice', !formData.is_multiple_choice)}
                     />
                     <br />
+                    Hide answers?
+                    <input
+                        type="checkbox"
+                        checked={formData.hide_answers || false}
+                        onChange={() => handleChange('hide_answers', !formData.hide_answers)}
+                    />
+                    <br />
                     <h6>Answers:</h6>
                     {formData.answers.map((answer: string, index: number) => (
                         <li key={index}>

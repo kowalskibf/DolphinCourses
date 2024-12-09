@@ -19,5 +19,6 @@ urlpatterns = [
     path('course/<int:id>/structure', CourseStructureView.as_view(), name='course_structure'),
     path('course/<int:course_id>/structure/<int:module_id>', ModuleToCourseView.as_view(), name='module_to_course'),
     path('course/<int:course_id>/module/<int:module_id>/structure/<int:element_id>', ElementToModuleView.as_view(), name='element_to_module'),
+    path('module/<int:module_id>/structure/<int:element_id>', ElementToModuleView.as_view(), name='element_to_module'),
     path('element/<int:element_id>/copy', ElementCopyView.as_view(), name='element_copy'),
 ]

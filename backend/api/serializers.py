@@ -94,7 +94,7 @@ class ExampleElementSerializer(serializers.ModelSerializer):
 class AssignmentElementSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentElement
-        fields = ('question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'explanation', 'explanation_image')
+        fields = ('question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'hide_answers', 'explanation', 'explanation_image')
 
 
 class ExamElementSerializer(serializers.ModelSerializer):
@@ -153,11 +153,12 @@ class ModuleToCourseSerializer(serializers.ModelSerializer):
 class ElementToModuleSerializer(serializers.ModelSerializer):
     module = ModuleElementSerializer(read_only=True)
     element = ElementSerializer(read_only=True)
-    course = CourseSerializer(read_only=True)
+    #course = CourseSerializer(read_only=True)
 
     class Meta:
         model = ElementToModule
-        fields = ('id', 'module', 'element', 'course', 'order')
+        #fields = ('id', 'module', 'element', 'course', 'order')
+        fields = ('id', 'module', 'element', 'order')
 
 
 class CourseAccessSerializer(serializers.ModelSerializer):
@@ -185,13 +186,13 @@ class AssignmentWeightSerializer(serializers.ModelSerializer):
         model = AssignmentWeight
         fields = ('id', 'assignment', 'topic', 'weight')
 
-class ModuleWeightSerializer(serializers.ModelSerializer):
-    module = ModuleElementSerializer(read_only=True)
-    topic = CourseTopicSerializer(read_only=True)
+# class ModuleWeightSerializer(serializers.ModelSerializer):
+#     module = ModuleElementSerializer(read_only=True)
+#     topic = CourseTopicSerializer(read_only=True)
 
-    class Meta:
-        model = ModuleWeight
-        fields = ('id', 'module', 'topic', 'weight')
+#     class Meta:
+#         model = ModuleWeight
+#         fields = ('id', 'module', 'topic', 'weight')
 
 class AccountTopicSerializer(serializers.ModelSerializer):
     account = AccountSerializer(read_only=True)
@@ -219,7 +220,7 @@ class AssignmentElementStructureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AssignmentElement
-        fields = ('id', 'question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'explanation', 'explanation_image', 'weights')
+        fields = ('id', 'question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'hide_answers', 'explanation', 'explanation_image', 'weights')
 
     def get_weights(self, obj):
         course_id = self.context.get('course_id')
@@ -254,11 +255,11 @@ class ExamElementStructureSerializer(serializers.ModelSerializer):
             representation['questions'] = questions_serializer.data
         return representation
 
-class ModuleWeightStructureSerializer(serializers.ModelSerializer):
-    topic = CourseTopicStructureSerializer(read_only=True)
-    class Meta:
-        model = ModuleWeight
-        fields = ('id', 'topic', 'weight')
+# class ModuleWeightStructureSerializer(serializers.ModelSerializer):
+#     topic = CourseTopicStructureSerializer(read_only=True)
+#     class Meta:
+#         model = ModuleWeight
+#         fields = ('id', 'topic', 'weight')
 
 class ElementToModuleStructureSerializer(serializers.ModelSerializer):
     element_data = serializers.SerializerMethodField()

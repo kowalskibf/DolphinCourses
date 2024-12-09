@@ -150,6 +150,8 @@ export default function MyElementsPage() {
                                     <br />
                                     {element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
                                     <br />
+                                    {element.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                    <br />
                                     Answers:
                                     {element.data.answers.map((answer, i) => (
                                         <li key={i}>

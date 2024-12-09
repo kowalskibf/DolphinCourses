@@ -207,7 +207,7 @@ export default function EditCoursePage() {
     }
 
     const handleMoveElement = async (module_id: number, element_id: number, action: "up" | "down") => {
-        const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/module/${module_id}/structure/${element_id}`, {
+        const response = await fetch(`http://127.0.0.1:8000/api/module/${module_id}/structure/${element_id}`, {
             method: "PUT",
             headers: {
                 Accept: "application/json",
@@ -326,6 +326,8 @@ export default function EditCoursePage() {
                                     Image: <img src={MEDIA_URL + element.data.image} />
                                     <br />
                                     {element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                    <br />
+                                    {element.data.hide_answers ? "Answers hidden" : "Answers visible"}
                                     <br />
                                     Answers:
                                     {element.data.answers.map((answer, i) => (

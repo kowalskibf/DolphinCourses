@@ -294,6 +294,7 @@ class ElementView(APIView):
                         "question": request.data.get("question"),
                         "answers": json.loads(request.data.get("answers")),
                         "correct_answer_indices": json.loads(request.data.get("correct_answer_indices")),
+                        "hide_answers": request.data.get("hide_answers")=="true",
                         "is_multiple_choice": request.data.get("is_multiple_choice")=="true",
                         "explanation": request.data.get("explanation")
                     }
@@ -402,6 +403,7 @@ class ElementView(APIView):
                 element.answers = json.loads(request.data.get("answers"))
                 element.correct_answer_indices = json.loads(request.data.get("correct_answer_indices"))
                 element.is_multiple_choice = request.data.get("is_multiple_choice") == "true"
+                element.hide_answers = request.data.get("hide_answers") == "true"
                 element.explanation = request.data.get("explanation")
                 if request.data.get("image"):
                     element.image = request.data.get("image")
@@ -746,7 +748,7 @@ class ElementToModuleView(APIView):
                 elementToModule = ElementToModule(
                     module=module,
                     element=element,
-                    course=course,
+                    #course=course,
                     order=ElementToModule.objects.filter(module=module).count() + 1
                 )
                 elementToModule.save()
@@ -758,7 +760,7 @@ class ElementToModuleView(APIView):
                 elementToModule = ElementToModule(
                     module=module,
                     element=newElement,
-                    course=course,
+                    #course=course,
                     order=ElementToModule.objects.filter(module=module).count() + 1
                 )
                 elementToModule.save()
@@ -783,7 +785,7 @@ class ElementToModuleView(APIView):
             print(str(e))
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self, request, course_id, module_id, element_id):
+    def put(self, request, module_id, element_id):
         user = request.user
         account = Account.objects.get(user=user)
         body = json.loads(request.body)
