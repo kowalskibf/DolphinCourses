@@ -112,7 +112,8 @@ class ExamQuestionSerializer(serializers.ModelSerializer):
         fields = ('id', 'exam', 'question', 'marks', 'order')
 
 class DetailExamQuestionSerializer(serializers.ModelSerializer):
-    question = AssignmentElementSerializer(read_only=True)
+    #question = AssignmentElementSerializer(read_only=True)
+    question = ElementSerializer(read_only=True)
 
     class Meta:
         model = ExamQuestion
@@ -123,7 +124,7 @@ class DetailExamElementSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExamElement
-        fields = ('description', 'duration', 'total_marks', 'questions')
+        fields = ('id', 'description', 'duration', 'total_marks', 'questions')
 
 class DetailElementToModuleSerializer(serializers.ModelSerializer):
     element = ElementSerializer(read_only=True)

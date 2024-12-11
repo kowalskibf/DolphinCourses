@@ -47,6 +47,8 @@ export default function EditElementPage() {
     const { id } = useParams<Params>();
     const [element, setElement] = useState<ElementDetail | undefined>(undefined);
 
+    const [myElements, setMyElements] = useState<AssignmentElement[]>([]);
+
     const [formData, setFormData] = useState<Record<string, any>>({});
 
     const [newAnswer, setNewAnswer] = useState<string>("");
@@ -61,6 +63,8 @@ export default function EditElementPage() {
         })
             .then((response) => response.json())
             .then((data) => {
+                console.log("pobrane data z api");
+                console.log(data);
                 setElement(data);
                 setFormData({
                     name: data.name,
@@ -75,6 +79,18 @@ export default function EditElementPage() {
                 });
             });
     }
+
+    const fetchMyElements = async () => {
+        fetch("http://127.0.0.1:8000/api/elements/my", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => setMyElements(data));
+    };
 
     const handleChange = (key: string, value: any) => {
         setFormData((prev) => {
@@ -194,13 +210,19 @@ export default function EditElementPage() {
 
     useEffect(() => {
         fetchElement();
+        fetchMyElements();
     }, [])
 
     useEffect(() => {
-        console.log(formData);
+        //console.log(formData);
     }, [formData])
 
-    if (element === undefined || !formData) {
+    useEffect(() => {
+        console.log("zapisany element");
+        console.log(element);
+    }, [element])
+
+    if (element === undefined || !formData || myElements === undefined) {
         return <>Loading...</>
     }
 
@@ -344,6 +366,88 @@ export default function EditElementPage() {
                     />
                     Total marks: {formData.total_marks || ''}
                     <br />
+                    <div id="main-container">
+                        <div className="main-half">
+                            {myElements.filter((elem) => elem.type == 'assignment').map((assignment, index) => (
+                                <div
+                                    key={assignment.id}
+                                    className={assignment.type + '-element any-element element-margin'}
+                                >
+                                    Question: {assignment.data.question}
+                                    <br />
+                                    {assignment.data.image ?
+                                        <>
+                                            Image: <img src={MEDIA_URL + assignment.data.image} />
+                                            <br />
+                                        </>
+                                        : ""}
+                                    <br />
+                                    {assignment.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                    <br />
+                                    {assignment.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                    <br />
+                                    Answers:
+                                    {assignment.data.answers.map((answer, i) => (
+                                        <li key={i}>
+                                            {answer} {assignment.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                        </li>
+                                    ))}
+                                    Explanation: {assignment.data.explanation}
+                                    <br />
+                                    {assignment.data.explanation_image ?
+                                        <>
+                                            Explanation image: <img src={MEDIA_URL + assignment.data.explanation_image} />
+                                            <br />
+                                        </>
+                                        : ""}
+
+
+
+                                </div>
+                            ))}
+                        </div>
+                        <div className="main-half">
+                            {element.data.questions
+                                .sort((a, b) => a.order - b.order)
+                                .map((examQuestion, index) => (
+                                    <div
+                                        key={examQuestion.question.id}
+                                        className={examQuestion.question.type + '-element any-element element-margin'}
+                                    >
+                                        Question: {examQuestion.question.data.question}
+                                        <br />
+                                        {examQuestion.question.data.image ?
+                                            <>
+                                                Image: <img src={MEDIA_URL + examQuestion.question.data.image} />
+                                                <br />
+                                            </>
+                                            : ""}
+                                        <br />
+                                        {examQuestion.question.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                        <br />
+                                        {examQuestion.question.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                        <br />
+                                        Answers:
+                                        {examQuestion.question.data.answers.map((answer, i) => (
+                                            <li key={i}>
+                                                {answer} {examQuestion.question.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                            </li>
+                                        ))}
+                                        Explanation: {examQuestion.question.data.explanation}
+                                        <br />
+                                        {examQuestion.question.data.explanation_image ?
+                                            <>
+                                                Explanation image: <img src={MEDIA_URL + examQuestion.question.data.explanation_image} />
+                                                <br />
+                                            </>
+                                            : ""}
+
+
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+
                 </>
                 : ""}
             {element.type == 'module' ?
