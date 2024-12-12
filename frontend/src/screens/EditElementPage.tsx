@@ -49,6 +49,8 @@ export default function EditElementPage() {
 
     const [myElements, setMyElements] = useState<AssignmentElement[]>([]);
 
+    const [searchQuery, setSearchQuery] = useState<string>("");
+
     const [formData, setFormData] = useState<Record<string, any>>({});
 
     const [newAnswer, setNewAnswer] = useState<string>("");
@@ -63,8 +65,8 @@ export default function EditElementPage() {
         })
             .then((response) => response.json())
             .then((data) => {
-                console.log("pobrane data z api");
-                console.log(data);
+                // console.log("pobrane data z api");
+                // console.log(data);
                 setElement(data);
                 setFormData({
                     name: data.name,
@@ -77,6 +79,9 @@ export default function EditElementPage() {
                         )
                     )
                 });
+                // if (data.type == "exam") {
+                //     handleChange('exam_questions', data.data.questions.map((question: DetailExamQuestion) => ({ id: question.id, order: question.order })));
+                // }
             });
     }
 
@@ -106,6 +111,63 @@ export default function EditElementPage() {
             };
         });
         console.log(formData);
+    };
+
+    const handleSwapOrder = (key: string, order1: number, order2: number) => {
+        setFormData((prev) => {
+            if (Array.isArray(prev[key])) {
+                return {
+                    ...prev,
+                    [key]: prev[key].map((item: any) => {
+                        if (item.order === order1) {
+                            return { ...item, order: order2 };
+                        }
+                        if (item.order === order2) {
+                            return { ...item, order: order1 };
+                        }
+                        return item;
+                    }),
+                };
+            }
+            return prev;
+        });
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const updated = prev.questions.map((q: any) => {
+                if (q.order === order1) {
+                    return { ...q, order: order2 };
+                }
+                if (q.order === order2) {
+                    return { ...q, order: order1 };
+                }
+                return q;
+            });
+            return {
+                ...prev,
+                questions: updated,
+            };
+        });
+        // setElement((prevElement) => {
+        //     if (!prevElement) return prevElement;
+
+        //     const updatedQuestions = prevElement.data.questions.map((q: any) => {
+        //         if (q.order === order1) {
+        //             return { ...q, order: order2 };
+        //         }
+        //         if (q.order === order2) {
+        //             return { ...q, order: order1 };
+        //         }
+        //         return q;
+        //     });
+
+        //     return {
+        //         ...prevElement,
+        //         data: {
+        //             ...prevElement.data,
+        //             questions: updatedQuestions,
+        //         },
+        //     };
+        // });
     };
 
 
@@ -214,12 +276,13 @@ export default function EditElementPage() {
     }, [])
 
     useEffect(() => {
-        //console.log(formData);
+        console.log("form data");
+        console.log(formData);
     }, [formData])
 
     useEffect(() => {
-        console.log("zapisany element");
-        console.log(element);
+        // console.log("zapisany element");
+        // console.log(element);
     }, [element])
 
     if (element === undefined || !formData || myElements === undefined) {
@@ -368,52 +431,66 @@ export default function EditElementPage() {
                     <br />
                     <div id="main-container">
                         <div className="main-half">
-                            {myElements.filter((elem) => elem.type == 'assignment').map((assignment, index) => (
-                                <div
-                                    key={assignment.id}
-                                    className={assignment.type + '-element any-element element-margin'}
-                                >
-                                    Question: {assignment.data.question}
-                                    <br />
-                                    {assignment.data.image ?
-                                        <>
-                                            Image: <img src={MEDIA_URL + assignment.data.image} />
-                                            <br />
-                                        </>
-                                        : ""}
-                                    <br />
-                                    {assignment.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                    <br />
-                                    {assignment.data.hide_answers ? "Answers hidden" : "Answers visible"}
-                                    <br />
-                                    Answers:
-                                    {assignment.data.answers.map((answer, i) => (
-                                        <li key={i}>
-                                            {answer} {assignment.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                        </li>
-                                    ))}
-                                    Explanation: {assignment.data.explanation}
-                                    <br />
-                                    {assignment.data.explanation_image ?
-                                        <>
-                                            Explanation image: <img src={MEDIA_URL + assignment.data.explanation_image} />
-                                            <br />
-                                        </>
-                                        : ""}
+                            Search:
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            {myElements
+                                .filter((elem) => elem.type == 'assignment' && elem.name.includes(searchQuery))
+                                .map((assignment, index) => (
+                                    <div
+                                        key={assignment.id}
+                                        className={assignment.type + '-element any-element element-margin'}
+                                    >
+                                        Name: {assignment.name}
+                                        <br />
+                                        Question: {assignment.data.question}
+                                        <br />
+                                        {assignment.data.image ?
+                                            <>
+                                                Image: <img src={MEDIA_URL + assignment.data.image} />
+                                                <br />
+                                            </>
+                                            : ""}
+                                        <br />
+                                        {assignment.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                        <br />
+                                        {assignment.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                        <br />
+                                        Answers:
+                                        {assignment.data.answers.map((answer, i) => (
+                                            <li key={i}>
+                                                {answer} {assignment.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                            </li>
+                                        ))}
+                                        Explanation: {assignment.data.explanation}
+                                        <br />
+                                        {assignment.data.explanation_image ?
+                                            <>
+                                                Explanation image: <img src={MEDIA_URL + assignment.data.explanation_image} />
+                                                <br />
+                                            </>
+                                            : ""}
 
 
 
-                                </div>
-                            ))}
+                                    </div>
+                                ))}
                         </div>
                         <div className="main-half">
-                            {element.data.questions
+                            {(formData as DetailExamElement["data"]).questions //element.data.questions
                                 .sort((a, b) => a.order - b.order)
                                 .map((examQuestion, index) => (
                                     <div
                                         key={examQuestion.question.id}
                                         className={examQuestion.question.type + '-element any-element element-margin'}
                                     >
+                                        Name: {examQuestion.question.name}
+                                        <br />
+                                        Marks: {examQuestion.marks}
+                                        <br />
                                         Question: {examQuestion.question.data.question}
                                         <br />
                                         {examQuestion.question.data.image ?
@@ -442,7 +519,20 @@ export default function EditElementPage() {
                                             </>
                                             : ""}
 
+                                        {examQuestion.order > 1 && (
+                                            <>
+                                                <button type="button" onClick={() => handleSwapOrder('exam_questions', examQuestion.order, examQuestion.order - 1)}>^</button>
+                                                <br />
+                                            </>
+                                        )}
 
+                                        {examQuestion.order < formData.questions.length && (
+                                            <>
+                                                <button type="button" onClick={() => handleSwapOrder('exam_questions', examQuestion.order, examQuestion.order + 1)}>v</button>
+                                                <br />
+                                            </>
+                                        )}
+                                        <a href={`/element/${examQuestion.question.id}/edit`}>Edit</a>
                                     </div>
                                 ))}
                         </div>
