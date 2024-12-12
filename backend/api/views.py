@@ -365,21 +365,29 @@ class ElementView(APIView):
 
     def put(self, request, element_id):
         try:
+            print("1")
             user = request.user
             account = Account.objects.get(user=user)
+            print("2")
         except:
+            print("3")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
+            print("4")
             element = Element.objects.get(id=element_id)
+            print("5")
         except Element.DoesNotExist:
+            print("7")
             return Response(status=status.HTTP_404_NOT_FOUND)
         for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
             if Type.objects.filter(id=element_id).exists():
                 element = Type.objects.get(id=element_id)
                 break
         if not element.author == account:
+            print("8")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
+            print("9")
             element.name = request.data.get("name")
             if element.type == 'text':
                 element.content = request.data.get("content")
@@ -413,24 +421,35 @@ class ElementView(APIView):
                 element.description = request.data.get("description")
                 element.duration = request.data.get("duration")
                 element.total_marks = request.data.get("total_marks")
+                print("10")
                 for examQuestion in ExamQuestion.objects.filter(exam=element):
                     examQuestion.delete()
-                for assignment in json.loads(request.data.get("exam_assignments")):
+                print("11")
+                for exam_question in json.loads(request.data.get("questions")):
                     try:
-                        assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]))
+                        print("12")
+                        assignmentElement = AssignmentElement.objects.get(id=int(exam_question["question"]["id"]))
+                        print("13")
                     except AssignmentElement.DoesNotExist:
+                        print("14")
                         return Response(status=status.HTTP_404_NOT_FOUND)
                     try:
-                        assignmentElement = AssignmentElement.objects.get(id=int(assignment["id"]), author=account)
+                        print("15")
+                        assignmentElement = AssignmentElement.objects.get(id=int(exam_question["question"]["id"]), author=account)
+                        print("16")
                     except AssignmentElement.DoesNotExist:
+                        print("17")
                         return Response(status=status.HTTP_401_UNAUTHORIZED)
                     examQuestion = ExamQuestion(
                         exam=element,
                         question=assignmentElement,
-                        marks=assignment["marks"],
-                        order=assignment["order"]
+                        marks=exam_question["marks"],
+                        order=exam_question["order"]
                     )
                     examQuestion.save()
+                    assignmentWeightsView = AssignmentWeightsView()
+                    assignmentWeightsView.initialize_weights_for_assignment_in_every_course(account, assignmentElement.id)
+                    assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, assignmentElement.id)
             elif element.type == 'module':
                 element.title = request.data.get("title")
                 element.description = request.data.get("description")
@@ -450,7 +469,7 @@ class ElementView(APIView):
                     elementToModule = ElementToModule(
                         module=element,
                         element=elem,
-                        course=Course.objects.get(id=1), # TODO
+                        #course=Course.objects.get(id=1), # TODO
                         order=elementOfModule["order"]
                     )
                     elementToModule.save()
@@ -875,6 +894,17 @@ class AssignmentWeightsView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    def initialize_weights_for_assignment_in_every_course(self, author, assignment_id):
+        try:
+            courseStructureView = CourseStructureView()
+            courses = Course.objects.filter(author=author)
+            for course in courses:
+                if assignment_id in courseStructureView.get_all_assignments(course):
+                    assignment = AssignmentElement.objects.get(id=assignment_id)
+                    self.initialize_weights_for_assignment(assignment, course)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     def initialize_weights_for_topic(self, topic_id, course):
         try:
             try:
@@ -896,7 +926,34 @@ class AssignmentWeightsView(APIView):
                     assignmentWeight.save()
         except Exception as e:
             print(str(e))
-        
+
+    def remove_weights_for_assignment(self, assignment_id, course_id):
+        try:
+            try:
+                assignment = AssignmentElement.objects.get(id=assignment_id)
+            except AssignmentElement.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            try:
+                course = Course.objects.get(id=course)
+            except Course.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            topics = CourseTopic.objects.filter(course=course)
+            for topic in topics:
+                assignmentWeight = AssignmentWeight.objects.get(topic=topic, assignment=assignment)
+                assignmentWeight.delete()
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def remove_weights_for_assignment_in_every_course(self, author, assignment_id):
+        try:
+            courseStructureView = CourseStructureView()
+            courses = Course.objects.filter(author=author)
+            for course in courses:
+                if assignment_id not in courseStructureView.get_all_assignments(course):
+                    self.remove_weights_for_assignment(assignment_id, course.id)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
     def post(self, request, course_id, assignment_id): # dodanie zadania do kursu, zrobienie wag
