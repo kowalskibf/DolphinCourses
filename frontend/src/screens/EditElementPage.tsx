@@ -196,6 +196,43 @@ export default function EditElementPage() {
         });
     }
 
+    const handleAddAssignmentToExam = (assignment: AssignmentElement) => {
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const maxOrder = prev.questions.length > 0
+                ? Math.max(...prev.questions.map((q: any) => q.order))
+                : 0;
+            const newExamQuestion: DetailExamQuestion = {
+                id: 0,
+                marks: 1,
+                order: maxOrder + 1,
+                question: assignment,
+            };
+            const updatedExamQuestions = [...prev.questions, newExamQuestion];
+            const totalMarks = countTotalMarks(updatedExamQuestions);
+            const reorderedExamQuestions = reorderQuestions(updatedExamQuestions);
+            return {
+                ...prev,
+                questions: reorderedExamQuestions,
+                total_marks: totalMarks,
+            };
+        });
+    }
+
+    const exam_handleOnDrag = (e: React.DragEvent, assignment: AssignmentElement) => {
+        e.dataTransfer.setData("assignment", JSON.stringify(assignment));
+    }
+
+    const exam_handleOnDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        const assignmentData = e.dataTransfer.getData("assignment");
+        const assignment: AssignmentElement = JSON.parse(assignmentData);
+        handleAddAssignmentToExam(assignment);
+    }
+
+    const exam_handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    }
 
     const handleFileChange = (
         e: React.ChangeEvent<HTMLInputElement>,
@@ -470,7 +507,7 @@ export default function EditElementPage() {
                                         key={assignment.id}
                                         className={assignment.type + '-element any-element element-margin'}
                                         draggable
-                                    //onDragStart={}
+                                        onDragStart={(e) => exam_handleOnDrag(e, assignment)}
                                     >
                                         Name: {assignment.name}
                                         <br />
@@ -572,8 +609,8 @@ export default function EditElementPage() {
                                 ))}
                             <div
                                 id="drop-here-field"
-                            // onDrop={}
-                            // onDragOver={}
+                                onDrop={(e) => exam_handleOnDrop(e)}
+                                onDragOver={exam_handleDragOver}
                             >
                                 Drop assignments here
                             </div>
