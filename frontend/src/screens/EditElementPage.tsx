@@ -147,28 +147,54 @@ export default function EditElementPage() {
                 questions: updated,
             };
         });
-        // setElement((prevElement) => {
-        //     if (!prevElement) return prevElement;
-
-        //     const updatedQuestions = prevElement.data.questions.map((q: any) => {
-        //         if (q.order === order1) {
-        //             return { ...q, order: order2 };
-        //         }
-        //         if (q.order === order2) {
-        //             return { ...q, order: order1 };
-        //         }
-        //         return q;
-        //     });
-
-        //     return {
-        //         ...prevElement,
-        //         data: {
-        //             ...prevElement.data,
-        //             questions: updatedQuestions,
-        //         },
-        //     };
-        // });
     };
+
+    const countTotalMarks = (examQuestions: any) => {
+        return examQuestions.reduce((sum: number, question: any) => sum + (question.marks || 0), 0);
+    }
+
+    const handleModifyMarks = (examQuestionId: number, newMarks: number) => {
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const updatedExamQuestions = prev.questions.map((q: any) => {
+                if (q.id === examQuestionId) {
+                    return { ...q, marks: newMarks };
+                }
+                return q;
+            })
+            //const totalMarks = updatedExamQuestions.reduce((sum: number, question: any) => sum + (question.marks || 0), 0);
+            const totalMarks = countTotalMarks(updatedExamQuestions);
+            return {
+                ...prev,
+                questions: updatedExamQuestions,
+                total_marks: totalMarks,
+            };
+        });
+    }
+
+    const reorderQuestions = (examQuestions: any) => {
+        const reorderedQuestions = examQuestions.sort((a: any, b: any) => a.order - b.order).map((question: any, index: number) => ({
+            ...question,
+            order: index + 1,
+        }));
+        return reorderedQuestions;
+    }
+
+    const handleRemoveAssignmentFromExam = (examQuestionId: number) => {
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const updatedExamQuestions = prev.questions.filter(
+                (q: any) => q.id !== examQuestionId
+            );
+            const totalMarks = countTotalMarks(updatedExamQuestions);
+            const reorderedQuestions = reorderQuestions(updatedExamQuestions);
+            return {
+                ...prev,
+                questions: reorderedQuestions,
+                total_marks: totalMarks,
+            };
+        });
+    }
 
 
     const handleFileChange = (
@@ -443,6 +469,8 @@ export default function EditElementPage() {
                                     <div
                                         key={assignment.id}
                                         className={assignment.type + '-element any-element element-margin'}
+                                        draggable
+                                    //onDragStart={}
                                     >
                                         Name: {assignment.name}
                                         <br />
@@ -489,7 +517,13 @@ export default function EditElementPage() {
                                     >
                                         Name: {examQuestion.question.name}
                                         <br />
-                                        Marks: {examQuestion.marks}
+                                        Marks:
+                                        <input
+                                            type="number"
+                                            min={0}
+                                            value={examQuestion.marks}
+                                            onChange={(e) => handleModifyMarks(examQuestion.id, parseInt(e.target.value))}
+                                        />
                                         <br />
                                         Question: {examQuestion.question.data.question}
                                         <br />
@@ -533,8 +567,16 @@ export default function EditElementPage() {
                                             </>
                                         )}
                                         <a href={`/element/${examQuestion.question.id}/edit`}>Edit</a>
+                                        <button type="button" onClick={() => handleRemoveAssignmentFromExam(examQuestion.id)}>Remove</button>
                                     </div>
                                 ))}
+                            <div
+                                id="drop-here-field"
+                            // onDrop={}
+                            // onDragOver={}
+                            >
+                                Drop assignments here
+                            </div>
                         </div>
                     </div>
 
