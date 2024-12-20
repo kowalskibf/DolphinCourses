@@ -164,6 +164,46 @@ export default function NewElementPage() {
         });
     };
 
+    const countTotalMarks = (examQuestions: any) => {
+        return examQuestions.reduce((sum: number, question: any) => sum + (question.marks || 0), 0);
+    }
+
+    const reorderQuestions = (examQuestions: any) => {
+        const reorderedQuestions = examQuestions
+            .sort((a: any, b: any) => a.order - b.order)
+            .map((question: any, index: number) => ({
+                ...question,
+                order: index + 1,
+            }));
+        return reorderedQuestions;
+    }
+
+    const handleSwapOrder = (order1: number, order2: number) => {
+        setExamElementAssignments((prev) => {
+            if (!prev) return prev;
+            const updated = prev.map((q: any) => {
+                if (q.order === order1) {
+                    return { ...q, order: order2 };
+                }
+                if (q.order === order2) {
+                    return { ...q, order: order1 };
+                }
+                return q;
+            })
+            return updated;
+        })
+    }
+
+    const handleRemoveAssignmentFromExam = (order: number) => {
+        setExamElementAssignments((prev) => {
+            if (!prev) return prev;
+            const updated = prev.filter((q: any) => q.order !== order);
+            const reorderedQuestions = reorderQuestions(updated);
+            return reorderedQuestions;
+        })
+        setExamElementTotalMarks(countTotalMarks(examElementAssignments));
+    }
+
     type ModuleCourseElement = CourseElement & {
         order: number;
     }
@@ -407,6 +447,13 @@ export default function NewElementPage() {
                                         value={assignment.marks}
                                         onChange={(e) => handleMarksChange(i, parseInt(e.target.value) || 0)}
                                     />
+                                    {assignment.order > 1 && (
+                                        <button type="button" onClick={() => handleSwapOrder(assignment.order, assignment.order - 1)}>^</button>
+                                    )}
+                                    {assignment.order < examElementAssignments.length && (
+                                        <button type="button" onClick={() => handleSwapOrder(assignment.order, assignment.order + 1)}>v</button>
+                                    )}
+                                    <button type="button" onClick={() => handleRemoveAssignmentFromExam(assignment.order)}>Remove</button>
                                 </div>
                             ))}
                     </div>
