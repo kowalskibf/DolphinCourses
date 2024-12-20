@@ -43,6 +43,17 @@ export default function MyElementsPage() {
             .then((response) => fetchElements());
     }
 
+    const handleDeleteElement = async (element_id: number) => {
+        fetch(`http://127.0.0.1:8000/api/element/${element_id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => fetchElements());
+    }
+
     useEffect(() => {
         fetchElements();
     }, []);
@@ -180,6 +191,7 @@ export default function MyElementsPage() {
                             {['text', 'image', 'video', 'example', 'assignment'].includes(element.type) ?
                                 <button type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
                                 : ""}
+                            <button type="button" onClick={() => handleDeleteElement(element.id)}>Delete</button>
                         </div>
                     ))}
             </div>

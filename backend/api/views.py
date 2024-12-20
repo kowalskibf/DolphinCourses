@@ -479,6 +479,38 @@ class ElementView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
+    def delete(self, request, element_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            element = Element.objects.get(id=element_id)
+        except Element.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not element.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
+            if Type.objects.filter(id=element_id).exists():
+                element = Type.objects.get(id=element_id)
+                break
+        if ElementToModule.objects.filter(element=element).exists():
+            return Response({"error": "Detach element from all modules to delete it."}, status=status.HTTP_400_BAD_REQUEST)
+        if element.type == 'assignment':
+            if ExamQuestion.objects.filter(question=element).exists():
+                return Response({"error": "Detach assignment from all exams to delete it."}, status=status.HTTP_400_BAD_REQUEST)
+        if element.type == 'module':
+            if ModuleToCourse.objects.filter(module=element).exists():
+                return Response({"error": "Detach module from all courses to delete it."}, status=status.HTTP_400_BAD_REQUEST)
+        element.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+        
             
         
 
