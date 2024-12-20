@@ -874,6 +874,35 @@ class ElementToModuleView(APIView):
             elementToModule.order += 1
             elementToModule.save()
         return Response(status=status.HTTP_200_OK)
+    
+    def delete(self, request, module_id, element_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            module = ModuleElement.objects.get(id=module_id)
+        except ModuleElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            element = Element.objects.get(id=element_id)
+        except Element.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not module.author == account or not element.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            elementToModule = ElementToModule.objects.get(module=module, element=element)
+        except ElementToModule.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        for elementToModuleGT in ElementToModule.objects.filter(module=module, order__gt=elementToModule.order):
+            elementToModuleGT.order -= 1
+            elementToModuleGT.save()
+        elementToModule.delete()
+        return Response(status=status.HTTP_200_OK)
 
 class AssignmentWeightView(APIView):
     def post(self, request, assignment_id, topic_id):

@@ -222,6 +222,19 @@ export default function EditCoursePage() {
             })
     }
 
+    const handleDetachElement = async (module_id: number, element_id: number) => {
+        const response = await fetch(`http://127.0.0.1:8000/api/module/${module_id}/structure/${element_id}`, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => {
+                fetchCourseStructure();
+            })
+    }
+
 
 
     useEffect(() => {
@@ -439,6 +452,7 @@ export default function EditCoursePage() {
                                     <br />
                                     <button onClick={() => handleMoveElement(view.id, element.element_data.id, "down")}>v</button>
                                     <br />
+                                    <button onClick={() => handleDetachElement(view.id, element.element_data.id)}>Detach</button>
                                     {element.element_data.type == "module" ?
                                         <>
                                             <button onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
