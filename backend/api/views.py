@@ -902,6 +902,12 @@ class ElementToModuleView(APIView):
             elementToModuleGT.order -= 1
             elementToModuleGT.save()
         elementToModule.delete()
+        assignmentWeightsView = AssignmentWeightsView()
+        if element.type == "assignment":
+            assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, element.id)
+        elif element.type == "exam":
+            for examQuestion in ExamQuestion.objects.filter(exam=element):
+                assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, examQuestion.question.id)
         return Response(status=status.HTTP_200_OK)
 
 class AssignmentWeightView(APIView):
@@ -995,25 +1001,33 @@ class AssignmentWeightsView(APIView):
             except AssignmentElement.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             try:
-                course = Course.objects.get(id=course)
+                course = Course.objects.get(id=course_id)
             except Course.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             topics = CourseTopic.objects.filter(course=course)
             for topic in topics:
+                print(topic.topic)
                 assignmentWeight = AssignmentWeight.objects.get(topic=topic, assignment=assignment)
                 assignmentWeight.delete()
+            return True
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return False
 
     def remove_weights_for_assignment_in_every_course(self, author, assignment_id):
         try:
             courseStructureView = CourseStructureView()
             courses = Course.objects.filter(author=author)
             for course in courses:
+                print(f"przeszukkuje kurs {course.name}")
                 if assignment_id not in courseStructureView.get_all_assignments(course):
-                    self.remove_weights_for_assignment(assignment_id, course.id)
+                    print(f"nie ma assignment {assignment_id}")
+                    if not self.remove_weights_for_assignment(assignment_id, course.id):
+                        print("jakis blad")
+                        return False
+                    print("bez bledu")
+            return True
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return False
 
 
 

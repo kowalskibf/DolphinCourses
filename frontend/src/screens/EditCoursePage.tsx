@@ -163,6 +163,19 @@ export default function EditCoursePage() {
             })
     }
 
+    const handleDetachModule = async (module_id: number) => {
+        const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/structure/${module_id}`, {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => {
+                fetchCourseStructure();
+            });
+    }
+
     const handleAddElement = async (element: CourseElement) => {
         assertModuleElementStructure(view);
         const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/module/${view.id}/structure/${element.id}`, {
@@ -406,6 +419,8 @@ export default function EditCoursePage() {
                                     <button onClick={() => handleMoveModule(module.module.id, "up")}>^</button>
                                     <br />
                                     <button onClick={() => handleMoveModule(module.module.id, "down")}>v</button>
+                                    <br />
+                                    <button onClick={() => handleDetachModule(module.module.id)}>Detach</button>
                                     <br />
                                     <button onClick={() => handleChangeLocationInto(module.order)}>Enter</button>
                                 </div>
