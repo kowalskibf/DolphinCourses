@@ -21,4 +21,5 @@ urlpatterns = [
     path('course/<int:course_id>/module/<int:module_id>/structure/<int:element_id>', ElementToModuleView.as_view(), name='element_to_module'),
     path('module/<int:module_id>/structure/<int:element_id>', ElementToModuleView.as_view(), name='element_to_module'),
     path('element/<int:element_id>/copy', ElementCopyView.as_view(), name='element_copy'),
+    path('course/<int:course_id>/assignment/<int:assignment_id>/weights', AssignmentWeightsView.as_view(), name='assignment_weights'),
 ]

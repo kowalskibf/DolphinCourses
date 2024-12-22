@@ -1067,6 +1067,7 @@ class AssignmentWeightsView(APIView):
         if not course.author == account:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         body = json.loads(request.body)
+        print(1)
         try:
             weights = body["weights"] # struktura [{topic_id, weight}, {topic_id, weight}, ...]
         except:
@@ -1078,7 +1079,7 @@ class AssignmentWeightsView(APIView):
         if not assignment.author == account:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         for pair in weights:
-            topic_id = pair["topic_id"]
+            topic_id = pair["topic"]["id"]
             weight = pair["weight"]
             try:
                 topic = CourseTopic.objects.get(id=topic_id)
@@ -1091,10 +1092,32 @@ class AssignmentWeightsView(APIView):
             except CourseTopic.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
         for pair in weights:
-            topic_id = pair["topic_id"]
+            topic_id = pair["topic"]["id"]
             weight = pair["weight"]
             topic = CourseTopic.objects.get(id=topic_id)
             assignmentWeight = AssignmentWeight.objects.get(assignment=assignment, topic=topic)
             assignmentWeight.weight = weight
             assignmentWeight.save()
         return Response(status=status.HTTP_200_OK)
+    
+    def get(self, request, course_id, assignment_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            assignment = AssignmentElement.objects.get(id=assignment_id)
+        except AssignmentElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not course.author == account or not assignment.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        serializer = AssignmentElementStructureSerializer(assignment, context={"course_id": course_id})
+        return Response(serializer.data)

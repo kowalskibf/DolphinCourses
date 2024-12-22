@@ -332,3 +332,10 @@ class CourseStructureSerializer(serializers.ModelSerializer):
         model = Course
         fields = ('id', 'author', 'name', 'description', 'image', 'language', 'duration', 'last_updated', 'is_public', 'price_currency', 'price', 'promo_price', 'promo_expires', 'modules')
 
+# class AssignmentElementWeightsSerializer(serializers.ModelSerializer):
+#     author = AccountSerializer(read_only=True)
+#     weights = AssignmentWeightStructureSerializer(source='assignment_weights', many=True, read_only=True)
+
+#     class Meta:
+#         model = AssignmentElement
+#         fields = ('id', 'name', 'author', 'type', 'question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'hide_answers', 'explanation', 'explanation_image', 'weights')
