@@ -229,8 +229,8 @@ class MyElementsView(APIView):
         user = request.user
         account = Account.objects.get(user=user)
         elements = Element.objects.filter(author=account)
-        #serializer = ElementSerializer(elements, many=True)
-        serializer = DetailElementSerializer(elements, many=True)
+        serializer = ElementSerializer(elements, many=True)
+        #serializer = DetailElementSerializer(elements, many=True)
         return Response(serializer.data)
     
 class ElementView(APIView):

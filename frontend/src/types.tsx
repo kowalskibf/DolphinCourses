@@ -193,6 +193,31 @@ type AssignmentWeightStructure = {
     weight: number;
 };
 
+type TextElementStructure = {
+    id: number;
+    content: string;
+}
+
+type ImageElementStructure = {
+    id: number;
+    image: string;
+    description: string;
+}
+
+type VideoElementStructure = {
+    id: number;
+    video: string;
+    description: string;
+}
+
+type ExampleElementStructure = {
+    id: number;
+    question: string;
+    image: string;
+    explanation: string;
+    explanation_image: string;
+}
+
 type AssignmentElementStructure = {
     id: number;
     question: string;
@@ -240,19 +265,19 @@ type ElementDataStructure =
     }
     | {
         type: 'text';
-        data: TextElement;
+        data: TextElementStructure //TextElement;
     }
     | {
         type: 'image';
-        data: ImageElement;
+        data: ImageElementStructure //ImageElement;
     }
     | {
         type: 'video';
-        data: VideoElement;
+        data: VideoElementStructure //VideoElement;
     }
     | {
         type: 'example';
-        data: ExampleElement;
+        data: ExampleElementStructure //ExampleElement;
     }
     | {
         type: 'assignment';

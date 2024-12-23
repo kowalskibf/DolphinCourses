@@ -454,6 +454,102 @@ export default function EditCoursePage() {
                                     <div className={element.element_data.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
                                         {element.element_data.name} {element.uses > 1 ? `(used in ${element.uses - 1} other modules)` : ""}
                                     </div>
+                                    {element.element_data.type == "text" && (
+                                        <>
+                                            Content: {element.element_data.data.content}
+                                        </>
+                                    )}
+                                    {element.element_data.type == "image" && (
+                                        <>
+                                            <img src={MEDIA_URL + element.element_data.data.image} />
+                                            <br />
+                                            Description: {element.element_data.data.description}
+                                        </>
+                                    )}
+                                    {element.element_data.type == "video" && (
+                                        <>
+                                            <video src={MEDIA_URL + element.element_data.data.video} controls />
+                                            <br />
+                                            Description: {element.element_data.data.description}
+                                        </>
+                                    )}
+                                    {element.element_data.type == "example" && (
+                                        <>
+                                            Question: {element.element_data.data.question}
+                                            <br />
+                                            {element.element_data.data.image && (
+                                                <img src={MEDIA_URL + element.element_data.data.image} />
+                                            )}
+                                            <br />
+                                            Explanation: {element.element_data.data.explanation}
+                                            <br />
+                                            {element.element_data.data.explanation_image && (
+                                                <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                            )}
+                                        </>
+                                    )}
+                                    {element.element_data.type == "assignment" && (
+                                        <>
+                                            Question: {element.element_data.data.question}
+                                            <br />
+                                            Image: <img src={MEDIA_URL + element.element_data.data.image} />
+                                            <br />
+                                            {element.element_data.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                            <br />
+                                            {element.element_data.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                            <br />
+                                            Answers:
+                                            {element.element_data.data.answers.map((answer, i) => (
+                                                <li key={i}>
+                                                    {answer} {(element.element_data.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                                </li>
+                                            ))}
+                                            Explanation: {element.element_data.data.explanation}
+                                            <br />
+                                            Explanation image:
+                                            <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+
+                                        </>
+                                    )}
+                                    {element.element_data.type == "exam" && (
+                                        <>
+                                            Description: {element.element_data.data.description}
+                                            <br />
+                                            Duration: {element.element_data.data.duration}
+                                            <br />
+                                            Total marks: {element.element_data.data.total_marks}
+                                            <br />
+                                            {element.element_data.data.questions.map((examQuestion, i) => (
+                                                <>
+                                                    <br />
+                                                    Marks: {examQuestion.marks}
+                                                    <br />
+                                                    Question: {examQuestion.question.question}
+                                                    {examQuestion.question.image && (
+                                                        <img src={MEDIA_URL + examQuestion.question.image} />
+                                                    )}
+                                                    <br />
+                                                    {examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                                    <br />
+                                                    {examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}
+                                                    <br />
+                                                    Answers:
+                                                    {examQuestion.question.answers.map((answer, i) => (
+                                                        <li key={i}>
+                                                            {answer} {(examQuestion.question as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                                        </li>
+                                                    ))}
+                                                    Explanation: {examQuestion.question.explanation}
+                                                    <br />
+                                                    {examQuestion.question.explanation_image && (
+                                                        <img src={MEDIA_URL + examQuestion.question.explanation_image} />
+                                                    )}
+                                                    <a href={`/course/${id}/assignment/${examQuestion.question.id}/weights/edit`} target='_blank'>Modify weights</a>
+                                                    <br />
+                                                </>
+                                            ))}
+                                        </>
+                                    )}
                                     {element.element_data.type == "module" ?
                                         <>
                                             Title: {element.element_data.data.title}
@@ -473,6 +569,11 @@ export default function EditCoursePage() {
                                             <button onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
                                         </>
                                         : ""}
+                                    {element.element_data.type == "assignment" && (
+                                        <>
+                                            <a href={`/course/${id}/assignment/${element.element_data.id}/weights/edit`} target='_blank'>Modify weights</a>
+                                        </>
+                                    )}
                                 </div>
                             ))}
                         <br />

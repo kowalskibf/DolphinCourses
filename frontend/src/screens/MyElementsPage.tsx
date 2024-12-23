@@ -187,6 +187,14 @@ export default function MyElementsPage() {
 
                                 </>
                                 : ""}
+                            {element.type === 'module' && (
+                                <>
+                                    Title: {element.data.title}
+                                    <br />
+                                    Description: {element.data.description}
+                                    <br />
+                                </>
+                            )}
                             <a href={`/element/${element.id}/edit`}>Edit</a>
                             {['text', 'image', 'video', 'example', 'assignment'].includes(element.type) ?
                                 <button type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
