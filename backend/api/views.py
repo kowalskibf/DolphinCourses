@@ -452,11 +452,14 @@ class ElementView(APIView):
                     assignmentWeightsView.initialize_weights_for_assignment_in_every_course(account, assignmentElement.id)
                     assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, assignmentElement.id)
             elif element.type == 'module':
+                courseStructureView = CourseStructureView()
+                new_modules_ids = [int(elem["element"]["id"]) for elem in json.loads(request.data.get("elements"))]
+                if courseStructureView.editing_would_cause_infinite_recursion(element, new_modules_ids):
+                    return Response({"error": "This action would cause infinite recursion."}, status=status.HTTP_400_BAD_REQUEST)
                 element.title = request.data.get("title")
                 element.description = request.data.get("description")
                 if request.data.get("image"):
                     element.image = request.data.get("image")
-                courseStructureView = CourseStructureView()
                 assignmentWeightsView = AssignmentWeightsView()
                 assignmentIds2D_before = []
                 for course in Course.objects.filter(author=account):
@@ -681,6 +684,78 @@ class CourseStructureView(APIView):
                 process_element(element)
 
         return list(set(assignmentIds))
+    
+    def get_all_parent_modules(self, module):
+        def process_parent(child):
+            for elementToModule in ElementToModule.objects.filter(element=child):
+                parent = elementToModule.module
+                parentModulesIds.append(parent.id)
+                process_parent(parent)
+        parentModulesIds = [module.id]
+        process_parent(module)
+        return list(set(parentModulesIds))
+
+    def get_all_children_modules(self, module):
+        def process_child(parent):
+            for elementToModule in ElementToModule.objects.filter(module=parent):
+                child = elementToModule.element
+                if child.type == "module":
+                    childModulesIds.append(child.id)
+                    process_child(child)
+        childModulesIds = []
+        process_child(module)
+        return list(set(childModulesIds))
+
+    # def get_all_children_modules_for_modules(self, modulesIds):
+    #     def process_child(parent):
+    #         for elementToModule in ElementToModule.objects.filter(module=parent):
+    #             child = elementToModule.element
+    #             if child.type == "module":
+    #                 childModulesIds.append(child.id)
+    #                 process_child(child)
+    #     childModulesIds = []
+    #     for moduleId in modulesIds:
+    #         if ModuleElement.objects.filter(id=moduleId).exists():
+    #             childModulesIds.append(moduleId)
+    #     for moduleId in modulesIds:
+    #         if ModuleElement.objects.filter(id=moduleId).exists():
+    #             currParent = ModuleElement.objects.get(id=moduleId)
+    #             process_child(currParent)
+    #     return list(set(childModulesIds))
+
+    def attaching_would_cause_infinite_recursion(self, parent_module, child_module):
+        parent_modules = self.get_all_parent_modules(parent_module)
+        children_modules = self.get_all_children_modules(child_module)
+        if child_module.id in parent_modules:
+            return True
+        for child in children_modules:
+            if child in parent_modules:
+                return True
+        return False
+    
+    def editing_would_cause_infinite_recursion(self, parent_module, new_modules_ids):
+        print(f"parent module id: {parent_module.id}")
+        print(f"new modules ids: {[x for x in new_modules_ids]}")
+        parent_modules = self.get_all_parent_modules(parent_module)
+        print(f"parent modules: {[x for x in parent_modules]}")
+        for new_module_id in new_modules_ids:
+            print(f"\tnew module id: {new_module_id}")
+            if ModuleElement.objects.filter(id=new_module_id).exists():
+                curr_module = ModuleElement.objects.get(id=new_module_id)
+                print(f"\t\tcurr module id: {curr_module.id}")
+                curr_parent_modules = self.get_all_parent_modules(curr_module)
+                print(f"\t\tcurr parent modules: {[x for x in curr_parent_modules]}")
+                curr_children_modules = self.get_all_children_modules(curr_module)
+                print(f"\t\tcurr children modules: {[x for x in curr_children_modules]}")
+                for curr_child in curr_children_modules:
+                    print(f"\t\t\tcurr child: {curr_child}")
+                    if curr_child in curr_parent_modules or curr_child in parent_modules:
+                        print(f"\t\t\t\tJEST")
+                        return True
+        return False
+        
+            
+        
 
 
         
@@ -812,6 +887,10 @@ class ElementToModuleView(APIView):
             if ElementToModule.objects.filter(module=module, element=element).exists():
                 return Response({"message": "Element is already added to this module"}, status=status.HTTP_400_BAD_REQUEST)
             #if not body["copy"]:
+            if element.type == "module":
+                courseStructureView = CourseStructureView()
+                if courseStructureView.attaching_would_cause_infinite_recursion(module, element):
+                    return Response({"error": "This action would cause infinite recursion."}, status=status.HTTP_400_BAD_REQUEST)
             if True:
                 elementToModule = ElementToModule(
                     module=module,
