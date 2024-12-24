@@ -204,6 +204,45 @@ export default function NewElementPage() {
         setExamElementTotalMarks(countTotalMarks(examElementAssignments));
     }
 
+    const reorderElements = (elements: any) => {
+        const reorderedElements = elements
+            .sort((a: any, b: any) => a.order - b.order)
+            .map((element: any, index: number) => ({
+                ...element,
+                order: index + 1,
+            }));
+        return reorderedElements;
+    }
+
+    const handleSwapElementsOrder = (order1: number, order2: number) => {
+        setModuleElementElements((prev) => {
+            if (!prev) return prev;
+            const updated = prev.map((e: any) => {
+                if (e.order === order1) {
+                    return { ...e, order: order2 };
+                }
+                if (e.order === order2) {
+                    return { ...e, order: order1 };
+                }
+                return e;
+            })
+            return updated;
+        })
+    }
+
+    const handleRemoveElementFromModule = (order: number) => {
+        setModuleElementElements((prev) => {
+            if (!prev) return prev;
+            const updated = prev.filter((e: any) => e.order !== order);
+            const reorderedElements = reorderElements(updated);
+            return reorderedElements;
+        })
+    }
+
+
+
+
+
     type ModuleCourseElement = CourseElement & {
         order: number;
     }
@@ -275,6 +314,8 @@ export default function NewElementPage() {
             formData.append("description", moduleElementDescription);
             if (moduleElementImage)
                 formData.append("image", moduleElementImage);
+            formData.append("module_elements", JSON.stringify(moduleElementElements));
+
         }
         const response = await fetch("http://127.0.0.1:8000/api/element", {
             method: "POST",
@@ -298,6 +339,9 @@ export default function NewElementPage() {
         setExamElementTotalMarks(totalMarks);
     }, [examElementAssignments]);
 
+    useEffect(() => {
+        console.log(moduleElementElements);
+    }, [moduleElementElements]);
     return (
         <>
             <a href="/elements/my">Back</a>
@@ -502,6 +546,13 @@ export default function NewElementPage() {
                                     {element.id}<br />
                                     {element.name}<br />
                                     {element.type}<br />
+                                    {element.order > 1 && (
+                                        <button type="button" onClick={() => handleSwapElementsOrder(element.order, element.order + 1)}>v</button>
+                                    )}
+                                    {element.order < moduleElementElements.length && (
+                                        <button type="button" onClick={() => handleSwapElementsOrder(element.order, element.order - 1)}>^</button>
+                                    )}
+                                    <button type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Remove</button>
                                 </div>
                             ))}
                     </div>

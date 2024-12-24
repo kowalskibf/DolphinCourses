@@ -344,6 +344,23 @@ class ElementView(APIView):
                         module_data["image"] = request.data.get("image")
                     moduleElement = ModuleElement(**module_data)
                     moduleElement.save()
+                    for rawElement in json.loads(request.data.get("module_elements")):
+                        try:
+                            for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
+                                if Type.objects.filter(id=int(rawElement["id"])).exists():
+                                    element = Type.objects.get(id=int(rawElement["id"]))
+                                    break
+                            #element = Element.objects.get(id=int(element["id"]))
+                        except Element.DoesNotExist:
+                            return Response(status=status.HTTP_404_NOT_FOUND)
+                        if not element.author == account:
+                            return Response(status=status.HTTP_401_UNAUTHORIZED)
+                        elementToModule = ElementToModule(
+                            element=element,
+                            module=moduleElement,
+                            order=int(rawElement["order"])
+                        )
+                        elementToModule.save()
                     return Response(status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
@@ -695,6 +712,10 @@ class ModuleToCourseView(APIView):
             order=ModuleToCourse.objects.filter(course=course).count() + 1
         )
         moduleToCourse.save()
+        courseStructureView = CourseStructureView()
+        assignmentWeightsView = AssignmentWeightsView()
+        for assignmentId in courseStructureView.get_all_assignments(course):
+            assignmentWeightsView.initialize_weights_for_assignment(AssignmentElement.objects.get(id=assignmentId), course)
         return Response(status=status.HTTP_200_OK)
     
     def put(self, request, course_id, module_id):
@@ -758,7 +779,12 @@ class ModuleToCourseView(APIView):
         for mtc in ModuleToCourse.objects.filter(course=course, order__gt=moduleToCourse.order):
             mtc.order -= 1
             mtc.save()
+        courseStructureView = CourseStructureView()
+        assignmentWeightsView = AssignmentWeightsView()
+        assignmentIds = courseStructureView.get_all_assignments(course)
         moduleToCourse.delete()
+        for assignmentId in assignmentIds:
+            assignmentWeightsView.remove_weights_for_assignment(assignmentId, course_id)
         return Response(status=status.HTTP_200_OK)
 
 class ElementToModuleView(APIView):
@@ -767,15 +793,9 @@ class ElementToModuleView(APIView):
             user = request.user
             account = Account.objects.get(user=user)
             try:
-                #print("\n" * 20 + "ok" + "\n" *20)
-                #body = json.loads(request.body)
                 body={}
-                print("\n" * 20 + "ok" + "\n" *20)
             except Exception as e:
-                print("="*20)
-                print(str(e))
-                print("="*20)
-                return Response(status=status.HTTP_409_CONFLICT)
+                return Response(status=status.HTTP_400_BAD_REQUEST)
             try:
                 module = ModuleElement.objects.get(id=module_id)
             except ModuleElement.DoesNotExist:
@@ -816,21 +836,28 @@ class ElementToModuleView(APIView):
                 )
                 elementToModule.save()
 
-            if element.type == "assignment":
-                assignment = AssignmentElement.objects.get(id=element_id)
-                assignmentWeightsView = AssignmentWeightsView()
-                try:
-                    assignmentWeightsView.initialize_weights_for_assignment(assignment, course)
-                except Exception as e:
-                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            elif element.type == "exam":
-                assignmentWeightsView = AssignmentWeightsView()
-                try:
-                    examQuestions = ExamQuestion.objects.filter(exam=element)
-                    for examQuestion in examQuestions:
-                        assignmentWeightsView.initialize_weights_for_assignment(examQuestion.question, course)
-                except Exception as e:
-                    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            courseStructureView = CourseStructureView()
+            assignmentWeightsView = AssignmentWeightsView()
+            for course in Course.objects.filter(author=account):
+                for assignmentId in courseStructureView.get_all_assignments(course):
+                    assignmentWeightsView.initialize_weights_for_assignment(AssignmentElement.objects.get(id=assignmentId), course)
+            # chyba odtad niepotrzebne
+            # if element.type == "assignment":
+            #     assignment = AssignmentElement.objects.get(id=element_id)
+            #     assignmentWeightsView = AssignmentWeightsView()
+            #     try:
+            #         assignmentWeightsView.initialize_weights_for_assignment(assignment, course)
+            #     except Exception as e:
+            #         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            # elif element.type == "exam":
+            #     assignmentWeightsView = AssignmentWeightsView()
+            #     try:
+            #         examQuestions = ExamQuestion.objects.filter(exam=element)
+            #         for examQuestion in examQuestions:
+            #             assignmentWeightsView.initialize_weights_for_assignment(examQuestion.question, course)
+            #     except Exception as e:
+            #         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            # chyba dotad niepotrzebne
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             print(str(e))
@@ -901,13 +928,26 @@ class ElementToModuleView(APIView):
         for elementToModuleGT in ElementToModule.objects.filter(module=module, order__gt=elementToModule.order):
             elementToModuleGT.order -= 1
             elementToModuleGT.save()
-        elementToModule.delete()
+        assignmentIds2D = []
+        courseStructureView = CourseStructureView()
         assignmentWeightsView = AssignmentWeightsView()
-        if element.type == "assignment":
-            assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, element.id)
-        elif element.type == "exam":
-            for examQuestion in ExamQuestion.objects.filter(exam=element):
-                assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, examQuestion.question.id)
+        for course in Course.objects.filter(author=account):
+            assignmentIds2D.append(courseStructureView.get_all_assignments(course))
+        elementToModule.delete()
+        i = 0
+        for course in Course.objects.filter(author=account):
+            for assignmentId in assignmentIds2D[i]:
+                assignmentWeightsView.remove_weights_for_assignment(assignmentId, course.id)
+            i += 1
+
+        #
+        # assignmentWeightsView = AssignmentWeightsView()
+        # if element.type == "assignment":
+        #     assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, element.id)
+        # elif element.type == "exam":
+        #     for examQuestion in ExamQuestion.objects.filter(exam=element):
+        #         assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, examQuestion.question.id)
+        #
         return Response(status=status.HTTP_200_OK)
 
 class AssignmentWeightView(APIView):
@@ -946,9 +986,10 @@ class AssignmentWeightsView(APIView):
 
     def initialize_weights_for_assignment(self, assignment, course):
         try:
+            courseStructureView = CourseStructureView()
             topics = CourseTopic.objects.filter(course=course)
             for topic in topics:
-                if not AssignmentWeight.objects.filter(assignment=assignment, topic=topic).exists():
+                if not AssignmentWeight.objects.filter(assignment=assignment, topic=topic).exists() and assignment.id in courseStructureView.get_all_assignments(course):
                     try:
                         assignmentWeight = AssignmentWeight(
                         assignment=assignment,
@@ -1005,10 +1046,11 @@ class AssignmentWeightsView(APIView):
             except Course.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
             topics = CourseTopic.objects.filter(course=course)
+            courseStructureView = CourseStructureView()
             for topic in topics:
-                print(topic.topic)
-                assignmentWeight = AssignmentWeight.objects.get(topic=topic, assignment=assignment)
-                assignmentWeight.delete()
+                if AssignmentWeight.objects.filter(assignment=assignment, topic=topic).exists() and assignment_id not in courseStructureView.get_all_assignments(course):
+                    assignmentWeight = AssignmentWeight.objects.get(topic=topic, assignment=assignment)
+                    assignmentWeight.delete()
             return True
         except Exception as e:
             return False
@@ -1019,12 +1061,17 @@ class AssignmentWeightsView(APIView):
             courses = Course.objects.filter(author=author)
             for course in courses:
                 print(f"przeszukkuje kurs {course.name}")
-                if assignment_id not in courseStructureView.get_all_assignments(course):
-                    print(f"nie ma assignment {assignment_id}")
-                    if not self.remove_weights_for_assignment(assignment_id, course.id):
-                        print("jakis blad")
-                        return False
-                    print("bez bledu")
+                # if assignment_id not in courseStructureView.get_all_assignments(course):
+                #     print(f"nie ma assignment {assignment_id}")
+                #     if not self.remove_weights_for_assignment(assignment_id, course.id):
+                #         print("jakis blad")
+                #         return False
+                #     print("bez bledu")
+                print(f"nie ma assignment {assignment_id}")
+                if not self.remove_weights_for_assignment(assignment_id, course.id):
+                    print("jakis blad")
+                    return False
+                print("bez bledu")
             return True
         except Exception as e:
             return False
