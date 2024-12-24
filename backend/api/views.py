@@ -740,20 +740,17 @@ class CourseStructureView(APIView):
         for new_module_id in new_modules_ids:
             if ModuleElement.objects.filter(id=new_module_id).exists():
                 curr_module = ModuleElement.objects.get(id=new_module_id)
-                curr_parent_modules = self.get_all_parent_modules(curr_module)
-                curr_children_modules = self.get_all_children_modules(curr_module)
-                if new_module_id in curr_parent_modules or new_module_id in parent_modules:
+                if curr_module.id == parent_module.id:
                     return True
-                for curr_child in curr_children_modules:
-                    if curr_child in curr_parent_modules or curr_child in parent_modules:
+                if curr_module.id in parent_modules:
+                    return True
+                for curr_child_id in self.get_all_children_modules(curr_module):
+                    curr_child = ModuleElement.objects.get(id=curr_child_id)
+                    if curr_child.id == parent_module.id:
+                        return True
+                    if curr_child.id in parent_modules:
                         return True
         return False
-        
-            
-        
-
-
-        
 
 class ModuleToCourseView(APIView):
     def post(self, request, course_id, module_id):
