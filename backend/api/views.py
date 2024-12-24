@@ -382,29 +382,21 @@ class ElementView(APIView):
 
     def put(self, request, element_id):
         try:
-            print("1")
             user = request.user
             account = Account.objects.get(user=user)
-            print("2")
         except:
-            print("3")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            print("4")
             element = Element.objects.get(id=element_id)
-            print("5")
         except Element.DoesNotExist:
-            print("7")
             return Response(status=status.HTTP_404_NOT_FOUND)
         for Type in (TextElement, ImageElement, VideoElement, ExampleElement, AssignmentElement, ExamElement, ModuleElement):
             if Type.objects.filter(id=element_id).exists():
                 element = Type.objects.get(id=element_id)
                 break
         if not element.author == account:
-            print("8")
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            print("9")
             element.name = request.data.get("name")
             if element.type == 'text':
                 element.content = request.data.get("content")
@@ -438,24 +430,16 @@ class ElementView(APIView):
                 element.description = request.data.get("description")
                 element.duration = request.data.get("duration")
                 element.total_marks = request.data.get("total_marks")
-                print("10")
                 for examQuestion in ExamQuestion.objects.filter(exam=element):
                     examQuestion.delete()
-                print("11")
                 for exam_question in json.loads(request.data.get("questions")):
                     try:
-                        print("12")
                         assignmentElement = AssignmentElement.objects.get(id=int(exam_question["question"]["id"]))
-                        print("13")
                     except AssignmentElement.DoesNotExist:
-                        print("14")
                         return Response(status=status.HTTP_404_NOT_FOUND)
                     try:
-                        print("15")
                         assignmentElement = AssignmentElement.objects.get(id=int(exam_question["question"]["id"]), author=account)
-                        print("16")
                     except AssignmentElement.DoesNotExist:
-                        print("17")
                         return Response(status=status.HTTP_401_UNAUTHORIZED)
                     examQuestion = ExamQuestion(
                         exam=element,
@@ -472,25 +456,38 @@ class ElementView(APIView):
                 element.description = request.data.get("description")
                 if request.data.get("image"):
                     element.image = request.data.get("image")
+                courseStructureView = CourseStructureView()
+                assignmentWeightsView = AssignmentWeightsView()
+                assignmentIds2D_before = []
+                for course in Course.objects.filter(author=account):
+                    assignmentIds2D_before.append(courseStructureView.get_all_assignments(course))
                 for elementOfModule in ElementToModule.objects.filter(module=element):
                     elementOfModule.delete()
-                for elementOfModule in json.loads(request.data.get("module_elements")):
+                for elementOfModule in json.loads(request.data.get("elements")):
                     try:
-                        elem = Element.objects.get(id=int(elementOfModule["id"]))
+                        elem = Element.objects.get(id=int(elementOfModule["element"]["id"]))
                     except Element.DoesNotExist:
                         return Response(status=status.HTTP_404_NOT_FOUND)
                     try:
-                        elem = Element.objects.get(id=int(elementOfModule["id"]), author=account)
+                        elem = Element.objects.get(id=int(elementOfModule["element"]["id"]), author=account)
                     except Element.DoesNotExist:
                         return Response(status=status.HTTP_401_UNAUTHORIZED)
                     elementToModule = ElementToModule(
                         module=element,
                         element=elem,
-                        #course=Course.objects.get(id=1), # TODO
                         order=elementOfModule["order"]
                     )
                     elementToModule.save()
-                return Response({"message": "Not yet"}, status=status.HTTP_200_OK)
+                assignmentIds2D_new = []
+                for course in Course.objects.filter(author=account):
+                    assignmentIds2D_new.append(courseStructureView.get_all_assignments(course))
+                i = 0
+                for course in Course.objects.filter(author=account):
+                    for assignmentId in assignmentIds2D_before[i]:
+                        assignmentWeightsView.remove_weights_for_assignment(assignmentId, course.id)
+                    for assignmentId in assignmentIds2D_new[i]:
+                        assignmentWeightsView.initialize_weights_for_assignment(AssignmentElement.objects.get(id=assignmentId), course)
+                    i += 1
             element.save()
             return Response(status=status.HTTP_200_OK)
         except Exception as e:

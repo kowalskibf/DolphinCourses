@@ -234,6 +234,82 @@ export default function EditElementPage() {
         e.preventDefault();
     }
 
+    const handleAddElementToModule = (element: CourseElement) => {
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const maxOrder = prev.elements.length > 0
+                ? Math.max(...prev.elements.map((e: any) => e.order))
+                : 0;
+            const newElement: DetailElementToModule = {
+                id: 0,
+                order: maxOrder + 1,
+                element: element,
+            };
+            const updatedElements = [...prev.elements, newElement];
+            const reorderedElements = reorderElements(updatedElements);
+            return {
+                ...prev,
+                elements: reorderedElements,
+            };
+        });
+    }
+
+    const reorderElements = (elementsToModule: any) => {
+        const reorderedElements = elementsToModule.sort((a: any, b: any) => a.order - b.order).map((element: any, index: number) => ({
+            ...element,
+            order: index + 1,
+        }));
+        return reorderedElements;
+    }
+
+    const handleSwapElementsOrder = (key: string, order1: number, order2: number) => {
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const updated = prev.elements.map((e: any) => {
+                if (e.order === order1) {
+                    return { ...e, order: order2 };
+                }
+                if (e.order === order2) {
+                    return { ...e, order: order1 };
+                }
+                return e;
+            });
+            return {
+                ...prev,
+                elements: reorderElements(updated),
+            };
+        });
+    };
+
+    const handleRemoveElementFromModule = (order: number) => {
+        setFormData((prev) => {
+            if (!prev) return prev;
+            const updated = prev.elements.filter(
+                (e: any) => e.order !== order
+            );
+            const reordered = reorderElements(updated);
+            return {
+                ...prev,
+                elements: reordered,
+            };
+        });
+    }
+
+    const module_handleOnDrag = (e: React.DragEvent, element: CourseElement) => {
+        e.dataTransfer.setData("element", JSON.stringify(element));
+    }
+
+    const module_handleOnDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        const elementData = e.dataTransfer.getData("element");
+        const element: CourseElement = JSON.parse(elementData);
+        handleAddElementToModule(element);
+    }
+
+    const module_handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+    }
+
     const handleFileChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         imageType: "main" | "explanation" = "main"
@@ -621,7 +697,68 @@ export default function EditElementPage() {
                 : ""}
             {element.type == 'module' ?
                 <>
-                    module
+                    Title: <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} />
+                    <br />
+                    Description: <textarea value={formData.description || ''} onChange={(e) => handleChange('description', e.target.value)} />
+                    <br />
+                    <div id="main-container">
+                        <div className="main-half">
+                            Search:
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            {myElements
+                                .filter((elem) => elem.name.includes(searchQuery))
+                                .map((element, index) => (
+                                    <div
+                                        key={element.id}
+                                        className={element.type + '-element any-element element-margin'}
+                                        draggable
+                                        onDragStart={(e) => module_handleOnDrag(e, element)}
+                                    >
+                                        Name: {element.name}
+                                        <br />
+                                    </div>
+                                ))}
+                        </div>
+                        <div className="main-half">
+                            {(formData as DetailModuleElement["data"]).elements
+                                .sort((a, b) => a.order - b.order)
+                                .map((element, index) => (
+                                    <div
+                                        key={element.element.id}
+                                        className={element.element.type + '-element any-element element-margin'}
+                                    >
+                                        Name: {element.element.name}
+                                        <br />
+                                        {element.order > 1 && (
+                                            <>
+                                                <button type="button" onClick={() => handleSwapElementsOrder('module_elements', element.order, element.order - 1)}>^</button>
+                                                <br />
+                                            </>
+                                        )}
+
+                                        {element.order < formData.elements.length && (
+                                            <>
+                                                <button type="button" onClick={() => handleSwapElementsOrder('module_elements', element.order, element.order + 1)}>v</button>
+                                                <br />
+                                            </>
+                                        )}
+                                        <a href={`/element/${element.element.id}/edit`}>Edit</a>
+                                        <button type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Remove</button>
+                                    </div>
+                                ))}
+                            <div
+                                id="drop-here-field"
+                                onDrop={(e) => module_handleOnDrop(e)}
+                                onDragOver={module_handleDragOver}
+                            >
+                                Drop assignments here
+                            </div>
+                        </div>
+                    </div>
                 </>
                 : ""}
             <button type="button" onClick={handleEditElement}>Save</button>

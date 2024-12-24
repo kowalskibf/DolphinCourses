@@ -133,13 +133,21 @@ class DetailElementToModuleSerializer(serializers.ModelSerializer):
         model = ElementToModule
         fields = ('id', 'element', 'order')
 
+class DetailModuleElementSerializer(serializers.ModelSerializer):
+    elements = DetailElementToModuleSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ModuleElement
+        fields = ('id', 'title', 'description', 'elements')
+
 class DetailElementSerializer(ElementSerializer):
     def get_data(self, obj):
         if obj.type == 'exam':
             return DetailExamElementSerializer(obj.examelement).data
         if obj.type == 'module':
-            module_elements = ElementToModule.objects.filter(module=obj)
-            return DetailElementToModuleSerializer(module_elements, many=True).data
+            #module_elements = ElementToModule.objects.filter(module=obj)
+            #return DetailElementToModuleSerializer(module_elements, many=True).data
+            return DetailModuleElementSerializer(obj.moduleelement).data
         return super().get_data(obj)
 
 class ModuleToCourseSerializer(serializers.ModelSerializer):
