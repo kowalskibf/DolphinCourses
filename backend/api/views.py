@@ -691,7 +691,7 @@ class CourseStructureView(APIView):
                 parent = elementToModule.module
                 parentModulesIds.append(parent.id)
                 process_parent(parent)
-        parentModulesIds = [module.id]
+        parentModulesIds = []
         process_parent(module)
         return list(set(parentModulesIds))
 
@@ -726,6 +726,8 @@ class CourseStructureView(APIView):
     def attaching_would_cause_infinite_recursion(self, parent_module, child_module):
         parent_modules = self.get_all_parent_modules(parent_module)
         children_modules = self.get_all_children_modules(child_module)
+        if parent_module.id == child_module.id:
+            return True
         if child_module.id in parent_modules:
             return True
         for child in children_modules:
@@ -734,23 +736,16 @@ class CourseStructureView(APIView):
         return False
     
     def editing_would_cause_infinite_recursion(self, parent_module, new_modules_ids):
-        print(f"parent module id: {parent_module.id}")
-        print(f"new modules ids: {[x for x in new_modules_ids]}")
         parent_modules = self.get_all_parent_modules(parent_module)
-        print(f"parent modules: {[x for x in parent_modules]}")
         for new_module_id in new_modules_ids:
-            print(f"\tnew module id: {new_module_id}")
             if ModuleElement.objects.filter(id=new_module_id).exists():
                 curr_module = ModuleElement.objects.get(id=new_module_id)
-                print(f"\t\tcurr module id: {curr_module.id}")
                 curr_parent_modules = self.get_all_parent_modules(curr_module)
-                print(f"\t\tcurr parent modules: {[x for x in curr_parent_modules]}")
                 curr_children_modules = self.get_all_children_modules(curr_module)
-                print(f"\t\tcurr children modules: {[x for x in curr_children_modules]}")
+                if new_module_id in curr_parent_modules or new_module_id in parent_modules:
+                    return True
                 for curr_child in curr_children_modules:
-                    print(f"\t\t\tcurr child: {curr_child}")
                     if curr_child in curr_parent_modules or curr_child in parent_modules:
-                        print(f"\t\t\t\tJEST")
                         return True
         return False
         
