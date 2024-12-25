@@ -71,11 +71,11 @@ import parse, { domToReact, DOMNode } from 'html-react-parser';
 import { InlineMath, BlockMath } from 'react-katex';
 import DOMPurify from 'dompurify';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Stylizowanie Quill
+import 'react-quill/dist/quill.snow.css';
 
 export const sanitizeContent = (htmlString: string) => {
     return DOMPurify.sanitize(htmlString, {
-        ALLOWED_TAGS: ['b', 'i', 'u', 'h1', 'h2', 'p', 'br', 'span'],
+        ALLOWED_TAGS: ['b', 'i', 'u', 'h1', 'h2', 'p', 'br', 'span', 'strong'],
         ALLOWED_ATTR: ['style', 'class'],
     });
 };
