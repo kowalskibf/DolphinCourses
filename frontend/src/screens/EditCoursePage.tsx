@@ -290,6 +290,7 @@ export default function EditCoursePage() {
                         ))}
                     </div>
                 </div>
+                <button type="button" onClick={fetchMyElements}>Refresh</button>
                 {myElements
                     .filter((element) =>
                         element.name.includes(searchQuery)
@@ -387,11 +388,13 @@ export default function EditCoursePage() {
                                     <br />
                                 </>
                                 : ""}
+                            <a href={`/element/${element.id}/edit`} target='_blank'>Edit</a>
                         </div>
                     ))}
             </div>
             <div id="main-right">
                 <button type="button" onClick={fetchCourseStructure}>Refresh</button>
+                <br />
                 {view == "root" ?
                     <>
                         <h1>{courseStructure.name}</h1>
@@ -414,7 +417,7 @@ export default function EditCoursePage() {
                                                 Description: {module.module.data.description}
                                             </>
                                             : ""}
-
+                                        <a href={`/element/${module.module.id}/edit`} target='_blank'>Edit</a>
                                         <br />
                                     </div>
                                     <button onClick={() => handleMoveModule(module.module.id, "up")}>^</button>
@@ -558,6 +561,7 @@ export default function EditCoursePage() {
                                             Description: {element.element_data.data.description}
                                         </>
                                         : ""}
+                                    <a href={`/element/${element.element_data.id}/edit`} target='_blank'>Edit</a>
 
                                     <br />
                                     <button onClick={() => handleMoveElement(view.id, element.element_data.id, "up")}>^</button>

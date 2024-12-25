@@ -547,7 +547,7 @@ export default function EditElementPage() {
                     />
                     <br />
                     Explanation image:
-                    <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.image} />
+                    <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
                     Change image:
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'explanation')} />
                     <br />
@@ -680,7 +680,7 @@ export default function EditElementPage() {
                                                 <br />
                                             </>
                                         )}
-                                        <a href={`/element/${examQuestion.question.id}/edit`}>Edit</a>
+                                        <a href={`/element/${examQuestion.question.id}/edit`} target='_blank'>Edit</a>
                                         <button type="button" onClick={() => handleRemoveAssignmentFromExam(examQuestion.id)}>Remove</button>
                                     </div>
                                 ))}
@@ -748,7 +748,7 @@ export default function EditElementPage() {
                                                 <br />
                                             </>
                                         )}
-                                        <a href={`/element/${element.element.id}/edit`}>Edit</a>
+                                        <a href={`/element/${element.element.id}/edit`} target='_blank'>Edit</a>
                                         <button type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Remove</button>
                                     </div>
                                 ))}
