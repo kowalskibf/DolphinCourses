@@ -103,6 +103,7 @@ export default function MyElementsPage() {
                 </div>
             </div>
             <div id="main-right">
+                <button type="button" onClick={fetchElements}>Refresh</button>
                 {elements
                     .filter((element) =>
                         element.name.includes(searchQuery)

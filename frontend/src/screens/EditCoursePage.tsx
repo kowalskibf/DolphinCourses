@@ -391,6 +391,7 @@ export default function EditCoursePage() {
                     ))}
             </div>
             <div id="main-right">
+                <button type="button" onClick={fetchCourseStructure}>Refresh</button>
                 {view == "root" ?
                     <>
                         <h1>{courseStructure.name}</h1>

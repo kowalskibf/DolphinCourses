@@ -1,3 +1,7 @@
-from django.test import TestCase
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
-# Create your tests here.
+from django.test import TestCase
+from models import *
+from views import *
+

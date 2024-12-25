@@ -576,6 +576,7 @@ export default function EditElementPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
+                            <button type="button" onClick={fetchMyElements}>Refresh</button>
                             {myElements
                                 .filter((elem) => elem.type == 'assignment' && elem.name.includes(searchQuery))
                                 .map((assignment, index) => (
@@ -709,6 +710,7 @@ export default function EditElementPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
+                            <button type="button" onClick={fetchMyElements}>Refresh</button>
                             {myElements
                                 .filter((elem) => elem.name.includes(searchQuery))
                                 .map((element, index) => (

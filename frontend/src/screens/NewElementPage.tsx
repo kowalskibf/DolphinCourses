@@ -454,6 +454,8 @@ export default function NewElementPage() {
                     <br />
                     Total marks: {examElementTotalMarks}
                     <br />
+                    <button type="button" onClick={fetchAllElements}>Refresh</button>
+                    <br />
                     Add questions:
                     <br />
                     {allElements.filter((element) => element.type == "assignment").map((element) => (
@@ -513,6 +515,8 @@ export default function NewElementPage() {
                     <img id="uploaded-module-image" />
                     Upload module image
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
+                    <br />
+                    <button type="button" onClick={fetchAllElements}>Refresh</button>
                     <br />
                     Add elements:
                     <br />
