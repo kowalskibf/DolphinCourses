@@ -3,6 +3,7 @@ import '../App.css';
 import "../types";
 import "../styles/MyElementsPage.css";
 import { MEDIA_URL, TYPES } from '../constants';
+import ContentRenderer from '../components/ContentRenderer';
 
 
 
@@ -119,7 +120,7 @@ export default function MyElementsPage() {
                             </div>
                             {element.type === 'text' ?
                                 <div className="element-content-center">
-                                    {element.data.content}
+                                    <ContentRenderer content={element.data.content} />
                                 </div>
                                 : ""}
                             {element.type === 'image' ?
@@ -129,7 +130,7 @@ export default function MyElementsPage() {
                                         src={MEDIA_URL + element.data.image}
                                     />
                                     <br />
-                                    {element.data.description}
+                                    <ContentRenderer content={element.data.description} />
                                 </div>
                                 : ""}
                             {element.type === 'video' ?
@@ -140,23 +141,23 @@ export default function MyElementsPage() {
                                         className="element-media"
                                     />
                                     <br />
-                                    {element.data.description}
+                                    <ContentRenderer content={element.data.description} />
                                 </div>
                                 : ""}
                             {element.type === 'example' ?
                                 <div className="element-content-center">
-                                    Question: {element.data.question}
+                                    Question: <ContentRenderer content={element.data.question} />
                                     <br />
                                     Image: <img src={MEDIA_URL + element.data.image} />
                                     <br />
-                                    Explanation: {element.data.explanation}
+                                    Explanation: <ContentRenderer content={element.data.explanation} />
                                     <br />
                                     Explanation image: <img src={MEDIA_URL + element.data.explanation_image} />
                                 </div>
                                 : ""}
                             {element.type === 'assignment' ?
                                 <>
-                                    Question: {element.data.question}
+                                    Question: <ContentRenderer content={element.data.question} />
                                     <br />
                                     Image: <img src={MEDIA_URL + element.data.image} />
                                     <br />
@@ -167,10 +168,10 @@ export default function MyElementsPage() {
                                     Answers:
                                     {element.data.answers.map((answer, i) => (
                                         <li key={i}>
-                                            {answer} {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                            <ContentRenderer content={answer} /> {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
                                         </li>
                                     ))}
-                                    Explanation: {element.data.explanation}
+                                    Explanation: <ContentRenderer content={element.data.explanation} />
                                     <br />
                                     Explanation image:
                                     <img src={MEDIA_URL + element.data.explanation_image} />
@@ -179,7 +180,7 @@ export default function MyElementsPage() {
                                 : ""}
                             {element.type === 'exam' ?
                                 <>
-                                    Description: {element.data.description}
+                                    Description: <ContentRenderer content={element.data.description} />
                                     <br />
                                     Duration: {element.data.duration}
                                     <br />
@@ -192,7 +193,7 @@ export default function MyElementsPage() {
                                 <>
                                     Title: {element.data.title}
                                     <br />
-                                    Description: {element.data.description}
+                                    Description: <ContentRenderer content={element.data.description} />
                                     <br />
                                 </>
                             )}

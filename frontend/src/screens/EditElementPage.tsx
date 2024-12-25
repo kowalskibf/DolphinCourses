@@ -3,6 +3,9 @@ import '../App.css';
 import "../types";
 import { MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
+import TextEditor from '../components/TextEditor';
+import { BlockMath, InlineMath } from 'react-katex';
+import ContentRenderer from '../components/ContentRenderer';
 
 type Params = {
     id: string;
@@ -436,11 +439,7 @@ export default function EditElementPage() {
             <br />
             {element.type == 'text' ?
                 <>
-                    Content:
-                    <textarea
-                        value={formData.content || ''}
-                        onChange={(e) => handleChange('content', e.target.value)}
-                    />
+                    Content: <TextEditor value={formData.content || ''} onChange={(value: string) => handleChange('content', value)} />
                 </>
                 : ""}
             {element.type == 'image' ?
@@ -451,9 +450,9 @@ export default function EditElementPage() {
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
                     Description:
-                    <textarea
+                    <TextEditor
                         value={formData.description || ''}
-                        onChange={(e) => handleChange('description', e.target.value)}
+                        onChange={(value) => handleChange('description', value)}
                     />
                 </>
                 : ""}
@@ -465,18 +464,18 @@ export default function EditElementPage() {
                     <input type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
                     <br />
                     Description:
-                    <textarea
+                    <TextEditor
                         value={formData.description || ''}
-                        onChange={(e) => handleChange('description', e.target.value)}
+                        onChange={(value) => handleChange('description', value)}
                     />
                 </>
                 : ""}
             {element.type == 'example' ?
                 <>
                     Question:
-                    <textarea
+                    <TextEditor
                         value={formData.question || ''}
-                        onChange={(e) => handleChange('question', e.target.value)}
+                        onChange={(value) => handleChange('question', value)}
                     />
                     <br />
                     Image:
@@ -485,9 +484,9 @@ export default function EditElementPage() {
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
                     Explanation:
-                    <textarea
+                    <TextEditor
                         value={formData.explanation || ''}
-                        onChange={(e) => handleChange('explanation', e.target.value)}
+                        onChange={(value) => handleChange('explanation', value)}
                     />
                     <br />
                     Explanation image:
@@ -500,9 +499,9 @@ export default function EditElementPage() {
             {element.type == 'assignment' ?
                 <>
                     Question:
-                    <textarea
+                    <TextEditor
                         value={formData.question || ''}
-                        onChange={(e) => handleChange('question', e.target.value)}
+                        onChange={(value) => handleChange('question', value)}
                     />
                     <br />
                     Image:
@@ -527,7 +526,7 @@ export default function EditElementPage() {
                     <h6>Answers:</h6>
                     {formData.answers.map((answer: string, index: number) => (
                         <li key={index}>
-                            {answer}
+                            <ContentRenderer content={answer} />
                             <input
                                 type="checkbox"
                                 checked={formData.correct_answer_indices.includes(index)}
@@ -536,14 +535,14 @@ export default function EditElementPage() {
                             <button type="button" onClick={() => handleRemoveAnswer(index)}>Remove</button>
                         </li>
                     ))}
-                    <input type="text" value={newAnswer} onChange={(e) => setNewAnswer(e.target.value)} />
+                    <TextEditor value={newAnswer} onChange={(value) => setNewAnswer(value)} />
                     <br />
                     <button type="button" onClick={handleAddAnswer}>Add</button>
                     <br />
                     Explanation:
-                    <textarea
+                    <TextEditor
                         value={formData.explanation || ''}
-                        onChange={(e) => handleChange('explanation', e.target.value)}
+                        onChange={(value) => handleChange('explanation', value)}
                     />
                     <br />
                     Explanation image:
@@ -556,9 +555,9 @@ export default function EditElementPage() {
             {element.type == 'exam' ?
                 <>
                     Description:
-                    <textarea
+                    <TextEditor
                         value={formData.description || ''}
-                        onChange={(e) => handleChange('description', e.target.value)}
+                        onChange={(value) => handleChange('description', value)}
                     />
                     Duration:
                     <input
@@ -588,7 +587,7 @@ export default function EditElementPage() {
                                     >
                                         Name: {assignment.name}
                                         <br />
-                                        Question: {assignment.data.question}
+                                        Question: <ContentRenderer content={assignment.data.question} />
                                         <br />
                                         {assignment.data.image ?
                                             <>
@@ -604,10 +603,10 @@ export default function EditElementPage() {
                                         Answers:
                                         {assignment.data.answers.map((answer, i) => (
                                             <li key={i}>
-                                                {answer} {assignment.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                                <ContentRenderer content={answer} /> {assignment.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
                                             </li>
                                         ))}
-                                        Explanation: {assignment.data.explanation}
+                                        Explanation: <ContentRenderer content={assignment.data.explanation} />
                                         <br />
                                         {assignment.data.explanation_image ?
                                             <>
@@ -639,7 +638,7 @@ export default function EditElementPage() {
                                             onChange={(e) => handleModifyMarks(examQuestion.id, parseInt(e.target.value))}
                                         />
                                         <br />
-                                        Question: {examQuestion.question.data.question}
+                                        Question: <ContentRenderer content={examQuestion.question.data.question} />
                                         <br />
                                         {examQuestion.question.data.image ?
                                             <>
@@ -655,10 +654,10 @@ export default function EditElementPage() {
                                         Answers:
                                         {examQuestion.question.data.answers.map((answer, i) => (
                                             <li key={i}>
-                                                {answer} {examQuestion.question.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                                <ContentRenderer content={answer} /> {examQuestion.question.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
                                             </li>
                                         ))}
-                                        Explanation: {examQuestion.question.data.explanation}
+                                        Explanation: <ContentRenderer content={examQuestion.question.data.explanation} />
                                         <br />
                                         {examQuestion.question.data.explanation_image ?
                                             <>
@@ -700,7 +699,7 @@ export default function EditElementPage() {
                 <>
                     Title: <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} />
                     <br />
-                    Description: <textarea value={formData.description || ''} onChange={(e) => handleChange('description', e.target.value)} />
+                    Description: <TextEditor value={formData.description || ''} onChange={(value) => handleChange('description', value)} />
                     <br />
                     <div id="main-container">
                         <div className="main-half">

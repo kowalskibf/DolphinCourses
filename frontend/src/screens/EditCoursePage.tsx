@@ -6,6 +6,7 @@ import { CURRENCIES, LANGUAGES, MEDIA_URL, TYPES } from '../constants';
 import { useParams } from 'react-router-dom';
 import "../styles/EditCoursePage.css";
 import { useLocation, useNavigate } from 'react-router-dom';
+import ContentRenderer from '../components/ContentRenderer';
 
 type Params = {
     id: string;
@@ -311,7 +312,7 @@ export default function EditCoursePage() {
                             </div>
                             {element.type === 'text' ?
                                 <div className="element-content-center">
-                                    {element.data.content}
+                                    <ContentRenderer content={element.data.content} />
                                 </div>
                                 : ""}
                             {element.type === 'image' ?
@@ -321,7 +322,7 @@ export default function EditCoursePage() {
                                         src={MEDIA_URL + element.data.image}
                                     />
                                     <br />
-                                    {element.data.description}
+                                    <ContentRenderer content={element.data.description} />
                                 </div>
                                 : ""}
                             {element.type === 'video' ?
@@ -332,23 +333,23 @@ export default function EditCoursePage() {
                                         className="element-media"
                                     />
                                     <br />
-                                    {element.data.description}
+                                    <ContentRenderer content={element.data.description} />
                                 </div>
                                 : ""}
                             {element.type === 'example' ?
                                 <div className="element-content-center">
-                                    Question: {element.data.question}
+                                    Question: <ContentRenderer content={element.data.question} />
                                     <br />
                                     Image: <img src={MEDIA_URL + element.data.image} />
                                     <br />
-                                    Explanation: {element.data.explanation}
+                                    Explanation: <ContentRenderer content={element.data.explanation} />
                                     <br />
                                     Explanation image: <img src={MEDIA_URL + element.data.explanation_image} />
                                 </div>
                                 : ""}
                             {element.type === 'assignment' ?
                                 <>
-                                    Question: {element.data.question}
+                                    Question: <ContentRenderer content={element.data.question} />
                                     <br />
                                     Image: <img src={MEDIA_URL + element.data.image} />
                                     <br />
@@ -359,10 +360,10 @@ export default function EditCoursePage() {
                                     Answers:
                                     {element.data.answers.map((answer, i) => (
                                         <li key={i}>
-                                            {answer} {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                            <ContentRenderer content={answer} /> {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
                                         </li>
                                     ))}
-                                    Explanation: {element.data.explanation}
+                                    Explanation: <ContentRenderer content={element.data.explanation} />
                                     <br />
                                     Explanation image:
                                     <img src={MEDIA_URL + element.data.explanation_image} />
@@ -371,7 +372,7 @@ export default function EditCoursePage() {
                                 : ""}
                             {element.type === 'exam' ?
                                 <>
-                                    Description: {element.data.description}
+                                    Description: <ContentRenderer content={element.data.description} />
                                     <br />
                                     Duration: {element.data.duration}
                                     <br />
@@ -384,7 +385,7 @@ export default function EditCoursePage() {
                                 <>
                                     Title: {element.data.title}
                                     <br />
-                                    Description: {element.data.description}
+                                    Description: <ContentRenderer content={element.data.description} />
                                     <br />
                                 </>
                                 : ""}
@@ -414,7 +415,7 @@ export default function EditCoursePage() {
                                             <>
                                                 Title: {module.module.data.title}
                                                 <br />
-                                                Description: {module.module.data.description}
+                                                Description: <ContentRenderer content={module.module.data.description} />
                                             </>
                                             : ""}
                                         <a href={`/element/${module.module.id}/edit`} target='_blank'>Edit</a>
@@ -460,32 +461,32 @@ export default function EditCoursePage() {
                                     </div>
                                     {element.element_data.type == "text" && (
                                         <>
-                                            Content: {element.element_data.data.content}
+                                            <ContentRenderer content={element.element_data.data.content} />
                                         </>
                                     )}
                                     {element.element_data.type == "image" && (
                                         <>
                                             <img src={MEDIA_URL + element.element_data.data.image} />
                                             <br />
-                                            Description: {element.element_data.data.description}
+                                            Description: <ContentRenderer content={element.element_data.data.description} />
                                         </>
                                     )}
                                     {element.element_data.type == "video" && (
                                         <>
                                             <video src={MEDIA_URL + element.element_data.data.video} controls />
                                             <br />
-                                            Description: {element.element_data.data.description}
+                                            Description: <ContentRenderer content={element.element_data.data.description} />
                                         </>
                                     )}
                                     {element.element_data.type == "example" && (
                                         <>
-                                            Question: {element.element_data.data.question}
+                                            Question: <ContentRenderer content={element.element_data.data.question} />
                                             <br />
                                             {element.element_data.data.image && (
                                                 <img src={MEDIA_URL + element.element_data.data.image} />
                                             )}
                                             <br />
-                                            Explanation: {element.element_data.data.explanation}
+                                            Explanation: <ContentRenderer content={element.element_data.data.explanation} />
                                             <br />
                                             {element.element_data.data.explanation_image && (
                                                 <img src={MEDIA_URL + element.element_data.data.explanation_image} />
@@ -494,7 +495,7 @@ export default function EditCoursePage() {
                                     )}
                                     {element.element_data.type == "assignment" && (
                                         <>
-                                            Question: {element.element_data.data.question}
+                                            Question: <ContentRenderer content={element.element_data.data.question} />
                                             <br />
                                             Image: <img src={MEDIA_URL + element.element_data.data.image} />
                                             <br />
@@ -505,10 +506,10 @@ export default function EditCoursePage() {
                                             Answers:
                                             {element.element_data.data.answers.map((answer, i) => (
                                                 <li key={i}>
-                                                    {answer} {(element.element_data.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                                    <ContentRenderer content={answer} /> {(element.element_data.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
                                                 </li>
                                             ))}
-                                            Explanation: {element.element_data.data.explanation}
+                                            Explanation: <ContentRenderer content={element.element_data.data.explanation} />
                                             <br />
                                             Explanation image:
                                             <img src={MEDIA_URL + element.element_data.data.explanation_image} />
@@ -517,7 +518,7 @@ export default function EditCoursePage() {
                                     )}
                                     {element.element_data.type == "exam" && (
                                         <>
-                                            Description: {element.element_data.data.description}
+                                            Description: <ContentRenderer content={element.element_data.data.description} />
                                             <br />
                                             Duration: {element.element_data.data.duration}
                                             <br />
@@ -528,7 +529,7 @@ export default function EditCoursePage() {
                                                     <br />
                                                     Marks: {examQuestion.marks}
                                                     <br />
-                                                    Question: {examQuestion.question.question}
+                                                    Question: <ContentRenderer content={examQuestion.question.question} />
                                                     {examQuestion.question.image && (
                                                         <img src={MEDIA_URL + examQuestion.question.image} />
                                                     )}
@@ -540,10 +541,10 @@ export default function EditCoursePage() {
                                                     Answers:
                                                     {examQuestion.question.answers.map((answer, i) => (
                                                         <li key={i}>
-                                                            {answer} {(examQuestion.question as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                                            <ContentRenderer content={answer} /> {(examQuestion.question as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
                                                         </li>
                                                     ))}
-                                                    Explanation: {examQuestion.question.explanation}
+                                                    Explanation: <ContentRenderer content={examQuestion.question.explanation} />
                                                     <br />
                                                     {examQuestion.question.explanation_image && (
                                                         <img src={MEDIA_URL + examQuestion.question.explanation_image} />
@@ -558,7 +559,7 @@ export default function EditCoursePage() {
                                         <>
                                             Title: {element.element_data.data.title}
                                             <br />
-                                            Description: {element.element_data.data.description}
+                                            Description: <ContentRenderer content={element.element_data.data.description} />
                                         </>
                                         : ""}
                                     <a href={`/element/${element.element_data.id}/edit`} target='_blank'>Edit</a>

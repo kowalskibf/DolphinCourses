@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
+import TextEditor from '../components/TextEditor';
+import ContentRenderer from '../components/ContentRenderer';
 
 export default function NewElementPage() {
     const [elementType, setElementType] = useState<string>("text");
@@ -361,7 +363,7 @@ export default function NewElementPage() {
             <br />
             {elementType == "text" ?
                 <>
-                    Content: <textarea value={textElementContent} onChange={(e) => setTextElementContent(e.target.value)} />
+                    Content: <TextEditor value={textElementContent} onChange={(value) => setTextElementContent(value)} />
                 </>
                 : ""}
             {elementType == "image" ?
@@ -371,7 +373,7 @@ export default function NewElementPage() {
                     Upload image
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Description: <textarea value={imageElementDescription} onChange={(e) => setImageElementDescription(e.target.value)} />
+                    Description: <TextEditor value={imageElementDescription} onChange={(value) => setImageElementDescription(value)} />
                 </>
                 : ""}
             {elementType == "video" ?
@@ -381,18 +383,18 @@ export default function NewElementPage() {
                     Upload video
                     <input type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Description: <textarea value={videoElementDescription} onChange={(e) => setVideoElementDescription(e.target.value)} />
+                    Description: <TextEditor value={videoElementDescription} onChange={(value) => setVideoElementDescription(value)} />
                 </>
                 : ""}
             {elementType === "example" ?
                 <>
-                    Question: <textarea value={exampleElementQuestion} onChange={(e) => setExampleElementQuestion(e.target.value)} />
+                    Question: <TextEditor value={exampleElementQuestion} onChange={(value) => setExampleElementQuestion(value)} />
                     Question image:
                     <img id="uploaded-example-image" />
                     Upload question image
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Explanation: <textarea value={exampleElementExplanation} onChange={(e) => setExampleElementExplanation(e.target.value)} />
+                    Explanation: <TextEditor value={exampleElementExplanation} onChange={(value) => setExampleElementExplanation(value)} />
                     Explanation image:
                     <img id="uploaded-example-explanation-image" />
                     Upload explanation Image
@@ -401,7 +403,7 @@ export default function NewElementPage() {
                 : ""}
             {elementType === "assignment" ?
                 <>
-                    Question: <textarea value={assignmentElementQuestion} onChange={(e) => setAssignmentElementQuestion(e.target.value)} />
+                    Question: <TextEditor value={assignmentElementQuestion} onChange={(value) => setAssignmentElementQuestion(value)} />
                     Question image:
                     <img id="uploaded-assignment-image" />
                     Upload question image
@@ -424,7 +426,7 @@ export default function NewElementPage() {
                     <h3>Answers:</h3>
                     {assignmentElementAnswers.map((answer, index) => (
                         <li key={index}>
-                            {answer}
+                            <ContentRenderer content={answer} />
                             <input
                                 type="checkbox"
                                 checked={assignmentElementCorrectAnswerIndices.includes(index)}
@@ -433,11 +435,11 @@ export default function NewElementPage() {
                             <button type="button" onClick={(e) => handleAssignmentElementRemoveAnswer(index)}>Remove</button>
                         </li>
                     ))}
-                    <input type="text" value={assignmentElementNewAnswer} onChange={(e) => setAssignmentElementNewAnswer(e.target.value)} />
+                    <TextEditor value={assignmentElementNewAnswer} onChange={(value) => setAssignmentElementNewAnswer(value)} />
                     <br />
                     <button type="button" onClick={handleAssignmentElementAddAnswer}>Add</button>
                     <br />
-                    Explanation: <textarea value={assignmentElementExplanation} onChange={(e) => setAssignmentElementExplanation(e.target.value)} />
+                    Explanation: <TextEditor value={assignmentElementExplanation} onChange={(value) => setAssignmentElementExplanation(value)} />
                     <br />
                     Explanation image:
                     <img id="uploaded-assignment-explanation-image" />
@@ -448,7 +450,7 @@ export default function NewElementPage() {
                 : ""}
             {elementType == "exam" ?
                 <>
-                    Description: <textarea value={examElementDescription} onChange={(e) => setExamElementDescription(e.target.value)} />
+                    Description: <TextEditor value={examElementDescription} onChange={(value) => setExamElementDescription(value)} />
                     <br />
                     Duration: <input type="number" value={examElementDuration} onChange={(e) => setExamElementDuration(parseInt(e.target.value))} />
                     <br />
@@ -509,7 +511,7 @@ export default function NewElementPage() {
                 <>
                     Title: <input type="text" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
                     <br />
-                    Description: <textarea value={moduleElementDescription} onChange={(e) => setModuleElementDescription(e.target.value)} />
+                    Description: <TextEditor value={moduleElementDescription} onChange={(value) => setModuleElementDescription(value)} />
                     <br />
                     Module image:
                     <img id="uploaded-module-image" />

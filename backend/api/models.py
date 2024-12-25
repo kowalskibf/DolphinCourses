@@ -21,7 +21,7 @@ class Account(models.Model):
 class Course(models.Model):
     author = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='courses')
     name = models.CharField(max_length=255, default="Unnammed Course")
-    description = models.CharField(max_length=4095, default="No description provided.")
+    description = models.TextField(default="No description provided.")
     image = models.FileField(upload_to='courses_imgs/', blank=True, null=True)
     language = models.CharField(max_length=31, default="en")
     duration = models.IntegerField(default=0)
@@ -55,39 +55,39 @@ class Element(models.Model):
     
 class ModuleElement(Element):
     title = models.CharField(max_length=255, default="")
-    description = models.CharField(max_length=1023, default="")
+    description = models.TextField(default="")
     image = models.FileField(upload_to='elem_module/', blank=True, null=True)
 
 class TextElement(Element):
-    content = models.CharField(max_length=4095, default="")
+    content = models.TextField(default="")
 
 class ImageElement(Element):
     image = models.FileField(upload_to='elem_img/', blank=True, null=True)
-    description = models.CharField(max_length=1023, default="")
+    description = models.TextField(default="")
 
 class VideoElement(Element):
     video = models.FileField(upload_to='elem_vid/', blank=True, null=True)
-    description = models.CharField(max_length=1023, default="")
+    description = models.TextField(default="")
 
 class ExampleElement(Element):
-    question = models.CharField(max_length=1023, default="")
+    question = models.TextField(default="")
     image = models.FileField(upload_to='elem_example/', blank=True, null=True)
-    explanation = models.CharField(max_length=4095, default="")
+    explanation = models.TextField(default="")
     explanation_image = models.FileField(upload_to="elem_example/", blank=True, null=True)
 
 class AssignmentElement(Element):
-    question = models.CharField(max_length=1023, default="")
+    question = models.TextField(default="")
     image = models.FileField(upload_to='elem_assignment/', blank=True, null=True)
     answers = models.JSONField()
     correct_answer_indices = models.JSONField()
     is_multiple_choice = models.BooleanField(default=False)
     hide_answers = models.BooleanField(default=False)
-    explanation = models.CharField(max_length=4095, default="")
+    explanation = models.TextField(default="")
     explanation_image = models.FileField('elem_assignment/', blank=True, null=True)
 
 class ExamElement(Element):
-    description = models.CharField(max_length=1023, default="")
-    duration = models.IntegerField(default=3600)
+    description = models.TextField(default="")
+    duration = models.IntegerField(default=60)
     total_marks = models.IntegerField(default=1)
 
 class ExamQuestion(models.Model):
