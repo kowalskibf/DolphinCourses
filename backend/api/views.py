@@ -14,6 +14,7 @@ from django.core.exceptions import ValidationError
 from .serializers import *
 from django.utils import timezone
 import json
+from datetime import datetime
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
@@ -142,6 +143,14 @@ class CourseView(APIView):
             if promo_expires := request.data.get("promo_expires"):
                 course.promo_expires = promo_expires
             course.save()
+            courseAccess = CourseAccess(
+                account=author,
+                course=course,
+                expires=datetime.max,
+                is_active=True,
+                obtaining_type='author'
+            )
+            courseAccess.save()
             return Response({"message": "Course successfully created."}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(e)
@@ -209,8 +218,9 @@ class CourseView(APIView):
                 course = Course.objects.get(id=id)
             except Course.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            if not course.is_public and not course.author == account:
-                return Response(status=status.HTTP_401_UNAUTHORIZED)
+            # hasAccess = CourseAccess.objects.filter(account=account, course=course, is_active=True, expires__gt=timezone.now()).exists()
+            # if (not course.is_public or not hasAccess) and not course.author == account:
+            #     return Response(status=status.HTTP_401_UNAUTHORIZED)
             serializer = CourseSerializer(course)
             return Response(serializer.data)
         except:
@@ -1236,3 +1246,211 @@ class AssignmentWeightsView(APIView):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         serializer = AssignmentElementStructureSerializer(assignment, context={"course_id": course_id})
         return Response(serializer.data)
+
+class CourseAccessView(APIView):
+    def post(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            body = json.loads(request.body)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not body["expires"]:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        #if body["expires"] < timezone.now():
+        if datetime.strptime(body["expires"], "%Y-%m-%d %H:%M:%S") < timezone.now():
+            return Response({"error": "Access expiration date cannot be in the past."}, status=status.HTTP_400_BAD_REQUEST)
+        if CourseAccess.objects.filter(account=account, course=course).exists():
+            ca = CourseAccess.objects.get(account=account, course=course)
+            ca.delete()
+        # logika potencjalnej przyszłej płatności itp.
+        courseAccess = CourseAccess(
+            account=account,
+            course=course,
+            expires=body["expires"],
+            is_active=True,
+            obtaining_type='bought'
+        )
+        courseAccess.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+    def put(self, request, course_access_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not CourseAccess.objects.filter(id=course_access_id, obtaining_type='gifted').exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            courseAccess = CourseAccess.objects.get(id=course_access_id)
+        except CourseAccess.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not courseAccess.course.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            body = json.loads(request.body)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not body["expires"]:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        courseAccess = CourseAccess.objects.get(id=course_access_id)
+        courseAccess.expires = body["expires"]
+        if datetime.strptime(body["expires"], "%Y-%m-%d %H:%M:%S") < timezone.now():
+            courseAccess.is_active = False
+        courseAccess.save()
+        return Response(status=status.HTTP_200_OK)
+    
+    def delete(self, request, course_access_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not CourseAccess.objects.filter(id=course_access_id, obtaining_type='gifted').exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            courseAccess = CourseAccess.objects.get(id=course_access_id)
+        except CourseAccess.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not courseAccess.course.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        courseAccess = CourseAccess.objects.get(id=course_access_id)
+        courseAccess.is_active = False
+        courseAccess.save()
+        return Response(status=status.HTTP_200_OK)
+
+    def get(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        hasAccess = CourseAccess.objects.filter(account=account, course=course, is_active=True, expires__gt=timezone.now()).exists()
+        if (not hasAccess or not course.is_public) and not course.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        courseAccess = CourseAccess.objects.get(account=account, course=course, is_active=True, expires__gt=timezone.now())
+        serializer = CourseAccessSerializer(courseAccess)
+        return Response(serializer.data)
+
+    
+    
+    
+class CourseAccessesView(APIView):
+    def get(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        courseAccesses = CourseAccess.objects.filter(
+            course=course,
+            is_active=True,
+            obtaining_type='gifted',
+            expires__gt=datetime.now()
+        )
+        serializer = CourseAccessDetailSerializer(courseAccesses, many=True)
+        return Response(serializer.data)
+    
+class CourseAccessGiftView(APIView):
+    def post(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not course.author == account:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            body = json.loads(request.body)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not body["username"]:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not body["expires"]:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        #if body["expires"] < timezone.now():
+        if datetime.strptime(body["expires"], "%Y-%m-%d %H:%M:%S") < timezone.now():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            invitedUser = User.objects.get(username=body["username"])
+        except User.DoesNotExist:
+            return Response({"error": "User does not exist."}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            invitedAccount = Account.objects.get(user=invitedUser)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if CourseAccess.objects.filter(account=invitedAccount, course=course).exists():
+            if CourseAccess.objects.filter(account=invitedAccount, course=course, is_active=True, expires__gt=timezone.now()).exists():
+                return Response(status=status.HTTP_409_CONFLICT)
+            courseAccess = CourseAccess.objects.get(account=invitedAccount, course=course)
+            courseAccess.delete()
+        courseAccess = CourseAccess(
+            account=invitedAccount,
+            course=course,
+            expires=body["expires"],
+            is_active=True,
+            obtaining_type='gifted'
+        )
+        courseAccess.save()
+        return Response(status=status.HTTP_201_CREATED)
+
+
+        
+        
+  
+class MyCourseAccessesView(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        courseAccesses = CourseAccess.objects.filter(
+            account=account,
+            is_active=True,
+            expires__gt=datetime.now()
+        )
+        serializer = CourseAccessDetailSerializer(courseAccesses, many=True)
+        return Response(serializer.data)
+    

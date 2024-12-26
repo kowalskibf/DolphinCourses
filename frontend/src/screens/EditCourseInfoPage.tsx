@@ -74,7 +74,7 @@ export default function EditCourseInfoPage() {
         formData.append("description", description);
         if (image)
             formData.append("image", image);
-        formData.append("language", language);
+        formData.append("language", language.toLowerCase());
         formData.append("duration", duration.toString());
         formData.append("is_public", isPublic.toString());
         formData.append("price_currency", priceCurrency);
@@ -116,6 +116,8 @@ export default function EditCourseInfoPage() {
             <br />
             <a href={`/course/${id}/edit/topics`}>Edit course topics</a>
             <br />
+            <a href={`/course/${id}/edit/members`}>Edit gifted course members</a>
+            <br />
             <h1>Edit course information</h1>
             Name: <input type="text" value={name} onChange={(e) => setName(e.target.value)} /> <br />
             Description: <textarea value={description} onChange={(e) => setDescription(e.target.value)} /> <br />
@@ -133,9 +135,9 @@ export default function EditCourseInfoPage() {
             Duration: <input type="number" value={duration} onChange={(e) => setDuration(parseInt(e.target.value))} />
             <br />
             public/private:
-            <select value={isPublic.toString()} onChange={(e) => setIsPublic(e.target.value === "False")}>
-                <option value="False">Private</option>
-                <option value="True">Public</option>
+            <select value={isPublic.toString()} onChange={(e) => setIsPublic(e.target.value === "true")}>
+                <option value="false">Private</option>
+                <option value="true">Public</option>
             </select>
             <br />
             currency:

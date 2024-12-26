@@ -176,7 +176,7 @@ class CourseAccessSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseAccess
-        fields = ('id', 'account', 'course', 'expires')
+        fields = ('id', 'account', 'course', 'expires', 'is_active', 'obtaining_type')
 
 
 class CourseTopicSerializer(serializers.ModelSerializer):
@@ -340,10 +340,9 @@ class CourseStructureSerializer(serializers.ModelSerializer):
         model = Course
         fields = ('id', 'author', 'name', 'description', 'image', 'language', 'duration', 'last_updated', 'is_public', 'price_currency', 'price', 'promo_price', 'promo_expires', 'modules')
 
-# class AssignmentElementWeightsSerializer(serializers.ModelSerializer):
-#     author = AccountSerializer(read_only=True)
-#     weights = AssignmentWeightStructureSerializer(source='assignment_weights', many=True, read_only=True)
-
-#     class Meta:
-#         model = AssignmentElement
-#         fields = ('id', 'name', 'author', 'type', 'question', 'image', 'answers', 'correct_answer_indices', 'is_multiple_choice', 'hide_answers', 'explanation', 'explanation_image', 'weights')
+class CourseAccessDetailSerializer(serializers.ModelSerializer):
+    account = AccountSerializer(read_only=True)
+    course = CourseSerializer(read_only=True)
+    class Meta:
+        model = CourseAccess
+        fields = ('id', 'account', 'course', 'expires', 'is_active', 'obtaining_type')

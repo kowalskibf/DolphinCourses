@@ -8,7 +8,7 @@ export default function CreateCoursePage() {
     const [name, setName] = useState<string>("");
     const [description, setDescription] = useState<string>("");
     const [image, setImage] = useState<File | null>(null);
-    const [language, setLanguage] = useState<string>("EN");
+    const [language, setLanguage] = useState<string>("en");
     const [duration, setDuration] = useState<number>(1);
     const [isPublic, setIsPublic] = useState<string>("False");
     const [priceCurrency, setPriceCurrency] = useState<string>("USD");
@@ -56,7 +56,7 @@ export default function CreateCoursePage() {
         formData.append("description", description);
         if (image)
             formData.append("image", image);
-        formData.append("language", language);
+        formData.append("language", language.toLowerCase());
         formData.append("duration", duration.toString());
         formData.append("is_public", isPublic.toString());
         formData.append("price_currency", priceCurrency);

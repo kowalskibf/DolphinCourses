@@ -19,6 +19,10 @@ import EditCourseTopicsPage from './screens/EditCourseTopicsPage';
 import EditCoursePage from './screens/EditCoursePage';
 import EditElementPage from './screens/EditElementPage';
 import EditWeightsPage from './screens/EditWeightsPage';
+import EditCourseMembersPage from './screens/EditCourseMembersPage';
+import LearnPage from './screens/LearnPage';
+import ViewCourseInfoPage from './screens/ViewCourseInfoPage';
+import ViewCourseAccessPage from './screens/ViewCourseAccessPage';
 
 export default function App() {
   return (
@@ -41,6 +45,10 @@ export default function App() {
           <Route path="/course/:id/edit" element={<EditCoursePage />} />
           <Route path="/element/:id/edit" element={<EditElementPage />} />
           <Route path="/course/:course_id/assignment/:assignment_id/weights/edit" element={<EditWeightsPage />} />
+          <Route path="/course/:id/edit/members" element={<EditCourseMembersPage />} />
+          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/course/:id/view/info" element={<ViewCourseInfoPage />} />
+          <Route path="/course/:id/view/access" element={<ViewCourseAccessPage />} />
         </Routes>
       </Router>
     </div>

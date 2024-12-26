@@ -158,6 +158,8 @@ type CourseAccess = {
     account: Account;
     course: Course;
     expires: Date;
+    is_active: boolean;
+    obtaining_type: string;
 }
 
 type CourseTopic = {

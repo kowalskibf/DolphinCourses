@@ -113,9 +113,16 @@ class ElementToModule(models.Model):
         ordering = ['order']
 
 class CourseAccess(models.Model):
+    OBTAINING_TYPES = [
+        ('author', 'Author'),
+        ('gifted', 'Gifted'),
+        ('bought', 'Bought')
+    ]
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='course_accesses')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_accesses')
     expires = models.DateTimeField(default=timezone.now)
+    is_active = models.BooleanField(default=False)
+    obtaining_type = models.CharField(max_length=16, choices=OBTAINING_TYPES, default='bought')
 
 class CourseTopic(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='topics')
