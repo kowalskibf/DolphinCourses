@@ -664,7 +664,8 @@ class CourseStructureView(APIView):
             course = Course.objects.get(id=id)
         except Course.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        if course.author != account and not course.is_public:
+        hasAccess = CourseAccess.objects.filter(account=account, course=course, is_active=True, expires__gt=datetime.now()).exists()
+        if (not course.is_public or not hasAccess) and not course.author == account:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         serializer = CourseStructureSerializer(course, context={'course_id': id})
         return Response(serializer.data)

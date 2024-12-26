@@ -116,7 +116,8 @@ class CourseAccess(models.Model):
     OBTAINING_TYPES = [
         ('author', 'Author'),
         ('gifted', 'Gifted'),
-        ('bought', 'Bought')
+        ('bought', 'Bought'),
+        ('free', 'Free')
     ]
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='course_accesses')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_accesses')
@@ -137,3 +138,22 @@ class AssignmentWeight(models.Model):
     assignment = models.ForeignKey(AssignmentElement, on_delete=models.CASCADE, related_name='assignment_weights')
     topic = models.ForeignKey(CourseTopic, on_delete=models.CASCADE, related_name='assignment_weights')
     weight = models.FloatField(default=0.0)
+
+ACCOUNT_TOPIC_DEFAULT_VALUE = 0.5
+@receiver(post_save, sender=CourseAccess, dispatch_uid="create_account_topics_on_course_access_save")
+def create_account_topics_on_course_access_save(sender, instance, **kwargs):
+    course = instance.course
+    account = instance.account
+    for courseTopic in CourseTopic.objects.filter(course=course):
+        if not AccountTopic.objects.filter(account=account, course_topic=courseTopic).exists():
+            accountTopic = AccountTopic(account=account, course_topic=courseTopic, value=ACCOUNT_TOPIC_DEFAULT_VALUE)
+            accountTopic.save()
+
+@receiver(post_save, sender=CourseTopic, dispatch_uid="create_course_topics_on_course_topic_save")
+def create_course_topics_on_course_topic_save(sender, instance, **kwargs):
+    course = instance.course
+    for courseAccess in CourseAccess.objects.filter(course=course):
+        account = courseAccess.account
+        if not AccountTopic.objects.filter(account=account, course_topic=instance).exists():
+            accountTopic = AccountTopic(account=account, course_topic=instance, value=ACCOUNT_TOPIC_DEFAULT_VALUE)
+            accountTopic.save()

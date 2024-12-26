@@ -23,6 +23,7 @@ import EditCourseMembersPage from './screens/EditCourseMembersPage';
 import LearnPage from './screens/LearnPage';
 import ViewCourseInfoPage from './screens/ViewCourseInfoPage';
 import ViewCourseAccessPage from './screens/ViewCourseAccessPage';
+import ViewCoursePage from './screens/ViewCoursePage';
 
 export default function App() {
   return (
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/course/:id/view/info" element={<ViewCourseInfoPage />} />
           <Route path="/course/:id/view/access" element={<ViewCourseAccessPage />} />
+          <Route path="/course/:id/view" element={<ViewCoursePage />} />
         </Routes>
       </Router>
     </div>

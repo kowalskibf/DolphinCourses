@@ -79,7 +79,7 @@ export default function ViewCourseInfoPage() {
             ) : (
                 <>
                     You do not have access, go to
-                    <a href={`/course/${id}/view/access`}>Manage access</a>
+                    {" "}<a href={`/course/${id}/view/access`}>Manage access</a>
                     <br />
                 </>
             )}
