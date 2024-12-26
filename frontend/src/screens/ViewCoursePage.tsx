@@ -75,6 +75,28 @@ export default function ViewCoursePage() {
         }
     }
 
+    const handleChangeLocationOneUp = () => {
+        if (courseStructure && view && view != "root") {
+            if (viewArray.length == 1) {
+                query.delete("v");
+                navigate(`${location.pathname}`);
+                setViewArray([]);
+                setView("root");
+                setPath([]);
+            } else {
+                const updatedViewArray = viewArray.slice(0, viewArray.length - 1);
+                const updatedPath = path.slice(0, path.length - 1);
+                const updatedViewParam = updatedViewArray.join("/");
+                query.set("v", updatedViewParam);
+                const newPath = `${location.pathname}?${query.toString()}`;
+                navigate(newPath);
+                setViewArray(updatedViewArray);
+                setView(path[path.length - 2]);
+                setPath(updatedPath);
+            }
+        }
+    }
+
 
     const handleViewArray = () => {
         if (!viewArray || viewArray === undefined || viewArray.length === 0) {
@@ -152,10 +174,6 @@ export default function ViewCoursePage() {
                                 <div
                                     className={module.module.type + '-element any-element element-margin'}
                                 >
-
-                                    <div className={module.module.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
-                                        {module.module.name} {module.uses > 1 ? `(${module.uses - 1} use${module.uses > 2 ? "s" : ""} in other place${module.uses > 2 ? "s" : ""})` : ""}
-                                    </div>
                                     {module.module.type == "module" ?
                                         <>
                                             Title: {module.module.data.title}
@@ -163,7 +181,8 @@ export default function ViewCoursePage() {
                                             Description: <ContentRenderer content={module.module.data.description} />
                                         </>
                                         : ""}
-                                    <a href={`/element/${module.module.id}/edit`} target='_blank'>Edit</a>
+                                    <br />
+                                    <button onClick={() => handleChangeLocationInto(module.order)}>Enter</button>
                                     <br />
                                 </div>
                             </div>
@@ -173,6 +192,9 @@ export default function ViewCoursePage() {
                 :
                 <>
                     <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
+                    <br />
+                    <span onClick={handleChangeLocationOneUp}>Back</span>
+                    <br />
                     {path.map((module, i) => (
                         <div key={i}>
                             {" > "}<span onClick={() => handleChangeLocationBack(i)}>{module.title}</span>

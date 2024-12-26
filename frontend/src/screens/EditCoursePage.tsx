@@ -87,6 +87,28 @@ export default function EditCoursePage() {
         }
     }
 
+    const handleChangeLocationOneUp = () => {
+        if (courseStructure && view && view != "root") {
+            if (viewArray.length == 1) {
+                query.delete("v");
+                navigate(`${location.pathname}`);
+                setViewArray([]);
+                setView("root");
+                setPath([]);
+            } else {
+                const updatedViewArray = viewArray.slice(0, viewArray.length - 1);
+                const updatedPath = path.slice(0, path.length - 1);
+                const updatedViewParam = updatedViewArray.join("/");
+                query.set("v", updatedViewParam);
+                const newPath = `${location.pathname}?${query.toString()}`;
+                navigate(newPath);
+                setViewArray(updatedViewArray);
+                setView(path[path.length - 2]);
+                setPath(updatedPath);
+            }
+        }
+    }
+
 
     const handleViewArray = () => {
         if (!viewArray || viewArray === undefined || viewArray.length === 0) {
@@ -249,7 +271,9 @@ export default function EditCoursePage() {
             })
     }
 
-
+    const totalWeight = (weights: any) => {
+        return weights.reduce((sum: any, weight: any) => sum + weight.weight, 0);
+    }
 
     useEffect(() => {
         fetchCourseStructure();
@@ -398,6 +422,8 @@ export default function EditCoursePage() {
                 <br />
                 {view == "root" ?
                     <>
+                        <a href={`/course/${id}/view`} target='_blank'>View as user</a>
+                        <br />
                         <h1>{courseStructure.name}</h1>
                         <br />
                         {courseStructure.modules
@@ -441,6 +467,10 @@ export default function EditCoursePage() {
                     </>
                     :
                     <>
+                        <a href={`/course/${id}/view?v=${viewArray.join("/")}`} target='_blank'>View as user</a>
+                        <br />
+                        <span onClick={handleChangeLocationOneUp}>Back</span>
+                        <br />
                         <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
                         {path.map((module, i) => (
                             <div key={i}>
@@ -513,7 +543,25 @@ export default function EditCoursePage() {
                                             <br />
                                             Explanation image:
                                             <img src={MEDIA_URL + element.element_data.data.explanation_image} />
-
+                                            <br />
+                                            {totalWeight(element.element_data.data.weights) == 0 ? (
+                                                <>
+                                                    Assignment has not set any weights!
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Weights:
+                                                    <br />
+                                                    {element.element_data.data.weights.filter((weight) => weight.weight !== 0).map((weight, i) => (
+                                                        <>
+                                                            {weight.topic.topic}: {weight.weight}
+                                                            <br />
+                                                        </>
+                                                    ))}
+                                                </>
+                                            )}
+                                            <a href={`/course/${id}/assignment/${element.element_data.id}/weights/edit`} target='_blank'>Modify weights</a>
+                                            <br />
                                         </>
                                     )}
                                     {element.element_data.type == "exam" && (
@@ -549,6 +597,24 @@ export default function EditCoursePage() {
                                                     {examQuestion.question.explanation_image && (
                                                         <img src={MEDIA_URL + examQuestion.question.explanation_image} />
                                                     )}
+
+                                                    {totalWeight(examQuestion.question.weights) == 0 ? (
+                                                        <>
+                                                            Assignment has not set any weights!
+                                                            <br />
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            Weights:
+                                                            <br />
+                                                            {examQuestion.question.weights.filter((weight) => weight.weight !== 0).map((weight, i) => (
+                                                                <>
+                                                                    {weight.topic.topic}: {weight.weight}
+                                                                    <br />
+                                                                </>
+                                                            ))}
+                                                        </>
+                                                    )}
                                                     <a href={`/course/${id}/assignment/${examQuestion.question.id}/weights/edit`} target='_blank'>Modify weights</a>
                                                     <br />
                                                 </>
@@ -575,11 +641,6 @@ export default function EditCoursePage() {
                                             <button onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
                                         </>
                                         : ""}
-                                    {element.element_data.type == "assignment" && (
-                                        <>
-                                            <a href={`/course/${id}/assignment/${element.element_data.id}/weights/edit`} target='_blank'>Modify weights</a>
-                                        </>
-                                    )}
                                 </div>
                             ))}
                         <br />

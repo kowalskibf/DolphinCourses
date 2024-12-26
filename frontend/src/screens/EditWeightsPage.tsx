@@ -78,6 +78,10 @@ export default function EditWeightsPage() {
 
     return (
         <>
+            <a href={`/course/${course_id}/edit/topics`} target='_blank'>Course topics</a>
+            <br />
+            <button type="button" onClick={fetchWeights}>Refresh</button>
+            <br />
             <h1>Assignment:</h1>
             {(formData as AssignmentElementStructure).question}
             <br />
