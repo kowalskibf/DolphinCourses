@@ -57,3 +57,15 @@
 .answer-wrong {
     border: 2px solid red;
 }
+
+.timer {
+    position: sticky;
+    top: 0;
+    float: right;
+    background: white;
+    opacity: 70%;
+    padding: 10px;
+    color: black;
+    z-index: 10;
+    border-radius: 16px;
+}

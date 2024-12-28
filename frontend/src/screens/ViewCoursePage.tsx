@@ -19,6 +19,16 @@ type AssignmentAnswer = {
     hideAnswers: boolean;
     explanationShown: boolean;
     isMultipleChoice: boolean;
+    marks: number;
+    correctAnswerIndices: number[];
+}
+
+type ExamContent = {
+    examId: number;
+    finished: boolean;
+    timeLeft: number;
+    totalQuestions: number;
+    assignments: AssignmentAnswer[];
 }
 
 export default function ViewCoursePage() {
@@ -33,6 +43,7 @@ export default function ViewCoursePage() {
     const [viewArray, setViewArray] = useState<number[]>(viewParam ? viewParam.split("/").filter(Boolean).map(Number) : []);
 
     const [assignmentAnswers, setAssignmentAnswers] = useState<AssignmentAnswer[]>([]);
+    const [examContent, setExamContent] = useState<ExamContent[]>([]);
 
     function assertModuleElementStructure(
         obj: any
@@ -46,6 +57,7 @@ export default function ViewCoursePage() {
 
     const handleChangeLocationBack = (i: number) => {
         setAssignmentAnswers([]);
+        setExamContent([]);
         if (i == -1) {
             query.delete("v");
             navigate(`${location.pathname}`);
@@ -67,6 +79,7 @@ export default function ViewCoursePage() {
 
     const handleChangeLocationInto = (i: number) => {
         setAssignmentAnswers([]);
+        setExamContent([]);
         if (courseStructure && view) {
             if (view == "root") {
                 setViewArray([i]);
@@ -90,6 +103,7 @@ export default function ViewCoursePage() {
 
     const handleChangeLocationOneUp = () => {
         setAssignmentAnswers([]);
+        setExamContent([]);
         if (courseStructure && view && view != "root") {
             if (viewArray.length == 1) {
                 query.delete("v");
@@ -160,7 +174,9 @@ export default function ViewCoursePage() {
         assignmentId: number,
         answerIndex: number,
         hideAnswers: boolean,
-        isMultipleChoice: boolean = false
+        isMultipleChoice: boolean = false,
+        marks: number = 0,
+        correctAnswerIndices: number[] = []
     ) => {
         setAssignmentAnswers((prev) => {
             const existingAssignment = prev.find((a) => a.assignmentId === assignmentId);
@@ -175,6 +191,8 @@ export default function ViewCoursePage() {
                         hideAnswers: hideAnswers,
                         explanationShown: false,
                         isMultipleChoice: isMultipleChoice,
+                        marks: marks,
+                        correctAnswerIndices: correctAnswerIndices
                     },
                 ];
             } else {
@@ -213,6 +231,9 @@ export default function ViewCoursePage() {
         assignmentId: number,
         isMultipleChoice: boolean,
         hideAnswers: boolean,
+        marks: number = 0,
+        examId: number | null = null,
+        correctAnswerIndices: number[] = []
     ) => {
         setAssignmentAnswers(prevAnswers => {
             if (!prevAnswers.some(assignment => assignment.assignmentId === assignmentId) && isMultipleChoice)
@@ -225,6 +246,8 @@ export default function ViewCoursePage() {
                         hideAnswers: hideAnswers,
                         explanationShown: false,
                         isMultipleChoice: isMultipleChoice,
+                        marks: marks,
+                        correctAnswerIndices: correctAnswerIndices
                     }
                 ]
             return prevAnswers.map(assignment => {
@@ -244,9 +267,27 @@ export default function ViewCoursePage() {
                 return assignment;
             });
         });
+        if (examId) {
+            setExamContent(prevExams => {
+                return prevExams.map(exam => {
+                    if (exam.examId === examId) {
+                        const assignment = assignmentAnswers.find(a => a.assignmentId === assignmentId);
+                        if (!assignment) return exam;
+                        return {
+                            ...exam,
+                            assignments: [
+                                ...exam.assignments,
+                                assignment
+                            ]
+                        };
+                    }
+                    return exam;
+                });
+            });
+        }
     };
 
-    const handleShowAnswers = (assignmentId: number, hideAnswers: boolean, isMultipleChoice: boolean) => {
+    const handleShowAnswers = (assignmentId: number, hideAnswers: boolean, isMultipleChoice: boolean, marks: number = 0, examId: number | null = null, correctAnswerIndices: number[] = []) => {
         setAssignmentAnswers(prevAnswers => {
             if (!hideAnswers) return prevAnswers;
             if (!assignmentAnswers.some(assignment => assignment.assignmentId === assignmentId)) {
@@ -259,6 +300,9 @@ export default function ViewCoursePage() {
                         hideAnswers: false,
                         explanationShown: false,
                         isMultipleChoice: isMultipleChoice,
+                        marks: marks,
+                        examId: examId,
+                        correctAnswerIndices: correctAnswerIndices
                     }
                 ];
             }
@@ -276,6 +320,79 @@ export default function ViewCoursePage() {
         );
     };
 
+    const handleStartExam = (examId: number, duration: number, totalQuestions: number) => {
+        setExamContent((prevExams) => [
+            ...prevExams,
+            {
+                examId: examId,
+                finished: false,
+                timeLeft: duration * 60,
+                totalQuestions: totalQuestions,
+                assignments: []
+            },
+        ]);
+        let localTimeLeft = duration * 60;
+        const intervalId = setInterval(() => {
+            localTimeLeft -= 1;
+            setExamContent((prevExams) =>
+                prevExams.map((exam) =>
+                    exam.examId === examId
+                        ? { ...exam, timeLeft: localTimeLeft }
+                        : exam
+                )
+            );
+            if (localTimeLeft <= 0) {
+                clearInterval(intervalId);
+                handleFinishExam(examId);
+            }
+        }, 1000);
+    };
+
+    const handleFinishExam = (examId: number, totalNumOfQuestions: number = -1) => {
+        const exam = examContent.find(e => e.examId === examId);
+        if (totalNumOfQuestions !== -1 && (!exam || exam.assignments.length !== totalNumOfQuestions)) {
+            return;
+        }
+        setExamContent(p => {
+            return p.map(exam =>
+                exam.examId === examId
+                    ? { ...exam, finished: true }
+                    : exam
+            );
+        });
+        setTimeout(() => {
+            const targetElement = document.getElementById(`exam_id_${examId}`);
+            if (targetElement) {
+                const offsetTop = targetElement.getBoundingClientRect().top + window.scrollY;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }, 100);
+    };
+
+    const calculateTotalMarks = (examId: number): number => {
+        let totalMarks = 0;
+        const exam = examContent.find(exam => exam.examId === examId);
+        if (exam) {
+            exam.assignments.forEach(assignment => {
+                const isCorrect = JSON.stringify(assignment.selectedAnswerIndices.sort()) === JSON.stringify(assignment.correctAnswerIndices.sort());
+                if (isCorrect) {
+                    totalMarks += assignment.marks;
+                }
+            });
+        }
+        return totalMarks;
+    };
+
+    const calculatePercentage = (examId: number, totalMarksPossible: number): string => {
+        const totalMarks = calculateTotalMarks(examId);
+        const percentage = totalMarksPossible > 0
+            ? Math.round((totalMarks / totalMarksPossible) * 100).toString()
+            : '0';
+        return percentage;
+    };
 
     useEffect(() => {
         fetchCourseStructure();
@@ -289,6 +406,8 @@ export default function ViewCoursePage() {
     }, [courseStructure]);
 
     useEffect(() => { console.log(assignmentAnswers); }, [assignmentAnswers]);
+    useEffect(() => { console.log(examContent); }, [examContent]);
+
     if (!courseStructure || !view) {
         return (
             <>Loading...</>
@@ -508,10 +627,6 @@ export default function ViewCoursePage() {
                                                 Show answers
                                             </button>
                                         )}
-
-
-
-
                                     </>
                                 )}
                                 {element.element_data.type === "exam" && (
@@ -520,133 +635,206 @@ export default function ViewCoursePage() {
                                         <br />
                                         <span className="gray">Duration: {element.element_data.data.duration} minutes</span>
                                         <br />
+                                        <span className="gray">Questions: {element.element_data.data.questions.length}</span>
+                                        <br />
                                         <span className="gray">Total marks: {element.element_data.data.total_marks}</span>
-                                        <br /><br />
-
-                                        {element.element_data.data.questions.map((examQuestion, i) => {
-                                            const assignment = assignmentAnswers.find(
-                                                (assignment) => assignment.assignmentId === examQuestion.question.id
-                                            );
-
-                                            const isAnswered = assignment?.answered;
-                                            const isMultipleChoice = examQuestion.question.is_multiple_choice;
-                                            const correctAnswerIndices = (examQuestion.question as AssignmentElementStructure).correct_answer_indices;
-
-                                            return (
-                                                <div className="assignment-element any-element element-margin">
-                                                    <span className="gray">Marks: {examQuestion.marks}</span>
-                                                    <br />
-                                                    <span className="gray">Question</span>
-                                                    <ContentRenderer content={examQuestion.question.question} />
-                                                    {examQuestion.question.image && (
-                                                        <>
-                                                            <div className="media-container">
-                                                                <img src={MEDIA_URL + examQuestion.question.image} />
+                                        <br />
+                                        <span id={`exam_id_${element.element_data.id}`}></span>
+                                        <br />
+                                        {!examContent.some(e => e.examId === element.element_data.id) ? (
+                                            <button
+                                                type="button"
+                                                className="button-submit-answer"
+                                                onClick={() => handleStartExam(
+                                                    element.element_data.id,
+                                                    (element.element_data.data as ExamElementStructure).duration,
+                                                    (element.element_data.data as ExamElementStructure).questions.length
+                                                )}>
+                                                Start
+                                            </button>
+                                        ) : (
+                                            <>
+                                                {examContent.find(e => e.examId === element.element_data.id && e.finished) && (
+                                                    <>
+                                                        <h2>Exam finished</h2>
+                                                        You scored {calculateTotalMarks(element.element_data.id)}/{(element.element_data.data as ExamElementStructure).total_marks} marks ({calculatePercentage(element.element_data.id, (element.element_data.data as ExamElementStructure).total_marks)}%)
+                                                        <br /><br />
+                                                    </>
+                                                )}
+                                                {examContent.find(e => e.examId === element.element_data.id) && (
+                                                    <>
+                                                        {examContent.find(e => e.examId === element.element_data.id && !e.finished) && (
+                                                            <div className="timer">
+                                                                Time left:{" "}
+                                                                {
+                                                                    (() => {
+                                                                        const timeLeft = examContent.find(e => e.examId === element.element_data.id)?.timeLeft;
+                                                                        if (!timeLeft) return "00:00:00";
+                                                                        const hours = Math.floor(timeLeft / 3600);
+                                                                        const minutes = Math.floor((timeLeft % 3600) / 60);
+                                                                        const seconds = timeLeft % 60;
+                                                                        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                                                                    })()
+                                                                }
                                                             </div>
-                                                        </>
-                                                    )}
-                                                    <br />
-                                                    <span className="gray">{examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
-                                                    <br />
-                                                    <span className="gray">{examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}</span>
-                                                    <br /><br />
-                                                    {!examQuestion.question.hide_answers || assignmentAnswers.some((a) => a.assignmentId === examQuestion.question.id && !a.hideAnswers) ? (
-                                                        <>
-                                                            <span className="gray">Answers</span>
-                                                            <div className="question-answer-container">
-                                                                {examQuestion.question.answers.map((answer, j) => {
-                                                                    const isSelected = assignment?.selectedAnswerIndices.includes(j);
-                                                                    const isCorrect = isAnswered && correctAnswerIndices.includes(j);
-                                                                    const isWrong = isAnswered && !correctAnswerIndices.includes(j) && isSelected;
+                                                        )}
+                                                        {element.element_data.data.questions.map((examQuestion, i) => {
+                                                            const assignment = assignmentAnswers.find(
+                                                                (assignment) => assignment.assignmentId === examQuestion.question.id
+                                                            );
 
-                                                                    return (
-                                                                        <div
-                                                                            className={`question-answer${isSelected ? ' answer-selected' : ''}${isCorrect ? ' answer-correct' : ''}${isWrong ? ' answer-wrong' : ''}`}
-                                                                            key={j}
-                                                                            onClick={() => handleSelectAnswer(
-                                                                                examQuestion.question.id,
-                                                                                j,
-                                                                                examQuestion.question.hide_answers,
-                                                                                isMultipleChoice
+                                                            const isAnswered = assignment?.answered;
+                                                            const isMultipleChoice = examQuestion.question.is_multiple_choice;
+                                                            const correctAnswerIndices = (examQuestion.question as AssignmentElementStructure).correct_answer_indices;
+
+                                                            return (
+                                                                <div className="assignment-element any-element element-margin">
+                                                                    <span className="gray">Marks: {examQuestion.marks}</span>
+                                                                    <br />
+                                                                    <span className="gray">Question</span>
+                                                                    <ContentRenderer content={examQuestion.question.question} />
+                                                                    {examQuestion.question.image && (
+                                                                        <>
+                                                                            <div className="media-container">
+                                                                                <img src={MEDIA_URL + examQuestion.question.image} />
+                                                                            </div>
+                                                                        </>
+                                                                    )}
+                                                                    <br />
+                                                                    <span className="gray">{examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                                                    <br />
+                                                                    <span className="gray">{examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                                                    <br /><br />
+                                                                    {!examQuestion.question.hide_answers || assignmentAnswers.some((a) => a.assignmentId === examQuestion.question.id && !a.hideAnswers) ? (
+                                                                        <>
+                                                                            <span className="gray">Answers</span>
+                                                                            <div className="question-answer-container">
+                                                                                {examQuestion.question.answers.map((answer, j) => {
+                                                                                    const isSelected = assignment?.selectedAnswerIndices.includes(j);
+                                                                                    const isCorrect = isAnswered && correctAnswerIndices.includes(j);
+                                                                                    const isWrong = isAnswered && !correctAnswerIndices.includes(j) && isSelected;
+
+                                                                                    return (
+                                                                                        <div
+                                                                                            className={`question-answer${isSelected ? ' answer-selected' : ''}${isCorrect ? ' answer-correct' : ''}${isWrong ? ' answer-wrong' : ''}`}
+                                                                                            key={j}
+                                                                                            onClick={() => handleSelectAnswer(
+                                                                                                examQuestion.question.id,
+                                                                                                j,
+                                                                                                examQuestion.question.hide_answers,
+                                                                                                isMultipleChoice,
+                                                                                                examQuestion.marks,
+                                                                                                examQuestion.question.correct_answer_indices
+                                                                                            )}
+                                                                                        >
+                                                                                            <ContentRenderer content={answer} />
+                                                                                        </div>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                            {examContent.find(e => e.examId === element.element_data.id && !e.finished) && (<button
+                                                                                type="button"
+                                                                                className={`button-submit-answer${assignmentAnswers.some(
+                                                                                    assignment => assignment.assignmentId === examQuestion.question.id && assignment.answered
+                                                                                )
+                                                                                    ? ' button-submit-answer-disabled'
+                                                                                    : (
+                                                                                        isMultipleChoice ||
+                                                                                        assignmentAnswers.some(
+                                                                                            assignment => assignment.assignmentId === examQuestion.question.id && assignment.selectedAnswerIndices.length > 0
+                                                                                        )
+                                                                                    )
+                                                                                        ? ''
+                                                                                        : ' button-submit-answer-disabled'
+                                                                                    }`}
+
+                                                                                onClick={() => handleSubmitAnswer(
+                                                                                    examQuestion.question.id,
+                                                                                    examQuestion.question.is_multiple_choice,
+                                                                                    examQuestion.question.hide_answers,
+                                                                                    examQuestion.marks,
+                                                                                    element.element_data.id,
+                                                                                    examQuestion.question.correct_answer_indices
+                                                                                )}
+                                                                                disabled={isAnswered}
+                                                                            >
+                                                                                Submit answer
+                                                                            </button>
+
                                                                             )}
-                                                                        >
-                                                                            <ContentRenderer content={answer} />
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                className={`button-submit-answer${assignmentAnswers.some(
-                                                                    assignment => assignment.assignmentId === examQuestion.question.id && assignment.answered
-                                                                )
-                                                                    ? ' button-submit-answer-disabled'
-                                                                    : (
-                                                                        isMultipleChoice ||
-                                                                        assignmentAnswers.some(
-                                                                            assignment => assignment.assignmentId === examQuestion.question.id && assignment.selectedAnswerIndices.length > 0
-                                                                        )
-                                                                    )
-                                                                        ? ''
-                                                                        : ' button-submit-answer-disabled'
-                                                                    }`}
-
-                                                                onClick={() => handleSubmitAnswer(
-                                                                    examQuestion.question.id,
-                                                                    examQuestion.question.is_multiple_choice,
-                                                                    examQuestion.question.hide_answers
-                                                                )}
-                                                                disabled={isAnswered}
-                                                            >
-                                                                Submit answer
-                                                            </button>
-
-                                                            <br />
-
-                                                            {isAnswered && (
-                                                                <>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="button-submit-answer"
-                                                                        onClick={() => handleToggleExplanation(examQuestion.question.id)}
-                                                                    >
-                                                                        {assignment?.explanationShown ? 'Hide explanation' : 'Show explanation'}
-                                                                    </button>
-                                                                    {assignment?.explanationShown && (
-                                                                        <div>
-                                                                            <span className="gray">Explanation</span>
                                                                             <br />
-                                                                            <ContentRenderer content={examQuestion.question.explanation} />
-                                                                            {examQuestion.question.explanation_image && (
+                                                                            {isAnswered && (
                                                                                 <>
-                                                                                    <br />
-                                                                                    <div className="media-container">
-                                                                                        <img src={MEDIA_URL + examQuestion.question.explanation_image} />
-                                                                                    </div>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="button-submit-answer"
+                                                                                        onClick={() => handleToggleExplanation(examQuestion.question.id)}
+                                                                                    >
+                                                                                        {assignment?.explanationShown ? 'Hide explanation' : 'Show explanation'}
+                                                                                    </button>
+                                                                                    {assignment?.explanationShown && (
+                                                                                        <div>
+                                                                                            <span className="gray">Explanation</span>
+                                                                                            <br />
+                                                                                            <ContentRenderer content={examQuestion.question.explanation} />
+                                                                                            {examQuestion.question.explanation_image && (
+                                                                                                <>
+                                                                                                    <br />
+                                                                                                    <div className="media-container">
+                                                                                                        <img src={MEDIA_URL + examQuestion.question.explanation_image} />
+                                                                                                    </div>
+                                                                                                </>
+                                                                                            )}
+                                                                                        </div>
+                                                                                    )}
                                                                                 </>
                                                                             )}
-                                                                        </div>
+                                                                        </>
+                                                                    ) : (
+                                                                        <button
+                                                                            type="button"
+                                                                            className="button-submit-answer"
+                                                                            onClick={() => handleShowAnswers(
+                                                                                examQuestion.question.id,
+                                                                                examQuestion.question.hide_answers,
+                                                                                examQuestion.question.is_multiple_choice,
+                                                                                examQuestion.marks,
+                                                                                element.element_data.id,
+                                                                                examQuestion.question.correct_answer_indices
+                                                                            )}
+                                                                        >
+                                                                            Show answers
+                                                                        </button>
                                                                     )}
-                                                                </>
-                                                            )}
-                                                        </>
-                                                    ) : (
-                                                        <button
-                                                            type="button"
-                                                            className="button-submit-answer"
-                                                            onClick={() => handleShowAnswers(
-                                                                examQuestion.question.id,
-                                                                examQuestion.question.hide_answers,
-                                                                examQuestion.question.is_multiple_choice
-                                                            )}
-                                                        >
-                                                            Show answers
-                                                        </button>
-                                                    )}
 
-                                                </div>
-                                            );
-                                        })}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                        {examContent.find(e => e.examId === element.element_data.id && !e.finished) && (
+                                                            <button
+                                                                type="button"
+                                                                className={`button-submit-answer${examContent.find(e => e.examId === element.element_data.id)?.assignments.length !== element.element_data.data.questions.length
+                                                                    ? ' button-submit-answer-disabled'
+                                                                    : ''
+                                                                    }`}
+                                                                onClick={() => handleFinishExam(element.element_data.id, (element.element_data.data as ExamElementStructure).questions.length)}
+                                                            >
+                                                                Finish exam
+                                                            </button>
+                                                        )}
+                                                        {examContent.find(e => e.examId === element.element_data.id && e.finished) && (
+                                                            <button
+                                                                type="button"
+                                                                className="button-submit-answer"
+                                                                onClick={() => location.reload()}
+                                                            >
+                                                                Try again
+                                                            </button>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </>
+                                        )}
                                     </>
                                 )}
 
