@@ -4,12 +4,21 @@ import "../types";
 import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, timeAgo } from '../functions';
 import { CURRENCIES, LANGUAGES, MEDIA_URL, TYPES } from '../constants';
 import { useParams } from 'react-router-dom';
-import "../styles/EditCoursePage.css";
+import "../styles/ViewCoursePage.css";
 import { useLocation, useNavigate } from 'react-router-dom';
 import ContentRenderer from '../components/ContentRenderer';
 
 type Params = {
     id: string;
+}
+
+type AssignmentAnswer = {
+    assignmentId: number;
+    selectedAnswerIndices: number[];
+    answered: boolean;
+    hideAnswers: boolean;
+    explanationShown: boolean;
+    isMultipleChoice: boolean;
 }
 
 export default function ViewCoursePage() {
@@ -23,6 +32,8 @@ export default function ViewCoursePage() {
     const viewParam = query.get("v");
     const [viewArray, setViewArray] = useState<number[]>(viewParam ? viewParam.split("/").filter(Boolean).map(Number) : []);
 
+    const [assignmentAnswers, setAssignmentAnswers] = useState<AssignmentAnswer[]>([]);
+
     function assertModuleElementStructure(
         obj: any
     ): asserts obj is ModuleElementStructure {
@@ -34,6 +45,7 @@ export default function ViewCoursePage() {
     const navigate = useNavigate();
 
     const handleChangeLocationBack = (i: number) => {
+        setAssignmentAnswers([]);
         if (i == -1) {
             query.delete("v");
             navigate(`${location.pathname}`);
@@ -54,6 +66,7 @@ export default function ViewCoursePage() {
     };
 
     const handleChangeLocationInto = (i: number) => {
+        setAssignmentAnswers([]);
         if (courseStructure && view) {
             if (view == "root") {
                 setViewArray([i]);
@@ -76,6 +89,7 @@ export default function ViewCoursePage() {
     }
 
     const handleChangeLocationOneUp = () => {
+        setAssignmentAnswers([]);
         if (courseStructure && view && view != "root") {
             if (viewArray.length == 1) {
                 query.delete("v");
@@ -142,6 +156,126 @@ export default function ViewCoursePage() {
             .then((data) => setCourseStructure(data));
     };
 
+    const handleSelectAnswer = (
+        assignmentId: number,
+        answerIndex: number,
+        hideAnswers: boolean,
+        isMultipleChoice: boolean = false
+    ) => {
+        setAssignmentAnswers((prev) => {
+            const existingAssignment = prev.find((a) => a.assignmentId === assignmentId);
+
+            if (!existingAssignment) {
+                return [
+                    ...prev,
+                    {
+                        assignmentId: assignmentId,
+                        selectedAnswerIndices: [answerIndex],
+                        answered: false,
+                        hideAnswers: hideAnswers,
+                        explanationShown: false,
+                        isMultipleChoice: isMultipleChoice,
+                    },
+                ];
+            } else {
+                if (existingAssignment.answered) {
+                    return prev;
+                }
+
+                const updatedAssignments = prev.map((assignment) => {
+                    if (assignment.assignmentId === assignmentId) {
+                        if (isMultipleChoice) {
+                            const isSelected = assignment.selectedAnswerIndices.includes(answerIndex);
+                            return {
+                                ...assignment,
+                                selectedAnswerIndices: isSelected
+                                    ? assignment.selectedAnswerIndices.filter((i) => i !== answerIndex)
+                                    : [...assignment.selectedAnswerIndices, answerIndex],
+                            };
+                        } else {
+                            const isSameAnswer = assignment.selectedAnswerIndices[0] === answerIndex;
+                            return {
+                                ...assignment,
+                                selectedAnswerIndices: isSameAnswer ? [] : [answerIndex],
+                            };
+                        }
+                    }
+                    return assignment;
+                });
+
+                return updatedAssignments;
+            }
+        });
+    }
+
+
+    const handleSubmitAnswer = (
+        assignmentId: number,
+        isMultipleChoice: boolean,
+        hideAnswers: boolean,
+    ) => {
+        setAssignmentAnswers(prevAnswers => {
+            if (!prevAnswers.some(assignment => assignment.assignmentId === assignmentId) && isMultipleChoice)
+                return [
+                    ...prevAnswers,
+                    {
+                        assignmentId: assignmentId,
+                        selectedAnswerIndices: [],
+                        answered: true,
+                        hideAnswers: hideAnswers,
+                        explanationShown: false,
+                        isMultipleChoice: isMultipleChoice,
+                    }
+                ]
+            return prevAnswers.map(assignment => {
+                if (assignment.assignmentId === assignmentId) {
+                    if (assignment.answered) {
+                        return assignment;
+                    }
+
+                    if (assignment.isMultipleChoice) {
+                        return { ...assignment, answered: true };
+                    } else if (assignment.selectedAnswerIndices.length === 1) {
+                        return { ...assignment, answered: true };
+                    } else {
+                        return assignment;
+                    }
+                }
+                return assignment;
+            });
+        });
+    };
+
+    const handleShowAnswers = (assignmentId: number, hideAnswers: boolean, isMultipleChoice: boolean) => {
+        setAssignmentAnswers(prevAnswers => {
+            if (!hideAnswers) return prevAnswers;
+            if (!assignmentAnswers.some(assignment => assignment.assignmentId === assignmentId)) {
+                return [
+                    ...prevAnswers,
+                    {
+                        assignmentId: assignmentId,
+                        selectedAnswerIndices: [],
+                        answered: false,
+                        hideAnswers: false,
+                        explanationShown: false,
+                        isMultipleChoice: isMultipleChoice,
+                    }
+                ];
+            }
+            return prevAnswers;
+        })
+    }
+
+    const handleToggleExplanation = (assignmentId: number) => {
+        setAssignmentAnswers(prevAnswers =>
+            prevAnswers.map(assignment =>
+                assignment.assignmentId === assignmentId
+                    ? { ...assignment, explanationShown: !assignment.explanationShown }
+                    : assignment
+            )
+        );
+    };
+
 
     useEffect(() => {
         fetchCourseStructure();
@@ -154,7 +288,7 @@ export default function ViewCoursePage() {
         }
     }, [courseStructure]);
 
-
+    useEffect(() => { console.log(assignmentAnswers); }, [assignmentAnswers]);
     if (!courseStructure || !view) {
         return (
             <>Loading...</>
@@ -172,18 +306,16 @@ export default function ViewCoursePage() {
                         .map((module, i) => (
                             <div key={i}>
                                 <div
-                                    className={module.module.type + '-element any-element element-margin'}
+                                    className={module.module.type + '-element any-element element-margin module-container'}
+                                    onClick={() => handleChangeLocationInto(module.order)}
                                 >
-                                    {module.module.type == "module" ?
+                                    {module.module.type == "module" &&
                                         <>
-                                            Title: {module.module.data.title}
+                                            <div className="module-container-title">{module.module.data.title}</div>
                                             <br />
-                                            Description: <ContentRenderer content={module.module.data.description} />
+                                            <span className="gray"><ContentRenderer content={module.module.data.description} /></span>
                                         </>
-                                        : ""}
-                                    <br />
-                                    <button onClick={() => handleChangeLocationInto(module.order)}>Enter</button>
-                                    <br />
+                                    }
                                 </div>
                             </div>
                         ))}
@@ -191,9 +323,9 @@ export default function ViewCoursePage() {
                 </>
                 :
                 <>
-                    <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
-                    <br />
                     <span onClick={handleChangeLocationOneUp}>Back</span>
+                    <br />
+                    <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
                     <br />
                     {path.map((module, i) => (
                         <div key={i}>
@@ -209,9 +341,6 @@ export default function ViewCoursePage() {
                                 key={i}
                                 className={element.element_data.type + '-element any-element element-margin'}
                             >
-                                <div className={element.element_data.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
-                                    {element.element_data.name} {element.uses > 1 ? `(used in ${element.uses - 1} other modules)` : ""}
-                                </div>
                                 {element.element_data.type == "text" && (
                                     <>
                                         <ContentRenderer content={element.element_data.data.content} />
@@ -219,106 +348,318 @@ export default function ViewCoursePage() {
                                 )}
                                 {element.element_data.type == "image" && (
                                     <>
-                                        <img src={MEDIA_URL + element.element_data.data.image} />
-                                        <br />
-                                        Description: <ContentRenderer content={element.element_data.data.description} />
+                                        <div className="media-container">
+                                            <img src={MEDIA_URL + element.element_data.data.image} />
+                                        </div>
+                                        <div className="media-description">
+                                            <ContentRenderer content={element.element_data.data.description} />
+                                        </div>
                                     </>
                                 )}
                                 {element.element_data.type == "video" && (
                                     <>
-                                        <video src={MEDIA_URL + element.element_data.data.video} controls />
-                                        <br />
-                                        Description: <ContentRenderer content={element.element_data.data.description} />
+                                        <div className="media-container">
+                                            <video src={MEDIA_URL + element.element_data.data.video} controls />
+                                        </div>
+                                        <div className="media-description">
+                                            <ContentRenderer content={element.element_data.data.description} />
+                                        </div>
                                     </>
                                 )}
                                 {element.element_data.type == "example" && (
                                     <>
-                                        Question: <ContentRenderer content={element.element_data.data.question} />
-                                        <br />
+                                        <span className="gray">Question</span>
+                                        <ContentRenderer content={element.element_data.data.question} />
                                         {element.element_data.data.image && (
-                                            <img src={MEDIA_URL + element.element_data.data.image} />
+                                            <>
+                                                <br />
+                                                <div className="media-container">
+                                                    <img src={MEDIA_URL + element.element_data.data.image} />
+                                                </div>
+                                                <br />
+                                            </>
                                         )}
                                         <br />
-                                        Explanation: <ContentRenderer content={element.element_data.data.explanation} />
-                                        <br />
+                                        <span className="gray">Explanation</span>
+                                        <ContentRenderer content={element.element_data.data.explanation} />
                                         {element.element_data.data.explanation_image && (
-                                            <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                            <>
+                                                <br />
+                                                <div className="media-container">
+                                                    <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                                </div>
+                                            </>
                                         )}
                                     </>
                                 )}
                                 {element.element_data.type == "assignment" && (
                                     <>
-                                        Question: <ContentRenderer content={element.element_data.data.question} />
+                                        <span className="gray">Question</span>
+                                        <ContentRenderer content={element.element_data.data.question} />
                                         <br />
-                                        Image: <img src={MEDIA_URL + element.element_data.data.image} />
+                                        {element.element_data.data.image && (
+                                            <>
+                                                <br />
+                                                <div className="media-container">
+                                                    <img src={MEDIA_URL + element.element_data.data.image} />
+                                                </div>
+                                                <br />
+                                            </>
+                                        )}
+                                        <span className="gray">{element.element_data.data.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
                                         <br />
-                                        {element.element_data.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                        <span className="gray">{element.element_data.data.hide_answers ? "Answers hidden" : "Answers visible"}</span>
                                         <br />
-                                        {element.element_data.data.hide_answers ? "Answers hidden" : "Answers visible"}
                                         <br />
-                                        Answers:
-                                        {element.element_data.data.answers.map((answer, i) => (
-                                            <li key={i}>
-                                                <ContentRenderer content={answer} /> {(element.element_data.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                            </li>
-                                        ))}
-                                        Explanation: <ContentRenderer content={element.element_data.data.explanation} />
-                                        <br />
-                                        Explanation image:
-                                        <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                        {!element.element_data.data.hide_answers || assignmentAnswers.some((a) => a.assignmentId === element.element_data.id && !a.hideAnswers) ? (
+                                            <>
+                                                <span className="gray">Answers</span>
+                                                <br />
+                                                <div className="question-answer-container">
+                                                    {element.element_data.data.answers.map((answer, i) => {
+                                                        const assignmentElement = element.element_data.data as AssignmentElementStructure;
+
+                                                        const assignment = assignmentAnswers.find(
+                                                            (assignment) => assignment.assignmentId === element.element_data.id
+                                                        );
+
+                                                        const isSelected = assignment?.selectedAnswerIndices.includes(i);
+                                                        const isCorrect = assignment?.answered && assignmentElement.correct_answer_indices.includes(i);
+                                                        const isWrong = assignment?.answered && !assignmentElement.correct_answer_indices.includes(i) && isSelected;
+
+                                                        return (
+                                                            <div
+                                                                className={`question-answer${isSelected ? ' answer-selected' : ''}${isCorrect ? ' answer-correct' : ''}${isWrong ? ' answer-wrong' : ''}`}
+                                                                key={i}
+                                                                onClick={() => handleSelectAnswer(
+                                                                    element.element_data.id,
+                                                                    i,
+                                                                    assignmentElement.hide_answers,
+                                                                    assignmentElement.is_multiple_choice
+                                                                )}
+                                                            >
+                                                                <ContentRenderer content={answer} />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    className={`button-submit-answer${element.element_data.data.is_multiple_choice ? '' :
+                                                        (!assignmentAnswers.some(assignment =>
+                                                            assignment.assignmentId === element.element_data.id &&
+                                                            assignment.selectedAnswerIndices.length > 0
+                                                        ) || !assignmentAnswers.some(assignment =>
+                                                            assignment.assignmentId === element.element_data.id
+                                                        ) || assignmentAnswers.some(assignment =>
+                                                            assignment.assignmentId === element.element_data.id && assignment.answered
+                                                        ) ? ' button-submit-answer-disabled' : '')}`}
+                                                    onClick={() => handleSubmitAnswer(
+                                                        element.element_data.id,
+                                                        (element.element_data.data as AssignmentElementStructure).is_multiple_choice,
+                                                        (element.element_data.data as AssignmentElementStructure).hide_answers
+                                                    )}
+                                                >
+                                                    Submit answer
+                                                </button>
+
+
+                                                <br />
+
+                                                {assignmentAnswers.some(assignment => assignment.assignmentId === element.element_data.id && assignment.answered) && (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            className="button-submit-answer "
+                                                            onClick={() => handleToggleExplanation(element.element_data.id)}
+                                                        >
+                                                            {assignmentAnswers.find(assignment => assignment.assignmentId === element.element_data.id)?.explanationShown
+                                                                ? 'Hide explanation'
+                                                                : 'Show explanation'}
+                                                        </button>
+                                                        {assignmentAnswers.find(assignment => assignment.assignmentId === element.element_data.id)?.explanationShown && (
+                                                            <div>
+                                                                <span className="gray">Explanation</span>
+                                                                <br />
+                                                                <ContentRenderer content={element.element_data.data.explanation} />
+                                                                {element.element_data.data.explanation_image && (
+                                                                    <>
+                                                                        <br />
+                                                                        <div className="media-container">
+                                                                            <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                                                        </div>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                className="button-submit-answer"
+                                                onClick={() => handleShowAnswers(
+                                                    element.element_data.id,
+                                                    (element.element_data.data as AssignmentElementStructure).hide_answers,
+                                                    (element.element_data.data as AssignmentElementStructure).is_multiple_choice
+                                                )}
+                                            >
+                                                Show answers
+                                            </button>
+                                        )}
+
+
+
 
                                     </>
                                 )}
-                                {element.element_data.type == "exam" && (
+                                {element.element_data.type === "exam" && (
                                     <>
-                                        Description: <ContentRenderer content={element.element_data.data.description} />
+                                        <ContentRenderer content={element.element_data.data.description} />
                                         <br />
-                                        Duration: {element.element_data.data.duration}
+                                        <span className="gray">Duration: {element.element_data.data.duration} minutes</span>
                                         <br />
-                                        Total marks: {element.element_data.data.total_marks}
-                                        <br />
-                                        {element.element_data.data.questions.map((examQuestion, i) => (
-                                            <>
-                                                <br />
-                                                Marks: {examQuestion.marks}
-                                                <br />
-                                                Question: <ContentRenderer content={examQuestion.question.question} />
-                                                {examQuestion.question.image && (
-                                                    <img src={MEDIA_URL + examQuestion.question.image} />
-                                                )}
-                                                <br />
-                                                {examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                                <br />
-                                                {examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}
-                                                <br />
-                                                Answers:
-                                                {examQuestion.question.answers.map((answer, i) => (
-                                                    <li key={i}>
-                                                        <ContentRenderer content={answer} /> {(examQuestion.question as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                                    </li>
-                                                ))}
-                                                Explanation: <ContentRenderer content={examQuestion.question.explanation} />
-                                                <br />
-                                                {examQuestion.question.explanation_image && (
-                                                    <img src={MEDIA_URL + examQuestion.question.explanation_image} />
-                                                )}
-                                                <a href={`/course/${id}/assignment/${examQuestion.question.id}/weights/edit`} target='_blank'>Modify weights</a>
-                                                <br />
-                                            </>
-                                        ))}
+                                        <span className="gray">Total marks: {element.element_data.data.total_marks}</span>
+                                        <br /><br />
+
+                                        {element.element_data.data.questions.map((examQuestion, i) => {
+                                            const assignment = assignmentAnswers.find(
+                                                (assignment) => assignment.assignmentId === examQuestion.question.id
+                                            );
+
+                                            const isAnswered = assignment?.answered;
+                                            const isMultipleChoice = examQuestion.question.is_multiple_choice;
+                                            const correctAnswerIndices = (examQuestion.question as AssignmentElementStructure).correct_answer_indices;
+
+                                            return (
+                                                <div className="assignment-element any-element element-margin">
+                                                    <span className="gray">Marks: {examQuestion.marks}</span>
+                                                    <br />
+                                                    <span className="gray">Question</span>
+                                                    <ContentRenderer content={examQuestion.question.question} />
+                                                    {examQuestion.question.image && (
+                                                        <>
+                                                            <div className="media-container">
+                                                                <img src={MEDIA_URL + examQuestion.question.image} />
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                    <br />
+                                                    <span className="gray">{examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                                    <br />
+                                                    <span className="gray">{examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                                    <br /><br />
+                                                    {!examQuestion.question.hide_answers || assignmentAnswers.some((a) => a.assignmentId === examQuestion.question.id && !a.hideAnswers) ? (
+                                                        <>
+                                                            <span className="gray">Answers</span>
+                                                            <div className="question-answer-container">
+                                                                {examQuestion.question.answers.map((answer, j) => {
+                                                                    const isSelected = assignment?.selectedAnswerIndices.includes(j);
+                                                                    const isCorrect = isAnswered && correctAnswerIndices.includes(j);
+                                                                    const isWrong = isAnswered && !correctAnswerIndices.includes(j) && isSelected;
+
+                                                                    return (
+                                                                        <div
+                                                                            className={`question-answer${isSelected ? ' answer-selected' : ''}${isCorrect ? ' answer-correct' : ''}${isWrong ? ' answer-wrong' : ''}`}
+                                                                            key={j}
+                                                                            onClick={() => handleSelectAnswer(
+                                                                                examQuestion.question.id,
+                                                                                j,
+                                                                                examQuestion.question.hide_answers,
+                                                                                isMultipleChoice
+                                                                            )}
+                                                                        >
+                                                                            <ContentRenderer content={answer} />
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                className={`button-submit-answer${assignmentAnswers.some(
+                                                                    assignment => assignment.assignmentId === examQuestion.question.id && assignment.answered
+                                                                )
+                                                                    ? ' button-submit-answer-disabled'
+                                                                    : (
+                                                                        isMultipleChoice ||
+                                                                        assignmentAnswers.some(
+                                                                            assignment => assignment.assignmentId === examQuestion.question.id && assignment.selectedAnswerIndices.length > 0
+                                                                        )
+                                                                    )
+                                                                        ? ''
+                                                                        : ' button-submit-answer-disabled'
+                                                                    }`}
+
+                                                                onClick={() => handleSubmitAnswer(
+                                                                    examQuestion.question.id,
+                                                                    examQuestion.question.is_multiple_choice,
+                                                                    examQuestion.question.hide_answers
+                                                                )}
+                                                                disabled={isAnswered}
+                                                            >
+                                                                Submit answer
+                                                            </button>
+
+                                                            <br />
+
+                                                            {isAnswered && (
+                                                                <>
+                                                                    <button
+                                                                        type="button"
+                                                                        className="button-submit-answer"
+                                                                        onClick={() => handleToggleExplanation(examQuestion.question.id)}
+                                                                    >
+                                                                        {assignment?.explanationShown ? 'Hide explanation' : 'Show explanation'}
+                                                                    </button>
+                                                                    {assignment?.explanationShown && (
+                                                                        <div>
+                                                                            <span className="gray">Explanation</span>
+                                                                            <br />
+                                                                            <ContentRenderer content={examQuestion.question.explanation} />
+                                                                            {examQuestion.question.explanation_image && (
+                                                                                <>
+                                                                                    <br />
+                                                                                    <div className="media-container">
+                                                                                        <img src={MEDIA_URL + examQuestion.question.explanation_image} />
+                                                                                    </div>
+                                                                                </>
+                                                                            )}
+                                                                        </div>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <button
+                                                            type="button"
+                                                            className="button-submit-answer"
+                                                            onClick={() => handleShowAnswers(
+                                                                examQuestion.question.id,
+                                                                examQuestion.question.hide_answers,
+                                                                examQuestion.question.is_multiple_choice
+                                                            )}
+                                                        >
+                                                            Show answers
+                                                        </button>
+                                                    )}
+
+                                                </div>
+                                            );
+                                        })}
                                     </>
                                 )}
+
                                 {element.element_data.type == "module" ?
                                     <>
-                                        Title: {element.element_data.data.title}
-                                        <br />
-                                        Description: <ContentRenderer content={element.element_data.data.description} />
-                                    </>
-                                    : ""}
-                                <br />
-                                {element.element_data.type == "module" ?
-                                    <>
-                                        <button onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
+                                        <div
+                                            className={'module-container'}
+                                            onClick={() => handleChangeLocationInto(element.order)}
+                                        >
+                                            <div className="module-container-title">{element.element_data.data.title}</div>
+                                            <br />
+                                            <span className="gray"><ContentRenderer content={element.element_data.data.description} /></span>
+                                        </div>
                                     </>
                                     : ""}
                             </div>

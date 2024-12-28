@@ -227,3 +227,11 @@ a:visited {
   margin: 5px;
   max-width: 400px;
 }
+
+.gray {
+  color: gray;
+}
+
+.gray * {
+  color: gray;
+}
