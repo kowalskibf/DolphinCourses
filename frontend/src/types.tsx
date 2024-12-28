@@ -178,7 +178,7 @@ type AssignmentWeight = {
 type AccountTopic = {
     id: number;
     account: Account;
-    topic: CourseTopic;
+    course_topic: CourseTopic;
     value: number;
 }
 

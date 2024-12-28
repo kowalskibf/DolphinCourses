@@ -285,6 +285,8 @@ export default function ViewCoursePage() {
                 });
             });
         }
+        const selectedAnswerIndices = assignmentAnswers.find(a => a.assignmentId === assignmentId)?.selectedAnswerIndices ?? [];
+        handleSendAnswer(assignmentId, selectedAnswerIndices);
     };
 
     const handleShowAnswers = (assignmentId: number, hideAnswers: boolean, isMultipleChoice: boolean, marks: number = 0, examId: number | null = null, correctAnswerIndices: number[] = []) => {
@@ -393,6 +395,19 @@ export default function ViewCoursePage() {
             : '0';
         return percentage;
     };
+
+    const handleSendAnswer = async (assignmentId: number, selectedAnswerIndices: number[]) => {
+        fetch(`http://127.0.0.1:8000/api/course/${id}/accounttopics/assignment/${assignmentId}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                selected_answer_indices: selectedAnswerIndices,
+            }),
+        });
+    }
 
     useEffect(() => {
         fetchCourseStructure();

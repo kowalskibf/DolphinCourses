@@ -1454,4 +1454,65 @@ class MyCourseAccessesView(APIView):
         )
         serializer = CourseAccessDetailSerializer(courseAccesses, many=True)
         return Response(serializer.data)
-    
+
+class AccountTopicView(APIView):
+    def get(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        accountTopics = AccountTopic.objects.filter(account=account, course_topic__course=course)
+        serializer = AccountTopicSerializer(accountTopics, many=True)
+        return Response(serializer.data)
+
+    def put(self, request, course_id, assignment_id):
+        LOWER_BOUND = 0.0
+        UPPER_BOUND = 1.0
+        K = 0.05
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            body = json.loads(request.body)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not body["selected_answer_indices"]:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not CourseAccess.objects.filter(account=account, course=course, is_active=True, expires__gt=timezone.now()).exists():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            assignment = AssignmentElement.objects.get(id=assignment_id)
+        except AssignmentElement.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        correct_answer_indices = sorted(assignment.correct_answer_indices)
+        selected_answer_indices = sorted(body["selected_answer_indices"])
+        R = correct_answer_indices == selected_answer_indices
+        for courseTopic in CourseTopic.objects.filter(course=course):
+            assignmentWeight = AssignmentWeight.objects.get(assignment=assignment, topic=courseTopic)
+            w = assignmentWeight.weight
+            accountTopic = AccountTopic.objects.get(account=account, course_topic=courseTopic)
+            c = accountTopic.value
+            if R:
+                accountTopic.value += K * (UPPER_BOUND - c) * w
+            else:
+                accountTopic.value -= K * (c - LOWER_BOUND) * w
+            accountTopic.save()
+        return Response(status=status.HTTP_200_OK)
+        

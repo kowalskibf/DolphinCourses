@@ -27,4 +27,6 @@ urlpatterns = [
     path('course/<int:course_id>/access', CourseAccessView.as_view(), name='course_access'),
     path('courseaccess/<int:course_access_id>', CourseAccessView.as_view(), name='course_access_specific'),
     path('courseaccesses/my', MyCourseAccessesView.as_view(), name='my_course_accesses'),
+    path('course/<int:course_id>/accounttopics', AccountTopicView.as_view(), name='get_account_topics'),
+    path('course/<int:course_id>/accounttopics/assignment/<int:assignment_id>', AccountTopicView.as_view(), name='put_account_topics')
 ]
