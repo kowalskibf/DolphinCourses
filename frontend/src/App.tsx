@@ -25,6 +25,7 @@ import ViewCourseInfoPage from './screens/ViewCourseInfoPage';
 import ViewCourseAccessPage from './screens/ViewCourseAccessPage';
 import ViewCoursePage from './screens/ViewCoursePage';
 import ViewCourseTopicsPage from './screens/ViewCourseTopicsPage';
+import ExplorePage from './screens/ExplorePage';
 
 export default function App() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/course/:id/view/access" element={<ViewCourseAccessPage />} />
           <Route path="/course/:id/view" element={<ViewCoursePage />} />
           <Route path="/course/:id/view/topics" element={<ViewCourseTopicsPage />} />
+          <Route path="/explore" element={<ExplorePage />} />
         </Routes>
       </Router>
     </div>

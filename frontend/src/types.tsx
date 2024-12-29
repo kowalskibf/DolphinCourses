@@ -331,3 +331,9 @@ type CourseStructure = {
     promo_expires: number;
     modules: ModuleToCourseStructure[];
 };
+
+
+type CourseWithReviews = Course & {
+    reviews: Review[];
+    average_rating: number;
+};

@@ -1,0 +1,21 @@
+.star-rating {
+    display: flex;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.star-wrapper {
+    display: inline-block;
+}
+
+.star {
+    font-size: 16px;
+}
+
+.star.gold {
+    color: gold;
+}
+
+.star.gray {
+    color: lightgray;
+}

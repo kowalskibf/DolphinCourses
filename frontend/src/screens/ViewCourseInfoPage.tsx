@@ -5,6 +5,8 @@ import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, pri
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
 import ContentRenderer from '../components/ContentRenderer';
+import StarsInput from '../components/StarsInput';
+import Stars from '../components/Stars';
 
 type Params = {
     id: string;
@@ -17,6 +19,13 @@ export default function ViewCourseInfoPage() {
     const [course, setCourse] = useState<Course>();
 
     const [hasAccess, setHasAccess] = useState<boolean>(false);
+
+    const [reviewRating, setReviewRating] = useState<number>(5);
+    const [reviewComment, setReviewComment] = useState<string>("");
+
+    const [reviewed, setReviewed] = useState<boolean>(false);
+
+    const [allReviews, setAllReviews] = useState<Review[]>([]);
 
     const fetchCourse = async () => {
         fetch(`http://127.0.0.1:8000/api/course/${id}`, {
@@ -50,9 +59,76 @@ export default function ViewCourseInfoPage() {
             .then((data) => setCourseAccess(data));
     };
 
+    const fetchMyReview = async () => {
+        fetch(`http://127.0.0.1:8000/api/course/${id}/review`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => {
+                if (response.ok) {
+                    setReviewed(true);
+                    return response.json();
+                } else {
+                    setReviewed(false);
+                    return null;
+                }
+            })
+            .then((data) => {
+                if (data) {
+                    setReviewRating(data.rating);
+                    setReviewComment(data.comment);
+                }
+            });
+    };
+
+    const fetchAllReviews = async () => {
+        fetch(`http://127.0.0.1:8000/api/course/${id}/reviews`, {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => setAllReviews(data));
+    }
+
+    const handlePostPutReview = async (method: "POST" | "PUT") => {
+        fetch(`http://127.0.0.1:8000/api/course/${id}/review`, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify({
+                rating: reviewRating,
+                comment: reviewComment,
+            }),
+        })
+            .then((response) => {
+                fetchMyReview();
+                fetchAllReviews();
+            });
+    }
+
+    const handleDeleteReview = async () => {
+        fetch(`http://127.0.0.1:8000/api/course/${id}/review`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        })
+            .then((response) => {
+                fetchMyReview();
+                fetchAllReviews();
+            });
+    }
+
     useEffect(() => {
         fetchCourse();
         fetchCourseAccess();
+        fetchMyReview();
+        fetchAllReviews();
     }, []);
 
     if (!course || !courseAccess) {
@@ -64,6 +140,8 @@ export default function ViewCourseInfoPage() {
     return (
         <>
             <a href="/learn">Back to Learn</a>
+            <br />
+            <a href="/explore">Back to Explore</a>
             <br />
             {hasAccess ? (
                 <>
@@ -83,7 +161,7 @@ export default function ViewCourseInfoPage() {
                     <br />
                 </>
             )}
-            <h1>Edit course information</h1>
+            <h1>ECourse information</h1>
             Name: {course.name} <br />
             Description: <ContentRenderer content={course.description} /> <br />
             Image: <img src={MEDIA_URL + course.image} id="course-image" /> <br />
@@ -126,6 +204,23 @@ export default function ViewCourseInfoPage() {
                     {course.price}
                 </>
             )} <br />
+            <h2>Reviews</h2>
+            <h3>My review</h3>
+            <StarsInput onRatingChange={setReviewRating} initialRating={reviewed ? reviewRating : 5.0} />
+            Comment
+            <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} />
+            <button type="button" onClick={() => handlePostPutReview(reviewed ? "PUT" : "POST")}>{reviewed ? "Change my review" : "Review"}</button>
+            {reviewed && (
+                <button type="button" onClick={handleDeleteReview} >Delete my review</button>
+            )}
+            <h3>All reviews</h3>
+            {allReviews.map((review) => (
+                <>
+                    <Stars value={review.rating} />
+                    {review.comment} <br />
+                    <span className="gray">{review.author.user.first_name}</span>
+                </>
+            ))}
 
 
         </>

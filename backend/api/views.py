@@ -1516,3 +1516,142 @@ class AccountTopicView(APIView):
             accountTopic.save()
         return Response(status=status.HTTP_200_OK)
         
+class ReviewView(APIView):
+    def post(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            body = json.loads(request.body)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not CourseAccess.objects.filter(account=account, course=course).exists():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if Review.objects.filter(author=account, course=course).exists():
+            return Response({"error": "You already reviewed this course."}, status=status.HTTP_409_CONFLICT)
+        if not body["rating"]:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if body["comment"]:
+            comment = body["comment"]
+        else:
+            comment = ""
+        if len(comment) > 1023:
+            return Response({"error": "Comment too long."}, status=status.HTTP_400_BAD_REQUEST)
+        rating = int(body["rating"])
+        if rating < 1 or rating > 5:
+            return Response({"error": "Rating must be from 1 to 5."}, status=status.HTTP_400_BAD_REQUEST)
+        review = Review(
+            author=account,
+            course=course,
+            rating=rating,
+            comment=comment,
+            date=timezone.now()
+        )
+        review.save()
+        return Response(status=status.HTTP_201_CREATED)
+    
+    def get(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not CourseAccess.objects.filter(account=account, course=course).exists():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not Review.objects.filter(author=account, course=course).exists():
+            return Response({"message": "You have not reviewed this course."}, status=status.HTTP_404_NOT_FOUND)
+        review = Review.objects.get(author=account, course=course)
+        serializer = ReviewSerializer(review)
+        return Response(serializer.data)
+
+    def put(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        try:
+            body = json.loads(request.body)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not CourseAccess.objects.filter(account=account, course=course).exists():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not Review.objects.filter(author=account, course=course).exists():
+            return Response({"message": "You have not reviewed this course."}, status=status.HTTP_404_NOT_FOUND)
+        if not body["rating"]:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if body["comment"]:
+            comment = body["comment"]
+        else:
+            comment = ""
+        if len(comment) > 1023:
+            return Response({"error": "Comment too long."}, status=status.HTTP_400_BAD_REQUEST)
+        rating = int(body["rating"])
+        if rating < 1 or rating > 5:
+            return Response({"error": "Rating must be from 1 to 5."}, status=status.HTTP_400_BAD_REQUEST)
+        review = Review.objects.get(author=account, course=course)
+        review.comment = comment
+        review.rating = rating
+        review.date = timezone.now()
+        review.save()
+        return Response(status=status.HTTP_200_OK)
+    
+    def delete(self, request, course_id):
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            account = Account.objects.get(user=user)
+        except Account.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if not CourseAccess.objects.filter(account=account, course=course).exists():
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        if not Review.objects.filter(author=account, course=course).exists():
+            return Response({"message": "You have not reviewed this course."}, status=status.HTTP_404_NOT_FOUND)
+        review = Review.objects.get(author=account, course=course)
+        review.delete()
+        return Response(status=status.HTTP_200_OK)
+    
+class ReviewsView(APIView):
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+        except Course.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        reviews = Review.objects.filter(course=course)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+
+class CoursesExploreView(APIView):
+    def get(self, request):
+        courses = Course.objects.filter(is_public=True)
+        serializer = CourseWithReviewsSerializer(courses, many=True)
+        return Response(serializer.data)

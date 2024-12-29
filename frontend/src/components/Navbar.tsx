@@ -12,7 +12,7 @@ export default function Navbar() {
                     <a href="/" className="navbar-link-ahref">Home</a>
                 </div>
                 <div className="navbar-link">
-                    Explore
+                    <a href="/explore" className="navbar-link-ahref">Explore</a>
                 </div>
                 <div className="navbar-link">
                     <a href="/learn" className="navbar-link-ahref">Learn</a>
