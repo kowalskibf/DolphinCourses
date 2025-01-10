@@ -161,7 +161,7 @@ export default function ViewCourseInfoPage() {
                     <br />
                 </>
             )}
-            <h1>ECourse information</h1>
+            <h1>Course information</h1>
             Name: {course.name} <br />
             Description: <ContentRenderer content={course.description} /> <br />
             Image: <img src={MEDIA_URL + course.image} id="course-image" /> <br />
@@ -204,6 +204,11 @@ export default function ViewCourseInfoPage() {
                     {course.price}
                 </>
             )} <br />
+            <a href={`/profile/${course.author.user.username}`} target='_blank'>
+                <img className="avatar-mini" src={MEDIA_URL + (course.author.avatar ? course.author.avatar : "/media/default_avatar.png")} />
+                {course.author.user.username}
+            </a>
+            <br />
             <h2>Reviews</h2>
             <h3>My review</h3>
             <StarsInput onRatingChange={setReviewRating} initialRating={reviewed ? reviewRating : 5.0} />

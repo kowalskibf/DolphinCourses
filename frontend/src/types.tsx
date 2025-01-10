@@ -337,3 +337,7 @@ type CourseWithReviews = Course & {
     reviews: Review[];
     average_rating: number;
 };
+
+type AccountWithCourses = Account & {
+    courses: CourseWithReviews[];
+};

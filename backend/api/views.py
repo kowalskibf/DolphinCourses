@@ -115,6 +115,17 @@ class MyProfileView(APIView):
         serializer = AccountSerializer(account)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+class ProfileView(APIView):
+    def get(self, request, username):
+        if not User.objects.filter(username=username).exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        user = User.objects.get(username=username)
+        if not Account.objects.filter(user=user).exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        account = Account.objects.get(user=user)
+        serializer = AccountWithCoursesSerializer(account)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 class CourseView(APIView):
     def post(self, request):
         try:

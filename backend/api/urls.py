@@ -32,4 +32,5 @@ urlpatterns = [
     path('course/<int:course_id>/review', ReviewView.as_view(), name='review'),
     path('course/<int:course_id>/reviews', ReviewsView.as_view(), name='reviews'),
     path('courses/all', CoursesExploreView.as_view(), name='courses_explore'),
+    path('profile/<str:username>', ProfileView.as_view(), name='someone_profile_view'),
 ]

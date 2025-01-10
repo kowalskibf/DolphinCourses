@@ -362,3 +362,12 @@ class CourseWithReviewsSerializer(CourseSerializer):
         reviews = Review.objects.filter(course=obj)
         average = reviews.aggregate(average_rating=models.Avg('rating'))['average_rating']
         return average if average is not None else 0
+    
+class AccountWithCoursesSerializer(AccountSerializer):
+    courses = serializers.SerializerMethodField()
+    class Meta(AccountSerializer.Meta):
+        fields = AccountSerializer.Meta.fields + ('courses',)
+
+    def get_courses(self, obj):
+        courses = Course.objects.filter(author=obj, is_public=True)
+        return CourseWithReviewsSerializer(courses, many=True).data

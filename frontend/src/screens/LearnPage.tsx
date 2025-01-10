@@ -67,6 +67,8 @@ export default function LearnPage() {
                             </span>
                             <br />
                             <span className="course-minor-text">
+                                <img className="avatar-mini" src={MEDIA_URL + (course.author.avatar ? course.author.avatar : "/media/default_avatar.png")} />
+                                {course.author.user.username} <br />
                                 Language: {LANGUAGES.find(lang => lang[0] === course.language)?.[2]} {LANGUAGES.find(lang => lang[0] === course.language)?.[1]} <br />
                                 Duration: {course.duration} hours <br />
                                 Last updated {timeAgo(new Date(course.last_updated))} <br />
