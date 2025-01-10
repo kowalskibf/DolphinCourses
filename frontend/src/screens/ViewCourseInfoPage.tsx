@@ -210,20 +210,26 @@ export default function ViewCourseInfoPage() {
             </a>
             <br />
             <h2>Reviews</h2>
-            <h3>My review</h3>
-            <StarsInput onRatingChange={setReviewRating} initialRating={reviewed ? reviewRating : 5.0} />
-            Comment
-            <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} />
-            <button type="button" onClick={() => handlePostPutReview(reviewed ? "PUT" : "POST")}>{reviewed ? "Change my review" : "Review"}</button>
-            {reviewed && (
-                <button type="button" onClick={handleDeleteReview} >Delete my review</button>
+            {hasAccess && (
+                <>
+                    <h3>My review</h3>
+                    <StarsInput onRatingChange={setReviewRating} initialRating={reviewed ? reviewRating : 5.0} />
+                    Comment
+                    <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} />
+                    <button type="button" onClick={() => handlePostPutReview(reviewed ? "PUT" : "POST")}>{reviewed ? "Change my review" : "Review"}</button>
+                    {reviewed && (
+                        <button type="button" onClick={handleDeleteReview} >Delete my review</button>
+                    )}
+                </>
             )}
             <h3>All reviews</h3>
             {allReviews.map((review) => (
                 <>
                     <Stars value={review.rating} />
+                    <span className="gray">{review.author.user.first_name}</span>&nbsp;
+                    {timeAgo(new Date(review.date))}
+                    <br />
                     {review.comment} <br />
-                    <span className="gray">{review.author.user.first_name}</span>
                 </>
             ))}
 
