@@ -9,6 +9,7 @@ export default function ExplorePage() {
     const [courses, setCourses] = useState<CourseWithReviews[]>();
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [sortMethod, setSortMethod] = useState<string>("highestRating");
+    const [selectedLanguage, setSelectedLanguage] = useState<string>("any");
 
     const fetchCourses = async () => {
         fetch(`http://127.0.0.1:8000/api/courses/all`, {
@@ -85,10 +86,21 @@ export default function ExplorePage() {
                         <option value="priceAscending">Price (Ascending)</option>
                         <option value="priceDescending">Price (Descending)</option>
                     </select>
+                    <select
+                        value={selectedLanguage}
+                        onChange={(e) => setSelectedLanguage(e.target.value)}
+                    >
+                        <option value="any">Any language</option>
+                        {LANGUAGES.map(([code, name, flag]) => (
+                            <option key={code} value={code}>
+                                {flag}&nbsp;{name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
             </div>
             <div id="courses-container">
-                {sortCourses(courses.filter((course) => course.name.includes(searchQuery) && course.is_public)).map((course) => (
+                {sortCourses(courses.filter((course) => course.name.includes(searchQuery) && (selectedLanguage == "any" || course.language == selectedLanguage) && course.is_public)).map((course) => (
                     <a href={`/course/${course.id}/view/info`} key={course.id}>
                         <div className="course">
                             <div className="course-img-container">

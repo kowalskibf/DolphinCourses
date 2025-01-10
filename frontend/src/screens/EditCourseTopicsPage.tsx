@@ -15,6 +15,12 @@ export default function EditCourseTopicsPage() {
     const [topics, setTopics] = useState<CourseTopic[]>([]);
     const [topic, setTopic] = useState<string>("");
 
+    const [editedTopic, setEditedTopic] = useState<string>("");
+
+    const handleEditTopicValue = (value: string) => {
+
+    }
+
     const fetchTopics = async () => {
         fetch(`http://127.0.0.1:8000/api/course/${id}/topics`, {
             method: "GET",
@@ -89,7 +95,7 @@ export default function EditCourseTopicsPage() {
             <br />
             {topics.map((topic, i) => (
                 <>
-                    <input type="text" value={topic.topic} onChange={(e) => handleEditTopic(topic.id, e.target.value)} /> <button type="button" onClick={() => handleDeleteTopic(topic.id)}>Delete</button>
+                    <input type="text" defaultValue={topic.topic} onBlur={(e) => handleEditTopic(topic.id, e.target.value)} /> <button type="button" onClick={() => handleDeleteTopic(topic.id)}>Delete</button>
                     <br />
                 </>
             ))}
