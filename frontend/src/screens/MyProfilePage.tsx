@@ -5,7 +5,7 @@ import '../functions';
 import { timeAgo } from '../functions';
 import { MEDIA_URL } from '../constants';
 
-export default function ProfilePage() {
+export default function MyProfilePage() {
     const [account, setAccount] = useState<Account>();
     const [newAvatar, setNewAvatar] = useState<File | null>(null);
 
