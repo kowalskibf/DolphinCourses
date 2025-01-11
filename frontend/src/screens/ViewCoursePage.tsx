@@ -420,9 +420,6 @@ export default function ViewCoursePage() {
         }
     }, [courseStructure]);
 
-    useEffect(() => { console.log(assignmentAnswers); }, [assignmentAnswers]);
-    useEffect(() => { console.log(examContent); }, [examContent]);
-
     if (!courseStructure || !view) {
         return (
             <>Loading...</>

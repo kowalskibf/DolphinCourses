@@ -16,7 +16,6 @@ export default function ExplorePage() {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Token ${localStorage.getItem("token")}`,
             },
         })
             .then((response) => response.json())

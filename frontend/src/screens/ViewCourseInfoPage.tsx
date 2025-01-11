@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
-import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, timeAgo } from '../functions';
+import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, isUserLoggedIn, priceToInt, timeAgo } from '../functions';
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
 import ContentRenderer from '../components/ContentRenderer';
@@ -27,16 +27,17 @@ export default function ViewCourseInfoPage() {
 
     const [allReviews, setAllReviews] = useState<Review[]>([]);
 
+    const [loggedIn, setLoggedIn] = useState<boolean>(false);
+
     const fetchCourse = async () => {
         fetch(`http://127.0.0.1:8000/api/course/${id}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Token ${localStorage.getItem("token")}`,
             },
         })
             .then((response) => response.json())
-            .then((data) => setCourse(data))
+            .then((data) => setCourse(data));
     };
 
     const fetchCourseAccess = async () => {
@@ -139,8 +140,12 @@ export default function ViewCourseInfoPage() {
 
     return (
         <>
-            <a href="/learn">Back to Learn</a>
-            <br />
+            {hasAccess && (
+                <>
+                    <a href="/learn">Back to Learn</a>
+                    <br />
+                </>
+            )}
             <a href="/explore">Back to Explore</a>
             <br />
             {hasAccess ? (

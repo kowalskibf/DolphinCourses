@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
 import { LANGUAGES, CURRENCIES } from '../constants';
-import { formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt } from '../functions';
+import { formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
 export default function CreateCoursePage() {
     const [name, setName] = useState<string>("");
@@ -122,6 +122,10 @@ export default function CreateCoursePage() {
                 break;
         }
     }
+
+    useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
+    }, [])
 
     return (
         <>

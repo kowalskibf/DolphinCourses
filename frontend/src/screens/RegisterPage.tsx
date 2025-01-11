@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
-import { makeRequest } from '../functions';
 import { API_URL } from '../constants';
 
 export default function RegisterPage() {

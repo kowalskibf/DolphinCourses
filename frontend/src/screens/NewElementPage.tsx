@@ -3,6 +3,7 @@ import '../App.css';
 import "../types";
 import TextEditor from '../components/TextEditor';
 import ContentRenderer from '../components/ContentRenderer';
+import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
 export default function NewElementPage() {
     const [elementType, setElementType] = useState<string>("text");
@@ -333,6 +334,7 @@ export default function NewElementPage() {
     }
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchAllElements();
     }, []);
 
@@ -341,9 +343,6 @@ export default function NewElementPage() {
         setExamElementTotalMarks(totalMarks);
     }, [examElementAssignments]);
 
-    useEffect(() => {
-        console.log(moduleElementElements);
-    }, [moduleElementElements]);
     return (
         <>
             <a href="/elements/my">Back</a>

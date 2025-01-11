@@ -3,6 +3,7 @@ import '../App.css';
 import "../types";
 import { MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
+import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
 type Params = {
     course_id: string;
@@ -63,12 +64,9 @@ export default function EditWeightsPage() {
     }
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchWeights();
     }, [])
-
-    useEffect(() => {
-        console.log(formData);
-    }, [formData]);
 
     if (!formData || !formData.weights) {
         return (

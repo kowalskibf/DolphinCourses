@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import TextEditor from '../components/TextEditor';
 import { BlockMath, InlineMath } from 'react-katex';
 import ContentRenderer from '../components/ContentRenderer';
+import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
 type Params = {
     id: string;
@@ -413,19 +414,10 @@ export default function EditElementPage() {
     }
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchElement();
         fetchMyElements();
     }, [])
-
-    useEffect(() => {
-        console.log("form data");
-        console.log(formData);
-    }, [formData])
-
-    useEffect(() => {
-        // console.log("zapisany element");
-        // console.log(element);
-    }, [element])
 
     if (element === undefined || !formData || myElements === undefined) {
         return <>Loading...</>

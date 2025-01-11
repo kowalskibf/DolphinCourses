@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../App.css';
 import '../types';
 import '../functions';
-import { timeAgo } from '../functions';
+import { sendUserBackToLoginPageIfNotLoggedIn, timeAgo } from '../functions';
 import { MEDIA_URL } from '../constants';
 
 export default function MyProfilePage() {
@@ -64,6 +64,7 @@ export default function MyProfilePage() {
     }, [newAvatar]);
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchAccount();
     }, [])
 

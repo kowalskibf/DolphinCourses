@@ -222,8 +222,6 @@ class CourseView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
             
     def get(self, request, id):
-        user = request.user
-        account = Account.objects.get(user=user)
         try:
             try:
                 course = Course.objects.get(id=id)
@@ -1662,6 +1660,7 @@ class ReviewsView(APIView):
         return Response(serializer.data)
 
 class CoursesExploreView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         courses = Course.objects.filter(is_public=True)
         serializer = CourseWithReviewsSerializer(courses, many=True)

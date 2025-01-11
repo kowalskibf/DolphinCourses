@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
 import "../styles/MyCoursesPage.css";
-import { formatAmount, timeAgo } from '../functions';
+import { formatAmount, sendUserBackToLoginPageIfNotLoggedIn, timeAgo } from '../functions';
 import { LANGUAGES, MEDIA_URL } from '../constants';
 
 export default function MyCoursesPage() {
@@ -36,6 +36,7 @@ export default function MyCoursesPage() {
     };
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchAccount();
         fetchCourses();
     }, []);

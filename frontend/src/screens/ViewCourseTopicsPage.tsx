@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import "../types";
-import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, timeAgo } from '../functions';
+import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, sendUserBackToLoginPageIfNotLoggedIn, timeAgo } from '../functions';
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
 import ProgressBar from '../components/ProgressBar';
@@ -48,6 +48,7 @@ export default function ViewCourseTopicsPage() {
     };
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchAccountTopics();
     }, []);
 

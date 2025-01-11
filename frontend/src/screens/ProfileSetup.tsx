@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
+import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
 export default function ProfileSetupPage() {
     const [firstName, setFirstName] = useState<string>("");
@@ -34,6 +35,10 @@ export default function ProfileSetupPage() {
                 }
             });
     }
+
+    useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
+    }, []);
 
     return (
         <>

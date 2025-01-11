@@ -4,6 +4,7 @@ import "../types";
 import "../styles/MyElementsPage.css";
 import { MEDIA_URL, TYPES } from '../constants';
 import ContentRenderer from '../components/ContentRenderer';
+import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
 
 
@@ -56,6 +57,7 @@ export default function MyElementsPage() {
     }
 
     useEffect(() => {
+        sendUserBackToLoginPageIfNotLoggedIn();
         fetchElements();
     }, []);
 

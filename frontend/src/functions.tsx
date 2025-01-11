@@ -141,3 +141,25 @@ export const renderContent = (htmlString: string): JSX.Element => {
     });
     return <>{domNodes}</>;
 };
+
+export const isUserLoggedIn = async () => {
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/profile/me", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${localStorage.getItem("token")}`,
+            },
+        });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+}
+
+export const sendUserBackToLoginPageIfNotLoggedIn = async () => {
+    const loggedIn = await isUserLoggedIn();
+    if (!loggedIn) {
+        window.location.replace("/login");
+    }
+}
