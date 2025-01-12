@@ -154,6 +154,7 @@ class CourseView(APIView):
             if promo_expires := request.data.get("promo_expires"):
                 course.promo_expires = promo_expires
             course.save()
+            newCourseId = course.pk
             courseAccess = CourseAccess(
                 account=author,
                 course=course,
@@ -162,7 +163,7 @@ class CourseView(APIView):
                 obtaining_type='author'
             )
             courseAccess.save()
-            return Response({"message": "Course successfully created."}, status=status.HTTP_201_CREATED)
+            return Response({"newCourseId": newCourseId}, status=status.HTTP_201_CREATED)
         except Exception as e:
             print(e)
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

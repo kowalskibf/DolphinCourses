@@ -4,6 +4,7 @@ import "../types";
 import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, sendUserBackToLoginPageIfNotLoggedIn, timeAgo } from '../functions';
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
+import TextEditor from '../components/TextEditor';
 
 type Params = {
     id: string;
@@ -121,7 +122,7 @@ export default function EditCourseInfoPage() {
             <br />
             <h1>Edit course information</h1>
             Name: <input type="text" value={name} onChange={(e) => setName(e.target.value)} /> <br />
-            Description: <textarea value={description} onChange={(e) => setDescription(e.target.value)} /> <br />
+            Description: <TextEditor value={description} onChange={(value) => setDescription(value)} /> <br />
             Image: <img src={MEDIA_URL + course.image} id="course-image" /> <br />
             Upload new image:
             <input type="file" accept="image/*" onChange={handleFileChange} /> <br />
