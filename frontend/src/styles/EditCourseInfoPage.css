@@ -1,0 +1,95 @@
+#edit-course-info-main {
+    width: 90%;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.edit-course-info-button {
+    border: 2px solid #0059ff;
+    padding: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.edit-course-info-button:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.edit-course-info-input-text {
+    border: 2px solid #0059ff;
+    border-radius: 16px;
+    padding: 10px;
+    margin: 10px;
+    width: 50%;
+    font-size: 16px;
+}
+
+.edit-course-info-label-box {
+    font-size: 20px;
+    margin: 10px;
+}
+
+.edit-course-info-image {
+    max-width: 90%;
+    max-height: 400px;
+}
+
+.edit-course-info-header {
+    font-size: 30px;
+    margin: 10px;
+}
+
+.edit-course-info-select {
+    background-color: white;
+    border: 2px solid #0059ff;
+    border-radius: 16px;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.edit-course-info-input-number {
+    border: 2px solid #0059ff;
+    border-radius: 16px;
+    padding: 6px;
+    margin: 4px;
+    width: 50%;
+    max-width: 100px;
+    font-size: 16px;
+}
+
+@media only screen and (max-width: 810px) {
+    .edit-course-info-button {
+        padding: 10px;
+        margin: auto;
+        border-radius: 24px;
+        font-size: 16px;
+        margin: 10px;
+    }
+}
+
+@media only screen and (max-width: 460px) {
+    .edit-course-info-button {
+        padding: 4px;
+        margin: auto;
+        border-radius: 24px;
+        font-size: 14px;
+        margin: 4px;
+    }
+}
+
+@media only screen and (max-width: 355px) {
+    .edit-course-info-button {
+        padding: 4px;
+        margin: auto;
+        border-radius: 24px;
+        font-size: 14px;
+        margin: 4px;
+        width: 95%;
+    }
+}
