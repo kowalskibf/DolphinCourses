@@ -1,0 +1,72 @@
+#edit-weights-main-container {
+    width: 100%;
+    max-width: 1024px;
+    margin: auto;
+    text-align: center;
+}
+
+.edit-weights-button {
+    border: 2px solid #0059ff;
+    padding: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.edit-weights-button:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.edit-weights-label-box {
+    font-size: 20px;
+    margin: 10px;
+}
+
+.edit-weights-row {
+    font-size: 16px;
+    margin: 16px;
+    height: 40px;
+}
+
+.edit-weights-row-half {
+    width: 46%;
+    margin-left: 2%;
+    margin-right: 2%;
+    float: left;
+}
+
+.text-align-left {
+    text-align: left;
+}
+
+.text-align-right {
+    text-align: right;
+}
+
+@media only screen and (max-width: 1000px) {
+    .edit-weights-row-half {
+        width: 90%;
+    }
+
+    .edit-weights-row {
+        margin-bottom: 40px;
+    }
+
+    .text-align-left,
+    .text-align-right {
+        text-align: center;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .edit-weights-button {
+        margin: 6px;
+        padding: 6px;
+        font-size: 16px;
+    }
+}

@@ -4,6 +4,8 @@ import "../types";
 import { MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
 import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
+import "../styles/EditWeightsPage.css";
+import ContentRenderer from '../components/ContentRenderer';
 
 type Params = {
     course_id: string;
@@ -75,31 +77,40 @@ export default function EditWeightsPage() {
     }
 
     return (
-        <>
-            <a href={`/course/${course_id}/edit/topics`} target='_blank'>Course topics</a>
+        <div id="edit-weights-main-container">
+            <a href={`/course/${course_id}/edit/topics`} target='_blank'>
+                <button className="edit-weights-button">
+                    Course topics
+                </button>
+            </a>
+            <button className="edit-weights-button" type="button" onClick={fetchWeights}>Refresh</button>
+            <button className="edit-weights-button" type="button" onClick={handleSaveWeights}>Save</button>
             <br />
-            <button type="button" onClick={fetchWeights}>Refresh</button>
-            <br />
-            <h1>Assignment:</h1>
-            {(formData as AssignmentElementStructure).question}
+            <div className="edit-weights-label-box">
+                <span className="gray">
+                    Assignment
+                </span>
+            </div>
+            <ContentRenderer content={(formData as AssignmentElementStructure).question} />
             <br />
             {(formData as AssignmentElementStructure).weights.map((weight, index) => (
-                <li key={weight.id}>
-                    {weight.topic.topic}
-                    <input
-                        type="range"
-                        min={0.0}
-                        max={1.0}
-                        step={0.1}
-                        value={weight.weight}
-                        onChange={(e) => handleChangeWeight(weight.id, parseFloat(e.target.value))}
-                    />
-                    {weight.weight}
-                    <br />
-                </li>
+                <div className="edit-weights-row" key={weight.id}>
+                    <div className="edit-weights-row-half text-align-right">{weight.topic.topic}</div>
+                    <div className="edit-weights-row-half text-align-left">
+                        <input
+                            type="range"
+                            min={0.0}
+                            max={1.0}
+                            step={0.1}
+                            value={weight.weight}
+                            onChange={(e) => handleChangeWeight(weight.id, parseFloat(e.target.value))}
+                        />
+                        {weight.weight}
+                        <br />
+                    </div>
+                </div>
             ))}
-            <button type="button" onClick={handleSaveWeights}>Save</button>
-        </>
+        </div>
     )
 
 
