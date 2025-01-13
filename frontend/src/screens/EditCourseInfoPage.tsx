@@ -133,7 +133,7 @@ export default function EditCourseInfoPage() {
             </a>
             <a href={`/course/${id}/edit/members`}>
                 <button className="edit-course-info-button">
-                    Edit gifted course members
+                    Edit invited course members
                 </button>
             </a>
             <div className="edit-course-info-header">Edit course information</div>
@@ -147,7 +147,14 @@ export default function EditCourseInfoPage() {
             <div className="edit-course-info-label-box">
                 Image:&nbsp;
             </div>
-            <img className="edit-course-info-image" src={MEDIA_URL + course.image} id="course-image" /> <br />
+            {image ? (
+                <img className="edit-course-info-image" src={MEDIA_URL + course.image} id="course-image" />
+            ) : (
+                <>
+                    No image set.
+                </>
+            )}
+            <br />
             <div className="edit-course-info-label-box">
                 Upload new image:&nbsp;<input type="file" accept="image/*" onChange={handleFileChange} />
             </div>

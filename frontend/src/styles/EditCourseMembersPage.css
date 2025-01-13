@@ -1,0 +1,158 @@
+#edit-course-members-main {
+    width: 90%;
+    margin: auto;
+    margin-top: 20px;
+}
+
+.edit-course-members-button {
+    border: 2px solid #0059ff;
+    padding: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.edit-course-members-button:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.edit-course-members-header {
+    font-size: 30px;
+    margin: 10px;
+}
+
+.edit-course-members-label-box {
+    font-size: 20px;
+    margin: 10px;
+}
+
+.edit-course-members-input-text {
+    border: 2px solid #0059ff;
+    border-radius: 16px;
+    padding: 10px;
+    margin: 10px;
+    width: 256px;
+    font-size: 16px;
+}
+
+.edit-course-members-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+}
+
+.edit-course-members-member-container {
+    font-size: 20px;
+    margin: 20px;
+    clear: both;
+    height: 80px;
+}
+
+.edit-course-members-member-container-left {
+    float: left;
+    width: 64px;
+    height: 64px;
+    margin-right: 10px;
+}
+
+.edit-course-members-member-container-right {
+    float: left;
+    height: 64px;
+}
+
+.edit-course-members-member-container-right-half {
+    height: 32px;
+}
+
+.edit-course-members-button-mini {
+    border: 2px solid red;
+    padding: 4px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 4px;
+}
+
+.edit-course-members-button-mini:hover {
+    background-color: red;
+    color: white;
+    transition: 0.5s;
+}
+
+.edit-course-members-revoke-container {
+    display: inline-block;
+}
+
+@media only screen and (max-width: 610px) {
+
+
+    .edit-course-members-button {
+        width: 95%;
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .edit-course-members-input-text {
+        width: 90%;
+    }
+
+    .edit-course-members-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+    }
+
+    .edit-course-members-member-container {
+        font-size: 16px;
+        margin: 20px;
+        clear: both;
+        height: 150px;
+        text-align: center;
+        align-items: center;
+    }
+
+    .edit-course-members-member-container-left {
+        float: left;
+        height: 60px;
+        margin-right: 10px;
+        display: flex;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .edit-course-members-member-container-right {
+        float: left;
+        height: 80px;
+        width: 100%;
+    }
+
+    .edit-course-members-member-container-right-half {
+        height: 24px;
+        width: 100%;
+    }
+
+    .edit-course-members-button-mini {
+        border: 2px solid red;
+        padding: 4px;
+        margin: auto;
+        background-color: white;
+        border-radius: 24px;
+        font-size: 12px;
+        cursor: pointer;
+        margin: 4px;
+    }
+
+}
+
+@media only screen and (max-width: 345px) {
+    .edit-course-members-member-container {
+        height: 160px;
+    }
+}
