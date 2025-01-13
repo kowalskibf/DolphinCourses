@@ -1,0 +1,181 @@
+#edit-element-main-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+    text-align: center;
+}
+
+.edit-element-bottom-main-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+}
+
+.edit-element-bottom-left,
+.edit-element-bottom-right {
+    width: 40%;
+    margin: 4%;
+    float: left;
+}
+
+.edit-element-button {
+    border: 2px solid #0059ff;
+    padding: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.edit-element-button:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.edit-element-input-text {
+    border: 2px solid #0059ff;
+    border-radius: 24px;
+    padding: 10px;
+    margin: 10px;
+    width: 50%;
+    font-size: 16px;
+}
+
+.edit-element-label-box {
+    font-size: 20px;
+    margin: 10px;
+}
+
+.edit-element-checkbox {
+    width: 24px;
+    height: 24px;
+}
+
+.edit-element-answer-container {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.edit-element-answer {
+    border: 2px solid gray;
+    border-radius: 16px;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.edit-element-answer-correct {
+    border: 2px solid #09ff00;
+}
+
+.edit-element-answer-wrong {
+    border: 2px solid red;
+}
+
+.edit-element-button-small {
+    padding: 4px;
+    margin: 4px;
+}
+
+.edit-element-button-red {
+    border: 2px solid red;
+}
+
+.edit-element-button-red:hover {
+    background-color: red;
+    color: white;
+    transition: 0.5s;
+}
+
+.edit-element-input-number {
+    border: 2px solid #0059ff;
+    border-radius: 16px;
+    padding: 6px;
+    margin: 4px;
+    width: 50%;
+    max-width: 100px;
+    font-size: 16px;
+}
+
+.edit-element-input-number-small {
+    width: 40px;
+}
+
+.edit-element-search-container {
+    border: 4px solid #222222;
+    border-radius: 24px;
+    padding: 10px;
+    height: 60px;
+    text-align: center;
+}
+
+.edit-element-search-input {
+    border: 2px solid black;
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 10px;
+    width: 80%;
+}
+
+.edit-element-button-wide {
+    width: 100%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+@media only screen and (max-width: 1200px) {
+    .edit-element-bottom-main-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+        margin: auto;
+    }
+
+    .edit-element-bottom-right {
+        order: -1;
+        width: 90%;
+    }
+
+    .edit-element-bottom-left {
+        order: 1;
+        width: 90%;
+    }
+}
+
+@media only screen and (max-width: 510px) {
+
+    .edit-element-search-input {
+        border: 2px solid black;
+        border-radius: 12px;
+        padding: 8px;
+        margin-top: 10px;
+        width: 50%;
+    }
+
+    .edit-element-input-text {
+        border: 2px solid #0059ff;
+        border-radius: 24px;
+        padding: 4px;
+        margin: 4px;
+        width: 50%;
+        font-size: 12px;
+    }
+
+    .edit-element-label-box {
+        font-size: 14px;
+    }
+
+    .edit-element-button {
+        font-size: 12px;
+        margin: 6px;
+        padding: 6px;
+        margin-top: 20px;
+    }
+}

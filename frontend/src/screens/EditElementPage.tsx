@@ -7,6 +7,7 @@ import TextEditor from '../components/TextEditor';
 import { BlockMath, InlineMath } from 'react-katex';
 import ContentRenderer from '../components/ContentRenderer';
 import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
+import "../styles/EditElementPage.css";
 
 type Params = {
     id: string;
@@ -424,24 +425,40 @@ export default function EditElementPage() {
     }
 
     return (
-        <>
-            <a href="/elements/my">Back</a>
+        <div id="edit-element-main-container">
+            <a href="/elements/my">
+                <button className="edit-element-button">
+                    Back to my elements
+                </button>
+            </a>
+            <button className="edit-element-button" type="button" onClick={handleEditElement}>Save</button>
             <br />
-            Name: <input type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} />
+            <div className="edit-element-label-box">
+                Element name:&nbsp;
+                <input className="edit-element-input-text" type="text" value={formData.name || ''} onChange={(e) => handleChange('name', e.target.value)} />
+            </div>
             <br />
             {element.type == 'text' ?
                 <>
-                    Content: <TextEditor value={formData.content || ''} onChange={(value: string) => handleChange('content', value)} />
+                    <div className="edit-element-label-box">
+                        Content:&nbsp;
+                    </div>
+                    <TextEditor value={formData.content || ''} onChange={(value: string) => handleChange('content', value)} />
                 </>
                 : ""}
             {element.type == 'image' ?
                 <>
-                    Image:
+                    <div className="edit-element-label-box">
+                        Image:&nbsp;
+                    </div>
                     <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
-                    Change image:
+                    <br />
+                    Change image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Description:
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.description || ''}
                         onChange={(value) => handleChange('description', value)}
@@ -450,12 +467,17 @@ export default function EditElementPage() {
                 : ""}
             {element.type == 'video' ?
                 <>
-                    Video:
+                    <div className="edit-element-label-box">
+                        Video:&nbsp;
+                    </div>
                     <video controls id="uploaded-video" src={MEDIA_URL + element.data.video} />
-                    Change video:
+                    <br />
+                    Change video:&nbsp;
                     <input type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Description:
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.description || ''}
                         onChange={(value) => handleChange('description', value)}
@@ -464,25 +486,46 @@ export default function EditElementPage() {
                 : ""}
             {element.type == 'example' ?
                 <>
-                    Question:
+                    <div className="edit-element-label-box">
+                        Question:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.question || ''}
                         onChange={(value) => handleChange('question', value)}
                     />
                     <br />
-                    Image:
-                    <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                    {element.data.image ? (
+                        <div className="edit-element-label-box">
+                            Image:&nbsp;<br />
+                            <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                        </div>
+                    ) : (
+                        <div className="edit-element-label-box">
+                            Image not set.&nbsp;
+                        </div>
+                    )}
                     Change image:
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Explanation:
+                    <br />
+                    <div className="edit-element-label-box">
+                        Explanation:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.explanation || ''}
                         onChange={(value) => handleChange('explanation', value)}
                     />
                     <br />
-                    Explanation image:
-                    <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
+                    {element.data.explanation_image ? (
+                        <div className="edit-element-label-box">
+                            Explanation image:&nbsp;<br />
+                            <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
+                        </div>
+                    ) : (
+                        <div className="edit-element-label-box">
+                            Explanation image not set.&nbsp;
+                        </div>
+                    )}
                     Change image:
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'explanation')} />
                     <br />
@@ -490,55 +533,92 @@ export default function EditElementPage() {
                 : ""}
             {element.type == 'assignment' ?
                 <>
-                    Question:
+                    <div className="edit-element-label-box">
+                        Question:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.question || ''}
                         onChange={(value) => handleChange('question', value)}
                     />
                     <br />
-                    Image:
-                    <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                    {element.data.image ? (
+                        <div className="edit-element-label-box">
+                            Image:&nbsp;<br />
+                            <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                        </div>
+                    ) : (
+                        <div className="edit-element-label-box">
+                            Image not set.&nbsp;
+                        </div>
+                    )}
                     Change image:
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Is multiple choice?
-                    <input
-                        type="checkbox"
-                        checked={formData.is_multiple_choice || ''}
-                        onChange={() => handleChange('is_multiple_choice', !formData.is_multiple_choice)}
-                    />
                     <br />
-                    Hide answers?
-                    <input
-                        type="checkbox"
-                        checked={formData.hide_answers || false}
-                        onChange={() => handleChange('hide_answers', !formData.hide_answers)}
-                    />
+                    <div className="edit-element-label-box">
+                        Multiple choice&nbsp;
+                        <input
+                            type="checkbox"
+                            className="edit-element-checkbox"
+                            checked={formData.is_multiple_choice || ''}
+                            onChange={() => handleChange('is_multiple_choice', !formData.is_multiple_choice)}
+                        />
+                    </div>
+                    <div className="edit-element-label-box">
+                        Hide answers&nbsp;
+                        <input
+                            type="checkbox"
+                            className="edit-element-checkbox"
+                            checked={formData.hide_answers || false}
+                            onChange={() => handleChange('hide_answers', !formData.hide_answers)}
+                        />
+                    </div>
                     <br />
-                    <h6>Answers:</h6>
-                    {formData.answers.map((answer: string, index: number) => (
-                        <li key={index}>
-                            <ContentRenderer content={answer} />
-                            <input
-                                type="checkbox"
-                                checked={formData.correct_answer_indices.includes(index)}
-                                onChange={() => handleToggleAnswer(index)}
-                            />
-                            <button type="button" onClick={() => handleRemoveAnswer(index)}>Remove</button>
-                        </li>
-                    ))}
+                    <div className="edit-element-label-box">
+                        Answers
+                    </div>
+                    <div className="edit-element-answer-container">
+                        {formData.answers.map((answer: string, index: number) => (
+                            <div className={`edit-element-answer ${formData.correct_answer_indices.includes(index) ? "edit-element-answer-correct" : "edit-element-answer-wrong"}`} key={index}>
+                                <ContentRenderer content={answer} />
+                                <br />
+                                Correct&nbsp;
+                                <input
+                                    type="checkbox"
+                                    checked={formData.correct_answer_indices.includes(index)}
+                                    onChange={() => handleToggleAnswer(index)}
+                                />
+                                <br />
+                                <button className="edit-element-button edit-element-button-small edit-element-button-red" type="button" onClick={() => handleRemoveAnswer(index)}>Remove</button>
+                            </div>
+                        ))}
+                    </div>
+                    <br />
+                    <div className="edit-element-label-box">
+                        Add new answer:&nbsp;
+                    </div>
                     <TextEditor value={newAnswer} onChange={(value) => setNewAnswer(value)} />
+                    <button className="edit-element-button edit-element-button-small" type="button" onClick={handleAddAnswer}>Add answer</button>
                     <br />
-                    <button type="button" onClick={handleAddAnswer}>Add</button>
                     <br />
-                    Explanation:
+                    <div className="edit-element-label-box">
+                        Explanation:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.explanation || ''}
                         onChange={(value) => handleChange('explanation', value)}
                     />
                     <br />
-                    Explanation image:
-                    <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
+                    {element.data.explanation_image ? (
+                        <div className="edit-element-label-box">
+                            Explanation image:&nbsp;<br />
+                            <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
+                        </div>
+                    ) : (
+                        <div className="edit-element-label-box">
+                            Explanation image not set.&nbsp;
+                        </div>
+                    )}
                     Change image:
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'explanation')} />
                     <br />
@@ -546,28 +626,42 @@ export default function EditElementPage() {
                 : ""}
             {element.type == 'exam' ?
                 <>
-                    Description:
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;
+                    </div>
                     <TextEditor
                         value={formData.description || ''}
                         onChange={(value) => handleChange('description', value)}
                     />
-                    Duration:
-                    <input
-                        type="number"
-                        value={formData.duration || ''}
-                        onChange={(e) => handleChange('duration', parseInt(e.target.value))}
-                    />
-                    Total marks: {formData.total_marks || ''}
                     <br />
-                    <div id="main-container">
-                        <div className="main-half">
-                            Search:
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            <button type="button" onClick={fetchMyElements}>Refresh</button>
+                    <br />
+                    <div className="edit-element-label-box">
+                        Duration:&nbsp;
+                        <input
+                            type="number"
+                            min={1}
+                            className="edit-element-input-number"
+                            value={formData.duration || ''}
+                            onChange={(e) => handleChange('duration', parseInt(e.target.value))}
+                        />
+                        &nbsp;minutes
+                    </div>
+                    <div className="edit-element-label-box">
+                        Total marks: {formData.total_marks || ''}
+                    </div>
+                    <br />
+                    <div className="edit-element-bottom-main-container">
+                        <div className="edit-element-bottom-left">
+                            <div className="edit-element-search-container">
+                                Search:&nbsp;
+                                <input
+                                    type="text"
+                                    className="edit-element-search-input"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <button className="edit-element-button edit-element-button-wide" type="button" onClick={fetchMyElements}>Refresh</button>
                             {myElements
                                 .filter((elem) => elem.type == 'assignment' && elem.name.includes(searchQuery))
                                 .map((assignment, index) => (
@@ -577,42 +671,61 @@ export default function EditElementPage() {
                                         draggable
                                         onDragStart={(e) => exam_handleOnDrag(e, assignment)}
                                     >
-                                        Name: {assignment.name}
-                                        <br />
-                                        Question: <ContentRenderer content={assignment.data.question} />
-                                        <br />
-                                        {assignment.data.image ?
-                                            <>
-                                                Image: <img src={MEDIA_URL + assignment.data.image} />
-                                                <br />
-                                            </>
-                                            : ""}
-                                        <br />
-                                        {assignment.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                        <br />
-                                        {assignment.data.hide_answers ? "Answers hidden" : "Answers visible"}
-                                        <br />
-                                        Answers:
-                                        {assignment.data.answers.map((answer, i) => (
-                                            <li key={i}>
-                                                <ContentRenderer content={answer} /> {assignment.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                            </li>
-                                        ))}
-                                        Explanation: <ContentRenderer content={assignment.data.explanation} />
-                                        <br />
-                                        {assignment.data.explanation_image ?
-                                            <>
-                                                Explanation image: <img src={MEDIA_URL + assignment.data.explanation_image} />
-                                                <br />
-                                            </>
-                                            : ""}
+                                        <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                            {assignment.name}
+                                        </div>
+                                        <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                            <span className="gray">Question</span>
+                                            <ContentRenderer content={assignment.data.question} />
+                                            <br />
+                                            {assignment.data.image ?
+                                                <>
+                                                    <img src={MEDIA_URL + assignment.data.image} />
+                                                    <br />
+                                                    <br />
+                                                </>
+                                                : ""}
+                                            <span className="gray">{assignment.data.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                            <br />
+                                            <span className="gray">{assignment.data.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                            <br />
+                                            <br />
+                                            <span className="gray">Answers</span>
+                                            <br />
+                                            <br />
+                                            <div className="edit-element-answer-container">
+                                                {assignment.data.answers.map((answer, i) => (
+                                                    <div className={`edit-element-answer ${assignment.data.correct_answer_indices.includes(i) ? "edit-element-answer-correct" : "edit-element-answer-wrong"}`} key={i}>
+                                                        <ContentRenderer content={answer} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <br />
+                                            <span className="gray">Explanation</span>
+                                            <ContentRenderer content={assignment.data.explanation} />
+                                            <br />
+                                            {assignment.data.explanation_image ?
+                                                <>
+                                                    <img src={MEDIA_URL + assignment.data.explanation_image} />
+                                                    <br />
+                                                    <br />
+                                                </>
+                                                : ""}
+                                        </div>
+
+                                        <a href={`/element/${assignment.id}/edit`} target='_blank'>
+                                            <button type="button" className="edit-course-button edit-course-button-border-assignment-element">
+                                                Edit
+                                            </button>
+                                        </a>
+                                        <button className="edit-course-button edit-course-button-border-assignment-element" onClick={() => handleAddAssignmentToExam(assignment)}>Attach</button>
 
 
 
                                     </div>
                                 ))}
                         </div>
-                        <div className="main-half">
+                        <div className="edit-element-bottom-right">
                             {(formData as DetailExamElement["data"]).questions //element.data.questions
                                 .sort((a, b) => a.order - b.order)
                                 .map((examQuestion, index) => (
@@ -620,68 +733,79 @@ export default function EditElementPage() {
                                         key={examQuestion.question.id}
                                         className={examQuestion.question.type + '-element any-element element-margin'}
                                     >
-                                        Name: {examQuestion.question.name}
-                                        <br />
-                                        Marks:
-                                        <input
-                                            type="number"
-                                            min={0}
-                                            value={examQuestion.marks}
-                                            onChange={(e) => handleModifyMarks(examQuestion.id, parseInt(e.target.value))}
-                                        />
-                                        <br />
-                                        Question: <ContentRenderer content={examQuestion.question.data.question} />
-                                        <br />
-                                        {examQuestion.question.data.image ?
-                                            <>
-                                                Image: <img src={MEDIA_URL + examQuestion.question.data.image} />
-                                                <br />
-                                            </>
-                                            : ""}
-                                        <br />
-                                        {examQuestion.question.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                        <br />
-                                        {examQuestion.question.data.hide_answers ? "Answers hidden" : "Answers visible"}
-                                        <br />
-                                        Answers:
-                                        {examQuestion.question.data.answers.map((answer, i) => (
-                                            <li key={i}>
-                                                <ContentRenderer content={answer} /> {examQuestion.question.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                            </li>
-                                        ))}
-                                        Explanation: <ContentRenderer content={examQuestion.question.data.explanation} />
-                                        <br />
-                                        {examQuestion.question.data.explanation_image ?
-                                            <>
-                                                Explanation image: <img src={MEDIA_URL + examQuestion.question.data.explanation_image} />
-                                                <br />
-                                            </>
-                                            : ""}
-
+                                        <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                            {examQuestion.question.name}
+                                        </div>
+                                        <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                            Marks:
+                                            <input
+                                                type="number"
+                                                className="edit-element-input-number edit-element-input-number-small"
+                                                min={1}
+                                                value={examQuestion.marks}
+                                                onChange={(e) => handleModifyMarks(examQuestion.id, parseInt(e.target.value))}
+                                            />
+                                            <br />
+                                            <span className="gray">Question</span>
+                                            <ContentRenderer content={examQuestion.question.data.question} />
+                                            <br />
+                                            {examQuestion.question.data.image ?
+                                                <>
+                                                    <img src={MEDIA_URL + examQuestion.question.data.image} />
+                                                    <br />
+                                                </>
+                                                : ""}
+                                            <br />
+                                            <span className="gray">{examQuestion.question.data.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                            <br />
+                                            <span className="gray">{examQuestion.question.data.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                            <br />
+                                            <br />
+                                            <span className="gray">Answers</span>
+                                            <br />
+                                            <br />
+                                            <div className="edit-element-answer-container">
+                                                {examQuestion.question.data.answers.map((answer, i) => (
+                                                    <div className={`edit-element-answer ${examQuestion.question.data.correct_answer_indices.includes(i) ? "edit-element-answer-correct" : "edit-element-answer-wrong"}`} key={i}>
+                                                        <ContentRenderer content={answer} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <br />
+                                            <span className="gray">Explanation</span>
+                                            <ContentRenderer content={examQuestion.question.data.explanation} />
+                                            <br />
+                                            {examQuestion.question.data.explanation_image ?
+                                                <>
+                                                    <img src={MEDIA_URL + examQuestion.question.data.explanation_image} />
+                                                    <br />
+                                                </>
+                                                : ""}
+                                        </div>
+                                        <a href={`/element/${examQuestion.question.id}/edit`} target='_blank'>
+                                            <button className="edit-course-button edit-course-button-border-assignment-element" type="button">
+                                                Edit
+                                            </button>
+                                        </a>
                                         {examQuestion.order > 1 && (
-                                            <>
-                                                <button type="button" onClick={() => handleSwapOrder('exam_questions', examQuestion.order, examQuestion.order - 1)}>^</button>
-                                                <br />
-                                            </>
+                                            <button className="edit-course-button edit-course-button-border-assignment-element" type="button" onClick={() => handleSwapOrder('exam_questions', examQuestion.order, examQuestion.order - 1)}>Move up</button>
+
                                         )}
 
                                         {examQuestion.order < formData.questions.length && (
-                                            <>
-                                                <button type="button" onClick={() => handleSwapOrder('exam_questions', examQuestion.order, examQuestion.order + 1)}>v</button>
-                                                <br />
-                                            </>
+                                            <button className="edit-course-button edit-course-button-border-assignment-element" type="button" onClick={() => handleSwapOrder('exam_questions', examQuestion.order, examQuestion.order + 1)}>Move down</button>
+
                                         )}
-                                        <a href={`/element/${examQuestion.question.id}/edit`} target='_blank'>Edit</a>
-                                        <button type="button" onClick={() => handleRemoveAssignmentFromExam(examQuestion.id)}>Remove</button>
+                                        <button className="edit-course-button edit-course-button-border-assignment-element" type="button" onClick={() => handleRemoveAssignmentFromExam(examQuestion.id)}>Detach</button>
                                     </div>
                                 ))}
-                            <div
+                            {/* <div
                                 id="drop-here-field"
                                 onDrop={(e) => exam_handleOnDrop(e)}
                                 onDragOver={exam_handleDragOver}
                             >
                                 Drop assignments here
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -689,19 +813,25 @@ export default function EditElementPage() {
                 : ""}
             {element.type == 'module' ?
                 <>
-                    Title: <input type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} />
+                    <div className="edit-element-label-box">
+                        Title:&nbsp;<input className="edit-element-input-text" type="text" value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} />
+                    </div>
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;<TextEditor value={formData.description || ''} onChange={(value) => handleChange('description', value)} />
+                    </div>
                     <br />
-                    Description: <TextEditor value={formData.description || ''} onChange={(value) => handleChange('description', value)} />
-                    <br />
-                    <div id="main-container">
-                        <div className="main-half">
-                            Search:
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            <button type="button" onClick={fetchMyElements}>Refresh</button>
+                    <div className="edit-element-bottom-main-container">
+                        <div className="edit-element-bottom-left">
+                            <div className="edit-element-search-container">
+                                Search:&nbsp;
+                                <input
+                                    type="text"
+                                    className="edit-element-search-input"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <button className="edit-element-button edit-element-button-wide" type="button" onClick={fetchMyElements}>Refresh</button>
                             {myElements
                                 .filter((elem) => elem.name.includes(searchQuery))
                                 .map((element, index) => (
@@ -711,12 +841,19 @@ export default function EditElementPage() {
                                         draggable
                                         onDragStart={(e) => module_handleOnDrag(e, element)}
                                     >
-                                        Name: {element.name}
+                                        {element.name}
                                         <br />
+                                        <a href={`/element/${element.id}/edit`} target='_blank'>
+                                            <button type="button" className={`edit-course-button edit-course-button-border-${element.type}-element`}>
+                                                Edit
+                                            </button>
+                                        </a>
+                                        <button className={`edit-course-button edit-course-button-border-${element.type}-element`} onClick={() => handleAddElementToModule(element)}>Attach</button>
+
                                     </div>
                                 ))}
                         </div>
-                        <div className="main-half">
+                        <div className="edit-element-bottom-right">
                             {(formData as DetailModuleElement["data"]).elements
                                 .sort((a, b) => a.order - b.order)
                                 .map((element, index) => (
@@ -724,39 +861,36 @@ export default function EditElementPage() {
                                         key={element.element.id}
                                         className={element.element.type + '-element any-element element-margin'}
                                     >
-                                        Name: {element.element.name}
+                                        {element.element.name}
                                         <br />
+                                        <a href={`/element/${element.element.id}/edit`} target='_blank'>
+                                            <button className={`edit-course-button edit-course-button-border-${element.element.type}-element`}>
+                                                Edit
+                                            </button>
+                                        </a>
                                         {element.order > 1 && (
-                                            <>
-                                                <button type="button" onClick={() => handleSwapElementsOrder('module_elements', element.order, element.order - 1)}>^</button>
-                                                <br />
-                                            </>
+                                            <button className={`edit-course-button edit-course-button-border-${element.element.type}-element`} type="button" onClick={() => handleSwapElementsOrder('module_elements', element.order, element.order - 1)}>Move up</button>
                                         )}
 
                                         {element.order < formData.elements.length && (
-                                            <>
-                                                <button type="button" onClick={() => handleSwapElementsOrder('module_elements', element.order, element.order + 1)}>v</button>
-                                                <br />
-                                            </>
+                                            <button className={`edit-course-button edit-course-button-border-${element.element.type}-element`} type="button" onClick={() => handleSwapElementsOrder('module_elements', element.order, element.order + 1)}>Move down</button>
                                         )}
-                                        <a href={`/element/${element.element.id}/edit`} target='_blank'>Edit</a>
-                                        <button type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Remove</button>
+                                        <button className={`edit-course-button edit-course-button-border-${element.element.type}-element`} type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Remove</button>
                                     </div>
                                 ))}
-                            <div
+                            {/* <div
                                 id="drop-here-field"
                                 onDrop={(e) => module_handleOnDrop(e)}
                                 onDragOver={module_handleDragOver}
                             >
                                 Drop assignments here
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </>
                 : ""}
-            <button type="button" onClick={handleEditElement}>Save</button>
 
-        </>
+        </div>
     )
 
 }
