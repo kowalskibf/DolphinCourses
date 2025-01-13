@@ -298,6 +298,12 @@ export default function EditCoursePage() {
     return (
         <div id="main-container">
             <div id="main-left">
+                <a href="/element/new" target='_blank'>
+                    <div className="add-button">
+                        <img src="/media/icon_plus.png" className="add-button-img" />
+                        <div className="add-button-text">Create a new element</div>
+                    </div>
+                </a>
                 <div className="search-container">
                     Search by name
                     <input type="text" className="search-input" placeholder="Enter the name to search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
@@ -316,7 +322,7 @@ export default function EditCoursePage() {
                         ))}
                     </div>
                 </div>
-                <button type="button" onClick={fetchMyElements}>Refresh</button>
+                <button className="edit-course-button-big" type="button" onClick={fetchMyElements}>Refresh</button>
                 {myElements
                     .filter((element) =>
                         element.name.includes(searchQuery)
@@ -335,95 +341,128 @@ export default function EditCoursePage() {
                             <div className={element.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
                                 {element.name}
                             </div>
-                            {element.type === 'text' ?
-                                <div className="element-content-center">
-                                    <ContentRenderer content={element.data.content} />
-                                </div>
-                                : ""}
-                            {element.type === 'image' ?
-                                <div className="element-content-center">
-                                    <img
-                                        className="element-media"
-                                        src={MEDIA_URL + element.data.image}
-                                    />
-                                    <br />
-                                    <ContentRenderer content={element.data.description} />
-                                </div>
-                                : ""}
-                            {element.type === 'video' ?
-                                <div className="element-content-center">
-                                    <video
-                                        controls
-                                        src={MEDIA_URL + element.data.video}
-                                        className="element-media"
-                                    />
-                                    <br />
-                                    <ContentRenderer content={element.data.description} />
-                                </div>
-                                : ""}
-                            {element.type === 'example' ?
-                                <div className="element-content-center">
-                                    Question: <ContentRenderer content={element.data.question} />
-                                    <br />
-                                    Image: <img src={MEDIA_URL + element.data.image} />
-                                    <br />
-                                    Explanation: <ContentRenderer content={element.data.explanation} />
-                                    <br />
-                                    Explanation image: <img src={MEDIA_URL + element.data.explanation_image} />
-                                </div>
-                                : ""}
-                            {element.type === 'assignment' ?
-                                <>
-                                    Question: <ContentRenderer content={element.data.question} />
-                                    <br />
-                                    Image: <img src={MEDIA_URL + element.data.image} />
-                                    <br />
-                                    {element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                    <br />
-                                    {element.data.hide_answers ? "Answers hidden" : "Answers visible"}
-                                    <br />
-                                    Answers:
-                                    {element.data.answers.map((answer, i) => (
-                                        <li key={i}>
-                                            <ContentRenderer content={answer} /> {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                        </li>
-                                    ))}
-                                    Explanation: <ContentRenderer content={element.data.explanation} />
-                                    <br />
-                                    Explanation image:
-                                    <img src={MEDIA_URL + element.data.explanation_image} />
+                            <div className={element.type + '-element-border-bottom width-100 margin-bottom-10px'}>
+                                {element.type === 'text' ?
+                                    <div>
+                                        <ContentRenderer content={element.data.content} />
+                                    </div>
+                                    : ""}
+                                {element.type === 'image' ?
+                                    <div className="element-content-center">
+                                        <img
+                                            className="element-media"
+                                            src={MEDIA_URL + element.data.image}
+                                        />
+                                        <br />
+                                        <ContentRenderer content={element.data.description} />
+                                    </div>
+                                    : ""}
+                                {element.type === 'video' ?
+                                    <div className="element-content-center">
+                                        <video
+                                            controls
+                                            src={MEDIA_URL + element.data.video}
+                                            className="element-media"
+                                        />
+                                        <br />
+                                        <ContentRenderer content={element.data.description} />
+                                    </div>
+                                    : ""}
+                                {element.type === 'example' ?
+                                    <div>
+                                        <span className="gray">Question</span>
+                                        <ContentRenderer content={element.data.question} />
+                                        <br />
+                                        {element.data.image && (
+                                            <div className="text-align-center">
+                                                <img src={MEDIA_URL + element.data.image} />
+                                                <br />
+                                                <br />
+                                            </div>
+                                        )}
+                                        <span className="gray">Explanation</span>
+                                        <ContentRenderer content={element.data.explanation} />
+                                        <br />
+                                        {element.data.explanation_image && (
+                                            <div className="text-align-center">
+                                                <img src={MEDIA_URL + element.data.explanation_image} />
+                                                <br />
+                                                <br />
+                                            </div>
+                                        )}
+                                    </div>
+                                    : ""}
+                                {element.type === 'assignment' ?
+                                    <>
+                                        Question: <ContentRenderer content={element.data.question} />
+                                        <br />
+                                        Image: <img src={MEDIA_URL + element.data.image} />
+                                        <br />
+                                        {element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                        <br />
+                                        {element.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                        <br />
+                                        Answers:
+                                        {element.data.answers.map((answer, i) => (
+                                            <li key={i}>
+                                                <ContentRenderer content={answer} /> {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
+                                            </li>
+                                        ))}
+                                        Explanation: <ContentRenderer content={element.data.explanation} />
+                                        <br />
+                                        Explanation image:
+                                        <img src={MEDIA_URL + element.data.explanation_image} />
 
-                                </>
-                                : ""}
-                            {element.type === 'exam' ?
-                                <>
-                                    Description: <ContentRenderer content={element.data.description} />
-                                    <br />
-                                    Duration: {element.data.duration}
-                                    <br />
-                                    Total marks: {element.data.total_marks}
-                                    <br />
+                                    </>
+                                    : ""}
+                                {element.type === 'exam' ?
+                                    <>
+                                        Description: <ContentRenderer content={element.data.description} />
+                                        <br />
+                                        Duration: {element.data.duration}
+                                        <br />
+                                        Total marks: {element.data.total_marks}
+                                        <br />
 
-                                </>
-                                : ""}
-                            {element.type === 'module' ?
-                                <>
-                                    Title: {element.data.title}
-                                    <br />
-                                    Description: <ContentRenderer content={element.data.description} />
-                                    <br />
-                                </>
-                                : ""}
-                            <a href={`/element/${element.id}/edit`} target='_blank'>Edit</a>
+                                    </>
+                                    : ""}
+                                {element.type === 'module' ?
+                                    <>
+                                        Title: {element.data.title}
+                                        <br />
+                                        Description: <ContentRenderer content={element.data.description} />
+                                        <br />
+                                    </>
+                                    : ""}
+                            </div>
+                            <button
+                                type="button"
+                                className={`edit-course-button edit-course-button-border-${element.type}-element`}
+                                onClick={() => (view == "root" ? handleAddModule(element) : handleAddElement(element))}
+                            >Add</button>
+                            <a href={`/element/${element.id}/edit`} target='_blank'>
+                                <button className={`edit-course-button edit-course-button-border-${element.type}-element`}>
+                                    Edit
+                                </button>
+                            </a>
                         </div>
                     ))}
             </div>
             <div id="main-right">
-                <button type="button" onClick={fetchCourseStructure}>Refresh</button>
+                <button className="edit-course-button-big" type="button" onClick={fetchCourseStructure}>Refresh</button>
                 <br />
                 {view == "root" ?
                     <>
-                        <a href={`/course/${id}/view`} target='_blank'>View as user</a>
+                        <a href={`/course/${id}/edit/info`} target='_blank'>
+                            <button className="edit-course-button-big">
+                                Back to course info
+                            </button>
+                        </a>
+                        <a href={`/course/${id}/view`} target='_blank'>
+                            <button className="edit-course-button-big">
+                                View as user
+                            </button>
+                        </a>
                         <br />
                         <h1>{courseStructure.name}</h1>
                         <br />
@@ -439,45 +478,61 @@ export default function EditCoursePage() {
                                             {module.module.name} {module.uses > 1 ? `(${module.uses - 1} use${module.uses > 2 ? "s" : ""} in other place${module.uses > 2 ? "s" : ""})` : ""}
                                         </div>
                                         {module.module.type == "module" ?
-                                            <>
-                                                Title: {module.module.data.title}
+                                            <div className={module.module.type + '-element-border-bottom width-100 margin-bottom-10px'}>
+                                                <div className="module-container-title">{module.module.data.title}</div>
                                                 <br />
-                                                Description: <ContentRenderer content={module.module.data.description} />
-                                            </>
+                                                <span className="gray"><ContentRenderer content={module.module.data.description} /></span>
+                                            </div>
                                             : ""}
-                                        <a href={`/element/${module.module.id}/edit`} target='_blank'>Edit</a>
-                                        <br />
+                                        <a href={`/element/${module.module.id}/edit`} target='_blank'>
+                                            <button type="button" className={`edit-course-button edit-course-button-border-${module.module.type}-element`}>
+                                                Edit
+                                            </button>
+                                        </a>
+                                        {module.order > 1 && (
+                                            <button className={`edit-course-button edit-course-button-border-${module.module.type}-element`} onClick={() => handleMoveModule(module.module.id, "up")}>Move up</button>
+                                        )}
+                                        {module.order < courseStructure.modules.length && (
+                                            <button className={`edit-course-button edit-course-button-border-${module.module.type}-element`} onClick={() => handleMoveModule(module.module.id, "down")}>Move down</button>
+                                        )}
+                                        <button className={`edit-course-button edit-course-button-border-${module.module.type}-element`} onClick={() => handleDetachModule(module.module.id)}>Detach</button>
+                                        <button className={`edit-course-button edit-course-button-border-${module.module.type}-element`} onClick={() => handleChangeLocationInto(module.order)}>Enter</button>
+
                                     </div>
-                                    <button onClick={() => handleMoveModule(module.module.id, "up")}>^</button>
-                                    <br />
-                                    <button onClick={() => handleMoveModule(module.module.id, "down")}>v</button>
-                                    <br />
-                                    <button onClick={() => handleDetachModule(module.module.id)}>Detach</button>
-                                    <br />
-                                    <button onClick={() => handleChangeLocationInto(module.order)}>Enter</button>
                                 </div>
                             ))}
                         <br />
-                        <div
+                        {/* <div
                             id="drop-here-field"
                             onDrop={(e) => handleOnDrop(e, "r")}
                             onDragOver={handleDragOver}
                         >
                             Drop modules here
-                        </div>
+                        </div> */}
                     </>
                     :
                     <>
-                        <a href={`/course/${id}/view?v=${viewArray.join("/")}`} target='_blank'>View as user</a>
+                        <a href={`/course/${id}/edit/info`} target='_blank'>
+                            <button className="edit-course-button-big">
+                                Back to course info
+                            </button>
+                        </a>
+                        <a href={`/course/${id}/view?v=${viewArray.join("/")}`} target='_blank'>
+                            <button className="edit-course-button-big">
+                                View as user
+                            </button>
+                        </a>
                         <br />
-                        <span onClick={handleChangeLocationOneUp}>Back</span>
-                        <br />
-                        <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
-                        {path.map((module, i) => (
-                            <div key={i}>
-                                {" > "}<span onClick={() => handleChangeLocationBack(i)}>{module.title}</span>
-                            </div>
-                        ))}
+                        <span className="cursor-pointer">
+                            <span onClick={handleChangeLocationOneUp}>Back</span>
+                            <br />
+                            <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
+                            {path.map((module, i) => (
+                                <div key={i}>
+                                    {" > "}<span onClick={() => handleChangeLocationBack(i)}>{module.title}</span>
+                                </div>
+                            ))}
+                        </span>
                         <h1>{view.title}</h1>
                         <br />
                         {view.elements
@@ -490,172 +545,244 @@ export default function EditCoursePage() {
                                     <div className={element.element_data.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
                                         {element.element_data.name} {element.uses > 1 ? `(used in ${element.uses - 1} other modules)` : ""}
                                     </div>
-                                    {element.element_data.type == "text" && (
-                                        <>
-                                            <ContentRenderer content={element.element_data.data.content} />
-                                        </>
-                                    )}
-                                    {element.element_data.type == "image" && (
-                                        <>
-                                            <img src={MEDIA_URL + element.element_data.data.image} />
-                                            <br />
-                                            Description: <ContentRenderer content={element.element_data.data.description} />
-                                        </>
-                                    )}
-                                    {element.element_data.type == "video" && (
-                                        <>
-                                            <video src={MEDIA_URL + element.element_data.data.video} controls />
-                                            <br />
-                                            Description: <ContentRenderer content={element.element_data.data.description} />
-                                        </>
-                                    )}
-                                    {element.element_data.type == "example" && (
-                                        <>
-                                            Question: <ContentRenderer content={element.element_data.data.question} />
-                                            <br />
-                                            {element.element_data.data.image && (
+                                    <div className={element.element_data.type + '-element-border-bottom width-100 margin-bottom-10px'}>
+                                        {element.element_data.type == "text" && (
+                                            <>
+                                                <ContentRenderer content={element.element_data.data.content} />
+                                            </>
+                                        )}
+                                        {element.element_data.type == "image" && (
+                                            <div className="text-align-center">
                                                 <img src={MEDIA_URL + element.element_data.data.image} />
-                                            )}
-                                            <br />
-                                            Explanation: <ContentRenderer content={element.element_data.data.explanation} />
-                                            <br />
-                                            {element.element_data.data.explanation_image && (
-                                                <img src={MEDIA_URL + element.element_data.data.explanation_image} />
-                                            )}
-                                        </>
-                                    )}
+                                                <br />
+                                                <ContentRenderer content={element.element_data.data.description} />
+                                            </div>
+                                        )}
+                                        {element.element_data.type == "video" && (
+                                            <div className="text-align-center">
+                                                <video src={MEDIA_URL + element.element_data.data.video} controls />
+                                                <br />
+                                                Description: <ContentRenderer content={element.element_data.data.description} />
+                                            </div>
+                                        )}
+                                        {element.element_data.type == "example" && (
+                                            <>
+                                                <span className="gray">Question</span>
+                                                <ContentRenderer content={element.element_data.data.question} />
+                                                <br />
+                                                {element.element_data.data.image && (
+                                                    <div className="text-align-center">
+                                                        <img src={MEDIA_URL + element.element_data.data.image} />
+                                                        <br />
+                                                        <br />
+                                                    </div>
+                                                )}
+                                                <span className="gray">Explanation</span>
+                                                <ContentRenderer content={element.element_data.data.explanation} />
+                                                <br />
+                                                {element.element_data.data.explanation_image && (
+                                                    <div className="text-align-center">
+                                                        <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                                        <br />
+                                                        <br />
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                        {element.element_data.type == "assignment" && (
+                                            <>
+                                                <span className="gray">Question</span>
+                                                <ContentRenderer content={element.element_data.data.question} />
+                                                <br />
+                                                {element.element_data.data.image && (
+                                                    <div className="text-align-center">
+                                                        <img src={MEDIA_URL + element.element_data.data.image} />
+                                                        <br />
+                                                        <br />
+                                                    </div>
+
+                                                )}
+                                                <span className="gray">
+                                                    {element.element_data.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                                </span>
+                                                <br />
+                                                <span className="gray">
+                                                    {element.element_data.data.hide_answers ? "Answers hidden" : "Answers visible"}
+                                                </span>
+                                                <br />
+                                                <br />
+                                                <span className="gray">Answers</span>
+                                                <br />
+                                                <br />
+                                                <div className="question-answer-container">
+                                                    {element.element_data.data.answers.map((answer, i) => (
+                                                        <div className={`question-answer ${(element.element_data.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "answer-correct" : "answer-wrong"}`} key={i}>
+                                                            <ContentRenderer content={answer} />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <br />
+                                                <span className="gray">Explanation</span>
+                                                <ContentRenderer content={element.element_data.data.explanation} />
+                                                <br />
+                                                {element.element_data.data.explanation_image && (
+                                                    <div className="text-align-center">
+                                                        <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                                        <br />
+                                                        <br />
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                        {element.element_data.type == "exam" && (
+                                            <>
+                                                <ContentRenderer content={element.element_data.data.description} />
+                                                <br />
+                                                <span className="gray">Duration: {element.element_data.data.duration} minutes</span>
+                                                <br />
+                                                <span className="gray">Questions: {element.element_data.data.questions.length}</span>
+                                                <br />
+                                                <span className="gray">Total marks: {element.element_data.data.total_marks}</span>
+                                                <br />
+                                                <br />
+                                                {element.element_data.data.questions.map((examQuestion, i) => (
+                                                    <div className="assignment-element any-element element-margin">
+                                                        <span className="gray">Marks: {examQuestion.marks}</span>
+                                                        <br />
+                                                        <span className="gray">Question</span>
+                                                        <ContentRenderer content={examQuestion.question.question} />
+                                                        {examQuestion.question.image && (
+                                                            <img src={MEDIA_URL + examQuestion.question.image} />
+                                                        )}
+                                                        <br />
+                                                        <span className="gray">{examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                                        <br />
+                                                        <span className="gray">{examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                                        <br />
+                                                        <br />
+                                                        <span className="gray">Answers</span>
+                                                        <br />
+                                                        <br />
+                                                        <div className="question-answer-container">
+                                                            {examQuestion.question.answers.map((answer, i) => (
+                                                                <div className={`question-answer ${(examQuestion.question as AssignmentElementStructure).correct_answer_indices.includes(i) ? "answer-correct" : "answer-wrong"}`} key={i}>
+                                                                    <ContentRenderer content={answer} />
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                        <br />
+                                                        <span className="gray">Explanation</span>
+                                                        <ContentRenderer content={examQuestion.question.explanation} />
+                                                        <br />
+                                                        {examQuestion.question.explanation_image && (
+                                                            <div className="text-align-center">
+                                                                <img src={MEDIA_URL + examQuestion.question.explanation_image} />
+                                                                <br />
+                                                                <br />
+                                                            </div>
+                                                        )}
+
+                                                        {totalWeight(examQuestion.question.weights) == 0 ? (
+                                                            <>
+                                                                <span className="red">Assignment has not set any weights!</span>
+                                                                <br />
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <span className="gray">Weights</span>
+                                                                <br />
+                                                                {examQuestion.question.weights.filter((weight) => weight.weight !== 0).map((weight, i) => (
+                                                                    <>
+                                                                        {weight.topic.topic}: {weight.weight}
+                                                                        <br />
+                                                                    </>
+                                                                ))}
+                                                            </>
+                                                        )}
+                                                        <a href={`/course/${id}/assignment/${examQuestion.question.id}/weights/edit`} target='_blank'>
+                                                            <button type="button" className="edit-course-button edit-course-button-border-assignment-element">
+                                                                Modify weights
+                                                            </button>
+                                                        </a>
+                                                        <br />
+                                                    </div>
+                                                ))}
+                                            </>
+                                        )}
+                                        {element.element_data.type == "module" ?
+                                            <>
+                                                <div className="module-container-title">{element.element_data.data.title}</div>
+                                                <br />
+                                                <span className="gray"><ContentRenderer content={element.element_data.data.description} /></span>
+                                            </>
+                                            : ""}
+
+                                    </div>
+                                    <a href={`/element/${element.element_data.id}/edit`} target='_blank'>
+                                        <button type="button" className={`edit-course-button edit-course-button-border-${element.element_data.type}-element`}>
+                                            Edit
+                                        </button>
+                                    </a>
+                                    {
+                                        element.order > 1 && (
+                                            <button className={`edit-course-button edit-course-button-border-${element.element_data.type}-element`} onClick={() => handleMoveElement(view.id, element.element_data.id, "up")}>Move up</button>
+                                        )
+                                    }
+                                    {
+                                        element.order < view.elements.length && (
+                                            <button className={`edit-course-button edit-course-button-border-${element.element_data.type}-element`} onClick={() => handleMoveElement(view.id, element.element_data.id, "down")}>Move down</button>
+                                        )
+                                    }
+
+                                    <button className={`edit-course-button edit-course-button-border-${element.element_data.type}-element`} onClick={() => handleDetachElement(view.id, element.element_data.id)}>Detach</button>
                                     {element.element_data.type == "assignment" && (
                                         <>
-                                            Question: <ContentRenderer content={element.element_data.data.question} />
-                                            <br />
-                                            Image: <img src={MEDIA_URL + element.element_data.data.image} />
-                                            <br />
-                                            {element.element_data.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                            <br />
-                                            {element.element_data.data.hide_answers ? "Answers hidden" : "Answers visible"}
-                                            <br />
-                                            Answers:
-                                            {element.element_data.data.answers.map((answer, i) => (
-                                                <li key={i}>
-                                                    <ContentRenderer content={answer} /> {(element.element_data.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                                </li>
-                                            ))}
-                                            Explanation: <ContentRenderer content={element.element_data.data.explanation} />
-                                            <br />
-                                            Explanation image:
-                                            <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+
+
                                             <br />
                                             {totalWeight(element.element_data.data.weights) == 0 ? (
-                                                <>
-                                                    Assignment has not set any weights!
-                                                </>
+                                                <span className="red">
+                                                    Assignment has not set any weights!<br />
+                                                </span>
                                             ) : (
                                                 <>
-                                                    Weights:
+                                                    <span className="gray">Weights</span>
                                                     <br />
                                                     {element.element_data.data.weights.filter((weight) => weight.weight !== 0).map((weight, i) => (
                                                         <>
-                                                            {weight.topic.topic}: {weight.weight}
+                                                            <span className="gray">{weight.topic.topic}</span>: {weight.weight}
                                                             <br />
                                                         </>
                                                     ))}
                                                 </>
                                             )}
-                                            <a href={`/course/${id}/assignment/${element.element_data.id}/weights/edit`} target='_blank'>Modify weights</a>
+                                            <a href={`/course/${id}/assignment/${element.element_data.id}/weights/edit`} target='_blank'>
+                                                <button className={`edit-course-button edit-course-button-border-${element.element_data.type}-element`}>
+                                                    Modify weights
+                                                </button>
+                                            </a>
                                             <br />
-                                        </>
-                                    )}
-                                    {element.element_data.type == "exam" && (
-                                        <>
-                                            Description: <ContentRenderer content={element.element_data.data.description} />
-                                            <br />
-                                            Duration: {element.element_data.data.duration}
-                                            <br />
-                                            Total marks: {element.element_data.data.total_marks}
-                                            <br />
-                                            {element.element_data.data.questions.map((examQuestion, i) => (
-                                                <>
-                                                    <br />
-                                                    Marks: {examQuestion.marks}
-                                                    <br />
-                                                    Question: <ContentRenderer content={examQuestion.question.question} />
-                                                    {examQuestion.question.image && (
-                                                        <img src={MEDIA_URL + examQuestion.question.image} />
-                                                    )}
-                                                    <br />
-                                                    {examQuestion.question.is_multiple_choice ? "Multiple choice" : "Single choice"}
-                                                    <br />
-                                                    {examQuestion.question.hide_answers ? "Answers hidden" : "Answers visible"}
-                                                    <br />
-                                                    Answers:
-                                                    {examQuestion.question.answers.map((answer, i) => (
-                                                        <li key={i}>
-                                                            <ContentRenderer content={answer} /> {(examQuestion.question as AssignmentElementStructure).correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                                        </li>
-                                                    ))}
-                                                    Explanation: <ContentRenderer content={examQuestion.question.explanation} />
-                                                    <br />
-                                                    {examQuestion.question.explanation_image && (
-                                                        <img src={MEDIA_URL + examQuestion.question.explanation_image} />
-                                                    )}
-
-                                                    {totalWeight(examQuestion.question.weights) == 0 ? (
-                                                        <>
-                                                            Assignment has not set any weights!
-                                                            <br />
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            Weights:
-                                                            <br />
-                                                            {examQuestion.question.weights.filter((weight) => weight.weight !== 0).map((weight, i) => (
-                                                                <>
-                                                                    {weight.topic.topic}: {weight.weight}
-                                                                    <br />
-                                                                </>
-                                                            ))}
-                                                        </>
-                                                    )}
-                                                    <a href={`/course/${id}/assignment/${examQuestion.question.id}/weights/edit`} target='_blank'>Modify weights</a>
-                                                    <br />
-                                                </>
-                                            ))}
                                         </>
                                     )}
                                     {element.element_data.type == "module" ?
                                         <>
-                                            Title: {element.element_data.data.title}
-                                            <br />
-                                            Description: <ContentRenderer content={element.element_data.data.description} />
-                                        </>
-                                        : ""}
-                                    <a href={`/element/${element.element_data.id}/edit`} target='_blank'>Edit</a>
-
-                                    <br />
-                                    <button onClick={() => handleMoveElement(view.id, element.element_data.id, "up")}>^</button>
-                                    <br />
-                                    <button onClick={() => handleMoveElement(view.id, element.element_data.id, "down")}>v</button>
-                                    <br />
-                                    <button onClick={() => handleDetachElement(view.id, element.element_data.id)}>Detach</button>
-                                    {element.element_data.type == "module" ?
-                                        <>
-                                            <button onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
+                                            <button className={`edit-course-button edit-course-button-border-${element.element_data.type}-element`} onClick={() => handleChangeLocationInto(element.order)}>Enter</button>
                                         </>
                                         : ""}
                                 </div>
                             ))}
                         <br />
-                        <div
+                        {/* <div
                             id="drop-here-field"
                             onDrop={(e) => handleOnDrop(e, "i")}
                             onDragOver={handleDragOver}
                         >
                             Drop modules here
-                        </div>
+                        </div> */}
                     </>
                 }
-            </div>
-        </div>
+            </div >
+        </div >
     )
 
 }

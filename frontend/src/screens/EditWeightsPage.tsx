@@ -31,7 +31,7 @@ export default function EditWeightsPage() {
             });
     }
 
-    const handleChangeWaight = (weight_id: number, new_value: number) => {
+    const handleChangeWeight = (weight_id: number, new_value: number) => {
         setFormData((prev) => {
             if (!prev) return prev;
             const updatedWeights = formData.weights.map((weight: any) => {
@@ -92,7 +92,7 @@ export default function EditWeightsPage() {
                         max={1.0}
                         step={0.1}
                         value={weight.weight}
-                        onChange={(e) => handleChangeWaight(weight.id, parseFloat(e.target.value))}
+                        onChange={(e) => handleChangeWeight(weight.id, parseFloat(e.target.value))}
                     />
                     {weight.weight}
                     <br />

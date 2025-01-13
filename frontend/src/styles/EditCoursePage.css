@@ -7,3 +7,65 @@
     text-align: center;
     color: #aaa;
 }
+
+.edit-course-button {
+    padding: 4px;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 4px;
+}
+
+:root {
+    --edit-course-button-border-width: 2px;
+}
+
+.edit-course-button-border-text-element {
+    border: var(--edit-course-button-border-width) solid var(--text-element-color);
+}
+
+.edit-course-button-border-image-element {
+    border: var(--edit-course-button-border-width) solid var(--image-element-color);
+}
+
+.edit-course-button-border-video-element {
+    border: var(--edit-course-button-border-width) solid var(--video-element-color);
+}
+
+.edit-course-button-border-example-element {
+    border: var(--edit-course-button-border-width) solid var(--example-element-color);
+}
+
+.edit-course-button-border-assignment-element {
+    border: var(--edit-course-button-border-width) solid var(--assignment-element-color);
+}
+
+.edit-course-button-border-exam-element {
+    border: var(--edit-course-button-border-width) solid var(--exam-element-color);
+}
+
+.edit-course-button-border-module-element {
+    border: var(--edit-course-button-border-width) solid var(--module-element-color);
+}
+
+.edit-course-button-big {
+    border: 2px solid #0059ff;
+    padding: 4px;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px 0 10px 0;
+    width: 100%;
+}
+
+.edit-course-button-big:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}

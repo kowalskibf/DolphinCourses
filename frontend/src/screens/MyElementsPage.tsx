@@ -80,7 +80,7 @@ export default function MyElementsPage() {
     return (
         <div id="main-container">
             <div id="main-left">
-                <a href="/element/new">
+                <a href="/element/new" target='_blank'>
                     <div className="add-button">
                         <img src="/media/icon_plus.png" className="add-button-img" />
                         <div className="add-button-text">Create a new element</div>

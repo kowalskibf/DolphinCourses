@@ -546,6 +546,7 @@ export default function ViewCoursePage() {
                                             <>
                                                 <span className="gray">Answers</span>
                                                 <br />
+                                                <br />
                                                 <div className="question-answer-container">
                                                     {element.element_data.data.answers.map((answer, i) => {
                                                         const assignmentElement = element.element_data.data as AssignmentElementStructure;
@@ -720,6 +721,8 @@ export default function ViewCoursePage() {
                                                                     {!examQuestion.question.hide_answers || assignmentAnswers.some((a) => a.assignmentId === examQuestion.question.id && !a.hideAnswers) ? (
                                                                         <>
                                                                             <span className="gray">Answers</span>
+                                                                            <br />
+                                                                            <br />
                                                                             <div className="question-answer-container">
                                                                                 {examQuestion.question.answers.map((answer, j) => {
                                                                                     const isSelected = assignment?.selectedAnswerIndices.includes(j);
