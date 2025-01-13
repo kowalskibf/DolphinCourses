@@ -4,6 +4,7 @@ import "../types";
 import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, sendUserBackToLoginPageIfNotLoggedIn, timeAgo } from '../functions';
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
+import "../styles/EditCourseTopicsPage.css";
 
 type Params = {
     id: string;
@@ -14,12 +15,6 @@ export default function EditCourseTopicsPage() {
     const { id } = useParams<Params>();
     const [topics, setTopics] = useState<CourseTopic[]>([]);
     const [topic, setTopic] = useState<string>("");
-
-    const [editedTopic, setEditedTopic] = useState<string>("");
-
-    const handleEditTopicValue = (value: string) => {
-
-    }
 
     const fetchTopics = async () => {
         fetch(`http://127.0.0.1:8000/api/course/${id}/topics`, {
@@ -88,20 +83,31 @@ export default function EditCourseTopicsPage() {
     }
 
     return (
-        <>
-            <a href={`/course/${id}/edit/info`}>Back</a>
+        <div id="edit-course-topics-main-container">
+            <a href={`/course/${id}/edit/info`}>
+                <button className="edit-course-topics-button">
+                    Back to course info
+                </button>
+            </a>
             <br />
-            new topic: <input type="text" value={topic} onChange={(e) => setTopic(e.target.value)} />
-            <button type="button" onClick={handleCreateTopic}>Create topic</button>
+            <div className="edit-course-topics-label-box">
+                Add a topic
+            </div>
+            <input className="edit-course-topics-input-text" type="text" value={topic} onChange={(e) => setTopic(e.target.value)} />
+            <button className="edit-course-topics-button edit-course-topics-button-small" type="button" onClick={handleCreateTopic}>Create topic</button>
             <br />
+            <div className="edit-course-topics-label-box">
+                Edit existing topics
+            </div>
             {topics.map((topic, i) => (
                 <>
-                    <input type="text" defaultValue={topic.topic} onBlur={(e) => handleEditTopic(topic.id, e.target.value)} /> <button type="button" onClick={() => handleDeleteTopic(topic.id)}>Delete</button>
+                    <input className="edit-course-topics-input-text" type="text" defaultValue={topic.topic} onBlur={(e) => handleEditTopic(topic.id, e.target.value)} />
+                    <button className="edit-course-topics-button edit-course-topics-button-small edit-course-topics-button-red" type="button" onClick={() => handleDeleteTopic(topic.id)}>Delete</button>
                     <br />
                 </>
             ))}
 
-        </>
+        </div>
     )
 
 }
