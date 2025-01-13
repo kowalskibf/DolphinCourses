@@ -1,0 +1,168 @@
+#explore-main-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+    margin-top: 20px;
+}
+
+
+#explore-header {
+    width: 100%;
+    height: 80px;
+}
+
+#explore-header-left {
+    width: 40%;
+    margin-right: 9%;
+    float: left;
+}
+
+#explore-header-right {
+    width: 40%;
+    float: right;
+    text-align: right;
+}
+
+.explore-search-input {
+    border: 2px solid black;
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+#explore-courses-container {
+    width: 100%;
+}
+
+.explore-course {
+    width: 20%;
+    margin: 2%;
+    float: left;
+    padding: 10px;
+    border: 1px solid #aaa;
+    border-radius: 16px;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.explore-course-img-container {
+    width: 80%;
+    margin: 10px auto 10px auto;
+    text-align: center;
+    height: 100px;
+    border-radius: 12px;
+}
+
+.explore-course-img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.explore-course-name {
+    font-size: 16px;
+    color: black;
+    height: 32px;
+}
+
+.explore-course-minor-text {
+    font-size: 12px;
+    color: gray;
+}
+
+.explore-author {
+    text-align: center;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+}
+
+.explore-avatar-mini {
+    border-radius: 50%;
+    max-height: 24px;
+    max-width: 24px;
+    float: left;
+}
+
+.explore-course-author-username {
+    font-size: 16px;
+    margin-left: 10px;
+    float: left;
+}
+
+.explore-rating-box {
+    text-align: center;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+.explore-select {
+    background-color: white;
+    border: 2px solid #0059ff;
+    border-radius: 16px;
+    padding: 8px;
+    cursor: pointer;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+.explore-img-alt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: black;
+    padding: 32px;
+}
+
+@media only screen and (max-width: 1180px) {
+    #explore-main-container {
+        text-align: center;
+        align-items: center;
+    }
+
+
+    #explore-header {
+        width: 100%;
+        height: 80px;
+    }
+
+    #explore-header-left {
+        width: 100%;
+    }
+
+    #explore-header-right {
+        width: 100%;
+        float: left;
+        text-align: center;
+    }
+
+    #explore-courses-container {
+        margin-top: 80px;
+    }
+}
+
+@media only screen and (max-width: 1000px) {
+    .explore-course {
+        width: 30%;
+        margin: 1%;
+        padding: 4px;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .explore-course {
+        width: 48%;
+        margin: 1%;
+        padding: 4px;
+    }
+}
+
+@media only screen and (max-width: 440px) {
+    .explore-course {
+        width: 98%;
+        margin: 1%;
+        padding: 4px;
+    }
+}

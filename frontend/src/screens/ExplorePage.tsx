@@ -4,6 +4,7 @@ import "../types";
 import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, priceToInt, timeAgo } from '../functions';
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import Stars from '../components/Stars';
+import "../styles/ExplorePage.css";
 
 export default function ExplorePage() {
     const [courses, setCourses] = useState<CourseWithReviews[]>();
@@ -59,24 +60,24 @@ export default function ExplorePage() {
     }
 
     return (
-        <div id="main-container">
+        <div id="explore-main-container">
             <h1>Explore</h1>
-            <div id="header">
-                <div id="header-left">
-                    Search by course name
+            <div id="explore-header">
+                <div id="explore-header-left">
+                    Search course by name
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search"
-                        className="search-input"
+                        className="explore-search-input"
                     />
                 </div>
-                <div id="header-right">
+                <div id="explore-header-right">
                     <select
                         value={sortMethod}
                         onChange={(e) => setSortMethod(e.target.value)}
-                        className="sort-select"
+                        className="explore-select"
                     >
                         <option value="highestRating">Highest Rating</option>
                         <option value="lastUpdated">Last Updated</option>
@@ -88,6 +89,7 @@ export default function ExplorePage() {
                     <select
                         value={selectedLanguage}
                         onChange={(e) => setSelectedLanguage(e.target.value)}
+                        className="explore-select"
                     >
                         <option value="any">Any language</option>
                         {LANGUAGES.map(([code, name, flag]) => (
@@ -98,39 +100,55 @@ export default function ExplorePage() {
                     </select>
                 </div>
             </div>
-            <div id="courses-container">
+            <div id="explore-courses-container">
                 {sortCourses(courses.filter((course) => course.name.includes(searchQuery) && (selectedLanguage == "any" || course.language == selectedLanguage) && course.is_public)).map((course) => (
                     <a href={`/course/${course.id}/view/info`} key={course.id}>
-                        <div className="course">
-                            <div className="course-img-container">
-                                <img
-                                    className="course-img"
-                                    src={MEDIA_URL + course.image}
-                                />
+                        <div className="explore-course">
+                            <div className="explore-course-img-container">
+                                {course.image ? (
+                                    <img
+                                        className="explore-course-img"
+                                        src={MEDIA_URL + course.image}
+                                    />
+                                ) : (
+                                    <div className="explore-img-alt">
+                                        No image
+                                    </div>
+                                )}
                             </div>
-                            <span className="course-name">
+                            <div className="explore-course-name">
                                 {course.name}
-                            </span>
+                            </div>
                             <br />
-                            <span className="course-minor-text">
-                                <img className="avatar-mini" src={MEDIA_URL + (course.author.avatar ? course.author.avatar : "/media/default_avatar.png")} />
-                                {course.author.user.username} <br />
+                            <span className="explore-course-minor-text">
+                                <div className="explore-author">
+                                    <img className="explore-avatar-mini" src={MEDIA_URL + (course.author.avatar ? course.author.avatar : "/media/default_avatar.png")} />
+                                    <div className="explore-course-author-username">{course.author.user.username}</div>
+                                </div>
                                 Language: {LANGUAGES.find(lang => lang[0] === course.language)?.[2]} {LANGUAGES.find(lang => lang[0] === course.language)?.[1]} <br />
                                 Duration: {course.duration} hours <br />
-                                Last updated {timeAgo(new Date(course.last_updated))} <br />
-                                {course.average_rating.toFixed(1)} <Stars value={course.average_rating} /> ({course.reviews.length})
-                                <br />
-                                <br />
-                                {CURRENCIES.find(curr => curr[0] === course.price_currency)?.[1]} {course.price_currency}{" "}
-                                {new Date(course.promo_expires) > new Date() ? (
-                                    <>
-                                        <span style={{ textDecoration: "line-through", color: "gray" }}>
-                                            {intToPrice(course.price)}
-                                        </span>{" "}
-                                        {intToPrice(course.promo_price)}
-                                    </>
+                                {/* Last updated {timeAgo(new Date(course.last_updated))} <br /> */}
+                                <div className="explore-rating-box">
+                                    {course.average_rating.toFixed(1)}&nbsp;
+                                    <Stars value={course.average_rating} />
+                                    &nbsp;({course.reviews.length})
+                                </div>
+                                {course.price == 0 ? (
+                                    <span className="red">Free</span>
                                 ) : (
-                                    intToPrice(course.price)
+                                    <>
+                                        {CURRENCIES.find(curr => curr[0] === course.price_currency)?.[1]} {course.price_currency}{" "}
+                                        {new Date(course.promo_expires) > new Date() ? (
+                                            <>
+                                                <span style={{ textDecoration: "line-through", color: "gray" }}>
+                                                    {intToPrice(course.price)}
+                                                </span>{" "}
+                                                <span className="red">{intToPrice(course.promo_price)}</span>
+                                            </>
+                                        ) : (
+                                            intToPrice(course.price)
+                                        )}
+                                    </>
                                 )}
 
 
@@ -139,6 +157,6 @@ export default function ExplorePage() {
                     </a>
                 ))}
             </div>
-        </div>
+        </div >
     );
 }
