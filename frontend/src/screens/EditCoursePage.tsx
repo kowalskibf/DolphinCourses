@@ -296,25 +296,28 @@ export default function EditCoursePage() {
     }
 
     return (
-        <div id="main-container">
-            <div id="main-left">
+        <div id="edit-course-main-container">
+            <div id="edit-course-main-left">
+                <div id="edit-course-my-elements-header">
+                    My elements
+                </div>
                 <a href="/element/new" target='_blank'>
                     <div className="add-button">
                         <img src="/media/icon_plus.png" className="add-button-img" />
                         <div className="add-button-text">Create a new element</div>
                     </div>
                 </a>
-                <div className="search-container">
+                <div className="edit-course-search-container">
                     Search by name
-                    <input type="text" className="search-input" placeholder="Enter the name to search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                    <input type="text" className="edit-course-search-input" placeholder="Enter the name to search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
-                <div className="filter-container">
-                    <div className="filter-top">Filter by type</div>
-                    <div className="filter-grid">
+                <div className="edit-course-filter-container">
+                    <div className="edit-course-filter-top">Filter by type</div>
+                    <div className="edit-course-filter-grid">
                         {TYPES.map((type, i) => (
                             <div
                                 key={i}
-                                className={type + '-element any-element filter-type' + (filterTypes.includes(type) ? "" : " filter-type-disabled")}
+                                className={type + '-element any-element edit-course-filter-type' + (filterTypes.includes(type) ? "" : " edit-course-filter-type-disabled")}
                                 onClick={() => handleFilterToggle(type)}
                             >
                                 {type.toUpperCase()}
@@ -394,34 +397,52 @@ export default function EditCoursePage() {
                                     : ""}
                                 {element.type === 'assignment' ?
                                     <>
-                                        Question: <ContentRenderer content={element.data.question} />
+                                        <span className="gray">Question</span>
+                                        <ContentRenderer content={element.data.question} />
                                         <br />
-                                        Image: <img src={MEDIA_URL + element.data.image} />
+                                        {element.data.image && (
+                                            <div className="text-align-center">
+                                                <img src={MEDIA_URL + element.data.image} />
+                                                <br />
+                                                <br />
+                                            </div>
+                                        )}
+                                        <span className="gray">{element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
                                         <br />
-                                        {element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}
+                                        <span className="gray">{element.data.hide_answers ? "Answers hidden" : "Answers visible"}</span>
                                         <br />
-                                        {element.data.hide_answers ? "Answers hidden" : "Answers visible"}
                                         <br />
-                                        Answers:
-                                        {element.data.answers.map((answer, i) => (
-                                            <li key={i}>
-                                                <ContentRenderer content={answer} /> {element.data.correct_answer_indices.includes(i) ? "Correct✅" : "Wrong❌"}
-                                            </li>
-                                        ))}
-                                        Explanation: <ContentRenderer content={element.data.explanation} />
+                                        <span className="gray">Answers</span>
                                         <br />
-                                        Explanation image:
-                                        <img src={MEDIA_URL + element.data.explanation_image} />
-
+                                        <br />
+                                        <div className="question-answer-container">
+                                            {element.data.answers.map((answer, i) => (
+                                                <div className={`question-answer ${(element.data as AssignmentElementStructure).correct_answer_indices.includes(i) ? "answer-correct" : "answer-wrong"}`} key={i}>
+                                                    <ContentRenderer content={answer} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <br />
+                                        <span className="gray">Explanation</span>
+                                        <ContentRenderer content={element.data.explanation} />
+                                        <br />
+                                        {element.data.explanation_image && (
+                                            <div className="text-align-center">
+                                                <img src={MEDIA_URL + element.data.explanation_image} />
+                                                <br />
+                                                <br />
+                                            </div>
+                                        )}
                                     </>
                                     : ""}
                                 {element.type === 'exam' ?
                                     <>
-                                        Description: <ContentRenderer content={element.data.description} />
+                                        <ContentRenderer content={element.data.description} />
                                         <br />
-                                        Duration: {element.data.duration}
+                                        <span className="gray">Duration: {element.data.duration}</span>
                                         <br />
-                                        Total marks: {element.data.total_marks}
+                                        <span className="gray">Total marks: {element.data.total_marks}</span>
+                                        <br />
                                         <br />
 
                                     </>
@@ -439,7 +460,7 @@ export default function EditCoursePage() {
                                 type="button"
                                 className={`edit-course-button edit-course-button-border-${element.type}-element`}
                                 onClick={() => (view == "root" ? handleAddModule(element) : handleAddElement(element))}
-                            >Add</button>
+                            >Attach</button>
                             <a href={`/element/${element.id}/edit`} target='_blank'>
                                 <button className={`edit-course-button edit-course-button-border-${element.type}-element`}>
                                     Edit
@@ -448,7 +469,7 @@ export default function EditCoursePage() {
                         </div>
                     ))}
             </div>
-            <div id="main-right">
+            <div id="edit-course-main-right">
                 <button className="edit-course-button-big" type="button" onClick={fetchCourseStructure}>Refresh</button>
                 <br />
                 {view == "root" ?
@@ -693,7 +714,7 @@ export default function EditCoursePage() {
                                                                 <br />
                                                                 {examQuestion.question.weights.filter((weight) => weight.weight !== 0).map((weight, i) => (
                                                                     <>
-                                                                        {weight.topic.topic}: {weight.weight}
+                                                                        <span className="gray">{weight.topic.topic}</span>: {weight.weight}
                                                                         <br />
                                                                     </>
                                                                 ))}
