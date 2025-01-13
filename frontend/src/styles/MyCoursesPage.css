@@ -1,21 +1,28 @@
-#header {
+#my-courses-main-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+    margin-top: 20px;
+}
+
+#my-courses-header {
     width: 100%;
     height: 80px;
 }
 
-#header-left {
+#my-courses-header-left {
     width: 40%;
     margin-right: 9%;
     float: left;
 }
 
-#header-right {
+#my-courses-header-right {
     width: 40%;
     float: right;
     text-align: right;
 }
 
-.search-input {
+.my-courses-search-input {
     border: 2px solid black;
     border-radius: 12px;
     padding: 8px;
@@ -23,7 +30,7 @@
     margin-left: 20px;
 }
 
-.create-new-button {
+.my-courses-create-new-button {
     background-color: black;
     border-radius: 8px;
     padding: 10px;
@@ -34,24 +41,11 @@
     font-size: 16px;
 }
 
-#courses-container {
-    /*width: 100%;
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    flex-wrap: wrap;*/
+#my-courses-courses-container {
     width: 100%;
 }
 
-.course {
-    /*width: 20%;
-    margin: 2%;
-    flex: 1 1 calc(25% - 10px);
-    margin-bottom: 10px;
-    padding: 10px;
-    background-color: lightblue;
-    border: 1px solid black;
-    box-sizing: border-box;*/
+.my-courses-course {
     width: 20%;
     margin: 2%;
     float: left;
@@ -63,7 +57,7 @@
 
 }
 
-.course-img-container {
+.my-courses-course-img-container {
     width: 80%;
     margin: 10px auto 10px auto;
     text-align: center;
@@ -71,17 +65,59 @@
     border-radius: 12px;
 }
 
-.course-img {
+.my-courses-course-img {
     max-width: 100%;
     max-height: 100%;
 }
 
-.course-name {
+.my-courses-course-name {
     font-size: 16px;
     color: black;
 }
 
-.course-minor-text {
+.my-courses-course-minor-text {
     font-size: 12px;
     color: gray;
+}
+
+@media only screen and (max-width: 1300px) {
+    #my-courses-main-container {
+        text-align: center;
+    }
+
+    #my-courses-header-left {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    #my-courses-header-right {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+}
+
+@media only screen and (max-width: 1000px) {
+    .my-courses-course {
+        width: 30%;
+        margin: 1%;
+        padding: 4px;
+    }
+}
+
+@media only screen and (max-width: 700px) {
+    .my-courses-course {
+        width: 48%;
+        margin: 1%;
+        padding: 4px;
+    }
+}
+
+@media only screen and (max-width: 440px) {
+    .my-courses-course {
+        width: 98%;
+        margin: 1%;
+        padding: 4px;
+    }
 }
