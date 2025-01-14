@@ -7,7 +7,7 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({ value }) => {
     const getColor = (value: number) => {
         if (value < 0.2) return 'red';
-        if (value < 0.4) return '#ff8000';
+        if (value < 0.4) return '#ffaa00';
         if (value < 0.6) return '#3399ff';
         if (value < 0.8) return '#03fc98';
         return '#03fc31';
