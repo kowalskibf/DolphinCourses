@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
+import "../styles/LoginPage.css";
 
 export default function LoginPage() {
     const [username, setUsername] = useState<string>("");
@@ -38,18 +39,30 @@ export default function LoginPage() {
     };
 
     return (
-        <>
-            <h1>Login page</h1>
-            <form onSubmit={(e) => e.preventDefault()}>
-                username:
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                password:
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <button type="button" onClick={handleLogin}>Login</button>
-            </form>
-            {error ? error : ""}
-            <a href="/register">Register</a>
-        </>
+        <div id="create-course-main" className="text-align-center">
+            <h1>Login</h1>
+            <div className="create-course-label-box">
+                Username
+            </div>
+            <input className="create-course-input-text" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <div className="create-course-label-box">
+                Password
+            </div>
+            <input className="create-course-input-text" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <br />
+            {error && (
+                <span className="red">
+                    {error}
+                    <br />
+                </span>
+            )}
+            <button className="create-course-step-button" type="button" onClick={handleLogin}>Login</button>
+            <a href="/register">
+                <button className="create-course-step-button">
+                    Register
+                </button>
+            </a>
+        </div>
     )
 
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../App.css';
 import { API_URL } from '../constants';
+import "../styles/RegisterPage.css";
 
 export default function RegisterPage() {
     const [username, setUsername] = useState<string>("");
@@ -103,29 +104,61 @@ export default function RegisterPage() {
     }
 
     return (
-        <>
-            <h1>Register Page</h1>
-
-            <a href="/login">Login</a>
+        <div id="create-course-main" className="text-align-center">
+            <h1>Register</h1>
+            <div className="create-course-label-box">
+                Username
+            </div>
+            <input className="create-course-input-text" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            {errorUsername && (
+                <span className="red">
+                    <br />
+                    {errorUsername}
+                </span>
+            )}
+            <div className="create-course-label-box">
+                Email
+            </div>
+            <input className="create-course-input-text" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            {errorEmail && (
+                <span className="red">
+                    <br />
+                    {errorEmail}
+                </span>
+            )}
+            <div className="create-course-label-box">
+                Password
+            </div>
+            <input className="create-course-input-text" type="password" value={password1} onChange={(e) => setPassword1(e.target.value)} />
+            {errorPassword1 && (
+                <span className="red">
+                    <br />
+                    {errorPassword1}
+                </span>
+            )}
+            <div className="create-course-label-box">
+                Repeat password
+            </div>
+            <input className="create-course-input-text" type="password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
+            {errorPassword2 && (
+                <span className="red">
+                    <br />
+                    {errorPassword2}
+                </span>
+            )}
             <br />
-            <a href="/">Back</a>
-            <br />
-            {errorUsername ? errorUsername : ''}
-            {errorEmail ? errorEmail : ''}
-            {errorPassword1 ? errorPassword1 : ''}
-            {errorPassword2 ? errorPassword2 : ''}
-            {errorGlobal ? errorGlobal : ''}
-            <form onSubmit={(e) => e.preventDefault()}>
-                username:
-                <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-                email:
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                pw:
-                <input type="password" value={password1} onChange={(e) => setPassword1(e.target.value)} />
-                repeat pw:
-                <input type="password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
-                <button type="button" onClick={handleRegister}>Register</button>
-            </form>
-        </>
+            {errorGlobal && (
+                <span className="red">
+                    <br />
+                    {errorGlobal}
+                </span>
+            )}
+            <button className="create-course-step-button" type="button" onClick={handleRegister}>Register</button>
+            <a href="/login">
+                <button className="create-course-step-button">
+                    Login
+                </button>
+            </a>
+        </div>
     );
 };
