@@ -5,6 +5,7 @@ import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, pri
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
 import ProgressBar from '../components/ProgressBar';
+import "../styles/ViewCourseTopicsPage.css";
 
 type Params = {
     id: string;
@@ -59,26 +60,35 @@ export default function ViewCourseTopicsPage() {
     }
 
     return (
-        <>
-            <a href={`/course/${id}/view/info`}>Back</a>
-            <br />
-            Search:
-            <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <br />
-            <select
-                value={sortMethod}
-                onChange={(e) => setSortMethod(e.target.value)}
-            >
-                <option value="default">Default</option>
-                <option value="highestRating">Highest rating</option>
-                <option value="lowestRating">Lowest rating</option>
-                <option value="alphabetical">Alphabetical</option>
-                <option value="alphabeticalDescending">Alphabetical (Descending)</option>
-            </select>
+        <div id="view-course-topics-main-container">
+            <a href={`/course/${id}/view/info`}>
+                <button className="view-course-topics-button">
+                    Back to course info
+                </button>
+            </a>
+            <div className="view-course-topics-label-box">
+                Search by topic name:&nbsp;
+                <input
+                    type="text"
+                    className="view-course-topics-input-text "
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
+            <div className="view-course-topics-label-box">
+                Sort topics by:&nbsp;
+                <select
+                    value={sortMethod}
+                    className="view-course-topics-select"
+                    onChange={(e) => setSortMethod(e.target.value)}
+                >
+                    <option value="default">Default</option>
+                    <option value="highestRating">Highest rating</option>
+                    <option value="lowestRating">Lowest rating</option>
+                    <option value="alphabetical">Alphabetical</option>
+                    <option value="alphabeticalDescending">Alphabetical (Descending)</option>
+                </select>
+            </div>
             <br />
             {sortTopics(accountTopics.filter(accountTopic => accountTopic.course_topic.topic.includes(searchQuery))).map((topic, i) => (
                 <>
@@ -88,7 +98,7 @@ export default function ViewCourseTopicsPage() {
                 </>
             ))}
 
-        </>
+        </div>
     )
 
 }
