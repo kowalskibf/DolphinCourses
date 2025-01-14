@@ -1461,7 +1461,7 @@ class MyCourseAccessesView(APIView):
             account=account,
             is_active=True,
             expires__gt=datetime.now()
-        )
+        ).exclude(course__author=account)
         serializer = CourseAccessDetailSerializer(courseAccesses, many=True)
         return Response(serializer.data)
 

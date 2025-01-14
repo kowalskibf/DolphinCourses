@@ -667,7 +667,7 @@ export default function EditElementPage() {
                                 .map((assignment, index) => (
                                     <div
                                         key={assignment.id}
-                                        className={assignment.type + '-element any-element element-margin'}
+                                        className={assignment.type + '-element any-element element-margin my-elements-element-margin'}
                                         draggable
                                         onDragStart={(e) => exam_handleOnDrag(e, assignment)}
                                     >
@@ -731,7 +731,7 @@ export default function EditElementPage() {
                                 .map((examQuestion, index) => (
                                     <div
                                         key={examQuestion.question.id}
-                                        className={examQuestion.question.type + '-element any-element element-margin'}
+                                        className={examQuestion.question.type + '-element any-element element-margin my-elements-element-margin'}
                                     >
                                         <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
                                             {examQuestion.question.name}
@@ -837,7 +837,7 @@ export default function EditElementPage() {
                                 .map((element, index) => (
                                     <div
                                         key={element.id}
-                                        className={element.type + '-element any-element element-margin'}
+                                        className={element.type + '-element any-element element-margin my-elements-element-margin'}
                                         draggable
                                         onDragStart={(e) => module_handleOnDrag(e, element)}
                                     >
@@ -859,7 +859,7 @@ export default function EditElementPage() {
                                 .map((element, index) => (
                                     <div
                                         key={element.element.id}
-                                        className={element.element.type + '-element any-element element-margin'}
+                                        className={element.element.type + '-element any-element element-margin my-elements-element-margin'}
                                     >
                                         {element.element.name}
                                         <br />

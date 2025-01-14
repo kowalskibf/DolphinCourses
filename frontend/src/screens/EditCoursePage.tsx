@@ -302,9 +302,9 @@ export default function EditCoursePage() {
                     My elements
                 </div>
                 <a href="/element/new" target='_blank'>
-                    <div className="add-button">
-                        <img src="/media/icon_plus.png" className="add-button-img" />
-                        <div className="add-button-text">Create a new element</div>
+                    <div className="edit-course-add-button">
+                        <img src="/media/icon_plus.png" className="edit-course-add-button-img" />
+                        <div className="edit-course-add-button-text">Create a new element</div>
                     </div>
                 </a>
                 <div className="edit-course-search-container">
@@ -337,7 +337,7 @@ export default function EditCoursePage() {
                     .map((element) => (
                         <div
                             key={element.id}
-                            className={element.type + '-element any-element element-margin'}
+                            className={element.type + '-element any-element element-margin edit-course-element-margin'}
                             draggable
                             onDragStart={(e) => handleOnDrag(e, element)}
                         >
@@ -492,7 +492,7 @@ export default function EditCoursePage() {
                             .map((module, i) => (
                                 <div key={i}>
                                     <div
-                                        className={module.module.type + '-element any-element element-margin'}
+                                        className={module.module.type + '-element any-element element-margin edit-course-element-margin'}
                                     >
 
                                         <div className={module.module.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
@@ -561,7 +561,7 @@ export default function EditCoursePage() {
                             .map((element, i) => (
                                 <div
                                     key={i}
-                                    className={element.element_data.type + '-element any-element element-margin'}
+                                    className={element.element_data.type + '-element any-element element-margin edit-course-element-margin'}
                                 >
                                     <div className={element.element_data.type + '-element-border-bottom width-100 text-align-center margin-bottom-10px'}>
                                         {element.element_data.name} {element.uses > 1 ? `(used in ${element.uses - 1} other modules)` : ""}
