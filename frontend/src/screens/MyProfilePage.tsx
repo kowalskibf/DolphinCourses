@@ -4,6 +4,7 @@ import '../types';
 import '../functions';
 import { sendUserBackToLoginPageIfNotLoggedIn, timeAgo } from '../functions';
 import { MEDIA_URL } from '../constants';
+import "../styles/MyProfilePage.css";
 
 export default function MyProfilePage() {
     const [account, setAccount] = useState<Account>();
@@ -75,30 +76,85 @@ export default function MyProfilePage() {
     }
 
     return (
-        <>
-            <a href="/courses/my">My courses</a>
-            <a href="/elements/my">My elements</a>
-            <img src={MEDIA_URL + (account.avatar ? account.avatar : "/media/default_avatar.png")} />
-            hello, {account.user.username}
+        <div id="my-profile-main-container">
+            <div id="my-profile-header">
+                <div className="my-profile-header-half">
+                    <img className="my-profile-avatar-img" src={MEDIA_URL + (account.avatar ? account.avatar : "/media/default_avatar.png")} />
+                </div>
+                <div className="my-profile-header-half">
+                    <span className="my-profile-header-text">
+                        Hello, <span className="blue">{account.user.username}</span>
+                        <br />
+                        ({account.user.first_name} {account.user.last_name})
+                    </span>
+                    <br />
+                    <div className="my-profile-upload-new-avatar-box">
+                        Upload new avatar&nbsp;
+                        <input type="file" accept="image/*" onChange={handleFileChange} />
+                    </div>
+                </div>
+            </div>
             <br />
-            or
+            <span className="gray">Email:&nbsp;</span>{account.user.email}
             <br />
-            {account.user.first_name} {account.user.last_name}
+            {account.socials.facebook.length ? (
+                <a href={account.socials.facebook} target='_blank'>
+                    <span className="blue">
+                        Facebook
+                    </span>
+                </a>
+            ) : (
+                <span>Facebook profile link not set.</span>
+            )}
             <br />
-            your email
+            {account.socials.instagram.length ? (
+                <a href={account.socials.instagram} target='_blank'>
+                    <span className="blue">
+                        Instagram
+                    </span>
+                </a>
+            ) : (
+                <span>Instagram profile link not set.</span>
+            )}
             <br />
-            {account.user.email}
+            {account.socials.tiktok.length ? (
+                <a href={account.socials.tiktok} target='_blank'>
+                    <span className="blue">
+                        Tiktok
+                    </span>
+                </a>
+            ) : (
+                <span>Tiktok profile link not set.</span>
+            )}
             <br />
-            tt:
-            {account.socials.tiktok}
+            {account.socials.linkedin.length ? (
+                <a href={account.socials.linkedin} target='_blank'>
+                    <span className="blue">
+                        LinkedIn
+                    </span>
+                </a>
+            ) : (
+                <span>LiniedIn profile link not set.</span>
+            )}
             <br />
-            you joined {timeAgo(new Date(account.user.date_joined))}
             <br />
-            <a href="/logout">Logout</a>
-            <h3>Change avatar:</h3>
-            <img id="uploaded-image"></img>
-            Upload new avatar
-            <input type="file" accept="image/*" onChange={handleFileChange} />
-        </>
+            <span className="gray">You joined&nbsp;</span>{timeAgo(new Date(account.user.date_joined))}
+            <br />
+            <a href="/profile/setup">
+                <button className="my-profile-button">
+                    Edit profile information
+                </button>
+            </a>
+            <a href={`/profile/${account.user.username}`}>
+                <button className="my-profile-button">
+                    View profile as a guest
+                </button>
+            </a>
+            <a href="/logout">
+                <button className="my-profile-button">
+                    Logout
+                </button>
+            </a>
+        </div>
     );
 }
