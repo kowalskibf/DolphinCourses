@@ -451,7 +451,7 @@ export default function EditElementPage() {
                     <div className="edit-element-label-box">
                         Image:&nbsp;
                     </div>
-                    <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                    <img id="uploaded-image" className="edit-element-img" src={MEDIA_URL + element.data.image} />
                     <br />
                     Change image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
@@ -470,7 +470,7 @@ export default function EditElementPage() {
                     <div className="edit-element-label-box">
                         Video:&nbsp;
                     </div>
-                    <video controls id="uploaded-video" src={MEDIA_URL + element.data.video} />
+                    <video className="edit-element-img" controls id="uploaded-video" src={MEDIA_URL + element.data.video} />
                     <br />
                     Change video:&nbsp;
                     <input type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
@@ -497,7 +497,7 @@ export default function EditElementPage() {
                     {element.data.image ? (
                         <div className="edit-element-label-box">
                             Image:&nbsp;<br />
-                            <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                            <img className="edit-element-img" id="uploaded-image" src={MEDIA_URL + element.data.image} />
                         </div>
                     ) : (
                         <div className="edit-element-label-box">
@@ -519,7 +519,7 @@ export default function EditElementPage() {
                     {element.data.explanation_image ? (
                         <div className="edit-element-label-box">
                             Explanation image:&nbsp;<br />
-                            <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
+                            <img className="edit-element-img" id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
                         </div>
                     ) : (
                         <div className="edit-element-label-box">
@@ -544,7 +544,7 @@ export default function EditElementPage() {
                     {element.data.image ? (
                         <div className="edit-element-label-box">
                             Image:&nbsp;<br />
-                            <img id="uploaded-image" src={MEDIA_URL + element.data.image} />
+                            <img className="edit-element-img" id="uploaded-image" src={MEDIA_URL + element.data.image} />
                         </div>
                     ) : (
                         <div className="edit-element-label-box">
@@ -612,7 +612,7 @@ export default function EditElementPage() {
                     {element.data.explanation_image ? (
                         <div className="edit-element-label-box">
                             Explanation image:&nbsp;<br />
-                            <img id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
+                            <img className="edit-element-img" id="uploaded-explanation-image" src={MEDIA_URL + element.data.explanation_image} />
                         </div>
                     ) : (
                         <div className="edit-element-label-box">

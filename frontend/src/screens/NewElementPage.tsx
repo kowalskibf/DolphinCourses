@@ -4,6 +4,7 @@ import "../types";
 import TextEditor from '../components/TextEditor';
 import ContentRenderer from '../components/ContentRenderer';
 import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
+import { MEDIA_URL } from '../constants';
 
 export default function NewElementPage() {
     const [elementType, setElementType] = useState<string>("text");
@@ -41,6 +42,8 @@ export default function NewElementPage() {
     const [moduleElementImage, setModuleElementImage] = useState<File | null>(null);
 
     const [allElements, setAllElements] = useState<CourseElement[]>([]);
+
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const fetchAllElements = async () => {
         fetch("http://127.0.0.1:8000/api/elements/my", {
@@ -344,13 +347,20 @@ export default function NewElementPage() {
     }, [examElementAssignments]);
 
     return (
-        <>
-            <a href="/elements/my">Back</a>
+        <div id="edit-element-main-container">
+            <a href="/elements/my">
+                <button className="edit-element-button">
+                    Back to my elements
+                </button>
+            </a>
+            <button className="edit-element-button" type="button" onClick={handleCreateElement}>Save</button>
             <br />
-            Element name: <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            <div className="edit-element-label-box">
+                Element name:&nbsp;<input className="edit-element-input-text" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
             <br />
-            Element type:
-            <select value={elementType} onChange={(e) => setElementType(e.target.value)}>
+            Element type:&nbsp;
+            <select className="create-course-select" value={elementType} onChange={(e) => setElementType(e.target.value)}>
                 <option value="text">Text</option>
                 <option value="image">Image</option>
                 <option value="video">Video</option>
@@ -362,86 +372,139 @@ export default function NewElementPage() {
             <br />
             {elementType == "text" ?
                 <>
-                    Content: <TextEditor value={textElementContent} onChange={(value) => setTextElementContent(value)} />
+                    <div className="edit-element-label-box">
+                        Content:&nbsp;
+                    </div>
+                    <TextEditor value={textElementContent} onChange={(value) => setTextElementContent(value)} />
                 </>
                 : ""}
             {elementType == "image" ?
                 <>
-                    Image:
-                    <img id="uploaded-image"></img>
-                    Upload image
+                    <div className="edit-element-label-box">
+                        Image:&nbsp;
+                    </div>
+                    <img className="edit-element-img" id="uploaded-image"></img>
+                    <br />
+                    Upload image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Description: <TextEditor value={imageElementDescription} onChange={(value) => setImageElementDescription(value)} />
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;
+                    </div>
+                    <TextEditor value={imageElementDescription} onChange={(value) => setImageElementDescription(value)} />
                 </>
                 : ""}
             {elementType == "video" ?
                 <>
-                    Video:
+                    <div className="edit-element-label-box">
+                        Video:&nbsp;
+                    </div>
                     <video controls id="uploaded-video" />
-                    Upload video
-                    <input type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Description: <TextEditor value={videoElementDescription} onChange={(value) => setVideoElementDescription(value)} />
+                    Upload video:&nbsp;
+                    <input className="edit-element-img" type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
+                    <br />
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;
+                    </div>
+                    <TextEditor value={videoElementDescription} onChange={(value) => setVideoElementDescription(value)} />
                 </>
                 : ""}
             {elementType === "example" ?
                 <>
-                    Question: <TextEditor value={exampleElementQuestion} onChange={(value) => setExampleElementQuestion(value)} />
-                    Question image:
-                    <img id="uploaded-example-image" />
-                    Upload question image
+                    <div className="edit-element-label-box">
+                        Question:&nbsp;
+                    </div>
+                    <TextEditor value={exampleElementQuestion} onChange={(value) => setExampleElementQuestion(value)} />
+                    <div className="edit-element-label-box">
+                        Question image:&nbsp;
+                    </div>
+                    <img className="edit-element-img" id="uploaded-example-image" />
+                    <br />
+                    Upload question image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Explanation: <TextEditor value={exampleElementExplanation} onChange={(value) => setExampleElementExplanation(value)} />
-                    Explanation image:
-                    <img id="uploaded-example-explanation-image" />
-                    Upload explanation Image
+                    <div className="edit-element-label-box">
+                        Explanation:&nbsp;
+                    </div>
+                    <TextEditor value={exampleElementExplanation} onChange={(value) => setExampleElementExplanation(value)} />
+                    <div className="edit-element-label-box">
+                        Explanation image:&nbsp;
+                    </div>
+                    <img className="edit-element-img" id="uploaded-example-explanation-image" />
+                    <br />
+                    Upload explanation Image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "explanation")} />
                 </>
                 : ""}
             {elementType === "assignment" ?
                 <>
-                    Question: <TextEditor value={assignmentElementQuestion} onChange={(value) => setAssignmentElementQuestion(value)} />
-                    Question image:
+                    <div className="edit-element-label-box">
+                        Question:&nbsp;
+                    </div>
+                    <TextEditor value={assignmentElementQuestion} onChange={(value) => setAssignmentElementQuestion(value)} />
+                    <div className="edit-element-label-box">
+                        Question image:&nbsp;
+                    </div>
                     <img id="uploaded-assignment-image" />
-                    Upload question image
+                    <br />
+                    Upload question image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
                     <br />
-                    Is multiple choice?
-                    <input
-                        type="checkbox"
-                        checked={assignmentElementIsMultipleChoice}
-                        onChange={() => setAssignmentElementIsMultipleChoice(!assignmentElementIsMultipleChoice)}
-                    />
                     <br />
-                    Hide answers?
-                    <input
-                        type="checkbox"
-                        checked={assignmentElementHideAnswers}
-                        onChange={() => setAssignmentElementHideAnswers(!assignmentElementHideAnswers)}
-                    />
+                    <div className="edit-element-label-box">
+                        Multiple choice&nbsp;
+                        <input
+                            type="checkbox"
+                            className="edit-element-checkbox"
+                            checked={assignmentElementIsMultipleChoice}
+                            onChange={() => setAssignmentElementIsMultipleChoice(!assignmentElementIsMultipleChoice)}
+                        />
+                    </div>
+                    <div className="edit-element-label-box">
+                        Hide answers&nbsp;
+                        <input
+                            type="checkbox"
+                            className="edit-element-checkbox"
+                            checked={assignmentElementHideAnswers}
+                            onChange={() => setAssignmentElementHideAnswers(!assignmentElementHideAnswers)}
+                        />
+                    </div>
                     <br />
-                    <h3>Answers:</h3>
-                    {assignmentElementAnswers.map((answer, index) => (
-                        <li key={index}>
-                            <ContentRenderer content={answer} />
-                            <input
-                                type="checkbox"
-                                checked={assignmentElementCorrectAnswerIndices.includes(index)}
-                                onChange={() => handleAssignmentElementCorrectAnswerToggle(index)}
-                            />
-                            <button type="button" onClick={(e) => handleAssignmentElementRemoveAnswer(index)}>Remove</button>
-                        </li>
-                    ))}
+                    <div className="edit-element-label-box">
+                        Answers
+                    </div>
+                    <div className="edit-element-answer-container">
+                        {assignmentElementAnswers.map((answer, index) => (
+                            <div className={`edit-element-answer ${assignmentElementCorrectAnswerIndices.includes(index) ? "edit-element-answer-correct" : "edit-element-answer-wrong"}`} key={index}>
+                                <ContentRenderer content={answer} />
+                                <input
+                                    type="checkbox"
+                                    checked={assignmentElementCorrectAnswerIndices.includes(index)}
+                                    onChange={() => handleAssignmentElementCorrectAnswerToggle(index)}
+                                />
+                                <button className="edit-element-button edit-element-button-small edit-element-button-red" type="button" onClick={(e) => handleAssignmentElementRemoveAnswer(index)}>Remove</button>
+                            </div>
+                        ))}
+                    </div>
+                    <br />
+                    <div className="edit-element-label-box">
+                        Add new answer:&nbsp;
+                    </div>
                     <TextEditor value={assignmentElementNewAnswer} onChange={(value) => setAssignmentElementNewAnswer(value)} />
+                    <button className="edit-element-button edit-element-button-small" type="button" onClick={handleAssignmentElementAddAnswer}>Add answer</button>
                     <br />
-                    <button type="button" onClick={handleAssignmentElementAddAnswer}>Add</button>
                     <br />
-                    Explanation: <TextEditor value={assignmentElementExplanation} onChange={(value) => setAssignmentElementExplanation(value)} />
+                    <div className="edit-element-label-box">
+                        Explanation:&nbsp;
+                    </div>
+                    <TextEditor value={assignmentElementExplanation} onChange={(value) => setAssignmentElementExplanation(value)} />
                     <br />
-                    Explanation image:
-                    <img id="uploaded-assignment-explanation-image" />
+                    <div className="edit-element-label-box">
+                        Explanation image:&nbsp;
+                        <br />
+                        <img id="uploaded-assignment-explanation-image" />
+                    </div>
                     Upload explanation Image
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "explanation")} />
                     <br />
@@ -449,122 +512,264 @@ export default function NewElementPage() {
                 : ""}
             {elementType == "exam" ?
                 <>
-                    Description: <TextEditor value={examElementDescription} onChange={(value) => setExamElementDescription(value)} />
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;
+                    </div>
+                    <TextEditor value={examElementDescription} onChange={(value) => setExamElementDescription(value)} />
                     <br />
-                    Duration: <input type="number" value={examElementDuration} onChange={(e) => setExamElementDuration(parseInt(e.target.value))} />
                     <br />
-                    Total marks: {examElementTotalMarks}
+                    <div className="edit-element-label-box">
+                        Duration:&nbsp;
+                        <input className="edit-element-input-number" type="number" min={1} value={examElementDuration} onChange={(e) => setExamElementDuration(parseInt(e.target.value))} />
+                        &nbsp;minutes
+                    </div>
+                    <div className="edit-element-label-box">
+                        Total marks: {examElementTotalMarks}
+                    </div>
                     <br />
-                    <button type="button" onClick={fetchAllElements}>Refresh</button>
-                    <br />
-                    Add questions:
-                    <br />
-                    {allElements.filter((element) => element.type == "assignment").map((element) => (
-                        <div
-                            draggable
-                            className='assignment-to-drop'
-                            key={element.id}
-                            onDragStart={(e) => handleOnDrag(e, { ...element, marks: 1, order: examElementAssignments.length + 1 })}
-                        >
-                            {element.id}<br />
-                            {element.name}<br />
-                            {element.data.question}
-
-                        </div>
-                    ))}
-                    <button type="button" onClick={() => console.log(examElementAssignments)}>debug</button>
-                    <div
-                        className='drop-zone'
-                        onDrop={handleOnDrop}
-                        onDragOver={handleDragOver}
-                    >
-                        {examElementAssignments
-                            .sort((a, b) => a.order - b.order)
-                            .map((assignment, i) => (
+                    <div className="edit-element-bottom-main-container">
+                        <div className="edit-element-bottom-left">
+                            <div className="edit-element-search-container">
+                                Search:&nbsp;
+                                <input
+                                    type="text"
+                                    className="edit-element-search-input"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <button className="edit-element-button edit-element-button-wide" type="button" onClick={fetchAllElements}>Refresh</button>
+                            <br />
+                            {allElements.filter((e) => e.name.includes(searchQuery)).filter((element) => element.type == "assignment").map((element) => (
                                 <div
-                                    className='assignment-to-drop'
-                                    key={i}
+                                    draggable
+                                    className={element.type + '-element any-element element-margin my-elements-element-margin'}
+                                    key={element.id}
+                                    onDragStart={(e) => handleOnDrag(e, { ...element, marks: 1, order: examElementAssignments.length + 1 })}
                                 >
-                                    {assignment.id}<br />
-                                    {assignment.name}<br />
-                                    {assignment.data.question}<br />
-                                    Marks:
-                                    <input
-                                        type="number"
-                                        value={assignment.marks}
-                                        onChange={(e) => handleMarksChange(i, parseInt(e.target.value) || 0)}
-                                    />
-                                    {assignment.order > 1 && (
-                                        <button type="button" onClick={() => handleSwapOrder(assignment.order, assignment.order - 1)}>^</button>
-                                    )}
-                                    {assignment.order < examElementAssignments.length && (
-                                        <button type="button" onClick={() => handleSwapOrder(assignment.order, assignment.order + 1)}>v</button>
-                                    )}
-                                    <button type="button" onClick={() => handleRemoveAssignmentFromExam(assignment.order)}>Remove</button>
+                                    <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                        {element.name}
+                                    </div>
+                                    <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                        <span className="gray">Question</span>
+                                        <ContentRenderer content={element.data.question} />
+                                        <br />
+                                        {element.data.image ?
+                                            <>
+                                                <img src={MEDIA_URL + element.data.image} />
+                                                <br />
+                                                <br />
+                                            </>
+                                            : ""}
+                                        <span className="gray">{element.data.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                        <br />
+                                        <span className="gray">{element.data.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                        <br />
+                                        <br />
+                                        <span className="gray">Answers</span>
+                                        <br />
+                                        <br />
+                                        <div className="edit-element-answer-container">
+                                            {element.data.answers.map((answer, i) => (
+                                                <div className={`edit-element-answer ${element.data.correct_answer_indices.includes(i) ? "edit-element-answer-correct" : "edit-element-answer-wrong"}`} key={i}>
+                                                    <ContentRenderer content={answer} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                        <br />
+                                        <span className="gray">Explanation</span>
+                                        <ContentRenderer content={element.data.explanation} />
+                                        <br />
+                                        {element.data.explanation_image ?
+                                            <>
+                                                <img src={MEDIA_URL + element.data.explanation_image} />
+                                                <br />
+                                                <br />
+                                            </>
+                                            : ""}
+                                    </div>
+                                    <a href={`/element/${element.id}/edit`} target='_blank'>
+                                        <button className="edit-course-button edit-course-button-border-assignment-element">
+                                            Edit
+                                        </button>
+                                    </a>
+                                    <button
+                                        className="edit-course-button edit-course-button-border-assignment-element"
+                                        onClick={() => {
+                                            setExamElementAssignments([...examElementAssignments, { ...(element as ExamAssignmentElement), marks: 1, order: examElementAssignments.length + 1 }]);
+                                        }}>
+                                        Attach
+                                    </button>
                                 </div>
                             ))}
+                            {/* <button type="button" onClick={() => console.log(examElementAssignments)}>debug</button>
+                            <div
+                                className='drop-zone'
+                                onDrop={handleOnDrop}
+                                onDragOver={handleDragOver}
+                            >
+                            </div> */}
+                        </div>
+                        <div className="edit-element-bottom-right">
+                            {examElementAssignments
+                                .sort((a, b) => a.order - b.order)
+                                .map((assignment, i) => (
+                                    <div
+                                        className={assignment.type + '-element any-element element-margin my-elements-element-margin'}
+                                        key={i}
+                                    >
+                                        <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                            {assignment.name}
+                                        </div>
+                                        <div className="assignment-element-border-bottom width-100 margin-bottom-10px">
+                                            Marks:
+                                            <input
+                                                type="number"
+                                                className="edit-element-input-number edit-element-input-number-small"
+                                                min={1}
+                                                value={assignment.marks}
+                                                onChange={(e) => handleMarksChange(i, parseInt(e.target.value) || 0)}
+                                            />
+                                            <br />
+                                            <span className="gray">Question</span>
+                                            <ContentRenderer content={assignment.data.question} />
+                                            <br />
+                                            {assignment.data.image ?
+                                                <>
+                                                    <img src={MEDIA_URL + assignment.data.image} />
+                                                    <br />
+                                                </>
+                                                : ""}
+                                            <br />
+                                            <span className="gray">{assignment.data.is_multiple_choice ? "Multiple choice" : "Single choice"}</span>
+                                            <br />
+                                            <span className="gray">{assignment.data.hide_answers ? "Answers hidden" : "Answers visible"}</span>
+                                            <br />
+                                            <br />
+                                            <span className="gray">Answers</span>
+                                            <br />
+                                            <br />
+                                            <div className="edit-element-answer-container">
+                                                {assignment.data.answers.map((answer, i) => (
+                                                    <div className={`edit-element-answer ${assignment.data.correct_answer_indices.includes(i) ? "edit-element-answer-correct" : "edit-element-answer-wrong"}`} key={i}>
+                                                        <ContentRenderer content={answer} />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <br />
+                                            <span className="gray">Explanation</span>
+                                            <ContentRenderer content={assignment.data.explanation} />
+                                            <br />
+                                            {assignment.data.explanation_image ?
+                                                <>
+                                                    <img src={MEDIA_URL + assignment.data.explanation_image} />
+                                                    <br />
+                                                </>
+                                                : ""}
+                                        </div>
+                                        <a href={`/element/${assignment.id}/edit`} target='_blank'>
+                                            <button className="edit-course-button edit-course-button-border-assignment-element">
+                                                Edit
+                                            </button>
+                                        </a>
+                                        {assignment.order > 1 && (
+                                            <button className="edit-course-button edit-course-button-border-assignment-element" type="button" onClick={() => handleSwapOrder(assignment.order, assignment.order - 1)}>Move up</button>
+                                        )}
+                                        {assignment.order < examElementAssignments.length && (
+                                            <button className="edit-course-button edit-course-button-border-assignment-element" type="button" onClick={() => handleSwapOrder(assignment.order, assignment.order + 1)}>Move down</button>
+                                        )}
+                                        <button className="edit-course-button edit-course-button-border-assignment-element" type="button" onClick={() => handleRemoveAssignmentFromExam(assignment.order)}>Detach</button>
+                                    </div>
+                                ))}
+                        </div>
                     </div>
                 </>
                 : ""}
             {elementType == "module" ?
                 <>
-                    Title: <input type="text" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
+                    <div className="edit-element-label-box">
+                        Title:&nbsp;<input className="edit-element-input-text" type="text" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
+                    </div>
+                    <div className="edit-element-label-box">
+                        Description:&nbsp;<TextEditor value={moduleElementDescription} onChange={(value) => setModuleElementDescription(value)} />
+                    </div>
                     <br />
-                    Description: <TextEditor value={moduleElementDescription} onChange={(value) => setModuleElementDescription(value)} />
-                    <br />
-                    Module image:
+                    {/* Module image:
                     <img id="uploaded-module-image" />
                     Upload module image
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
-                    <br />
-                    <button type="button" onClick={fetchAllElements}>Refresh</button>
-                    <br />
-                    Add elements:
-                    <br />
-                    <br />
-                    {allElements.map((element) => (
-                        <div
-                            draggable
-                            className='assignment-to-drop'
-                            key={element.id}
-                            onDragStart={(e) => handleOnDrag_m(e, { ...element, order: moduleElementElements.length + 1 })}
-                        >
-                            {element.id}<br />
-                            {element.name}<br />
-                            {element.type}
+                    <br /> */}
+                    <div className="edit-element-bottom-main-container">
+                        <div className="edit-element-bottom-left">
+                            <div className="edit-element-search-container">
+                                Search:&nbsp;
+                                <input
+                                    type="text"
+                                    className="edit-element-search-input"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                />
+                            </div>
+                            <button className="edit-element-button edit-element-button-wide" type="button" onClick={fetchAllElements}>Refresh</button>
 
+                            {allElements.map((element) => (
+                                <div
+                                    draggable
+                                    className={element.type + '-element any-element element-margin my-elements-element-margin'}
+                                    key={element.id}
+                                    onDragStart={(e) => handleOnDrag_m(e, { ...element, order: moduleElementElements.length + 1 })}
+                                >
+                                    {element.name}
+                                    <br />
+                                    <a href={`/element/${element.id}/edit`} target='_blank'>
+                                        <button type="button" className={`edit-course-button edit-course-button-border-${element.type}-element`}>
+                                            Edit
+                                        </button>
+                                    </a>
+                                    <button
+                                        className={`edit-course-button edit-course-button-border-${element.type}-element`}
+                                        onClick={() => {
+                                            setModuleElementElements([...moduleElementElements, { ...element, order: moduleElementElements.length + 1 }]);
+                                        }}>
+                                        Attach
+                                    </button>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                    <button type="button" onClick={() => console.log(moduleElementElements)}>debug</button>
+                        {/* <button type="button" onClick={() => console.log(moduleElementElements)}>debug</button>
                     <div
                         className='drop-zone'
                         onDrop={handleOnDrop_m}
                         onDragOver={handleDragOver_m}
-                    >
-                        {moduleElementElements
-                            .sort((a, b) => a.order - b.order)
-                            .map((element, i) => (
-                                <div
-                                    className='assignment-to-drop'
-                                    key={i}
-                                >
-                                    {element.id}<br />
-                                    {element.name}<br />
-                                    {element.type}<br />
-                                    {element.order > 1 && (
-                                        <button type="button" onClick={() => handleSwapElementsOrder(element.order, element.order + 1)}>v</button>
-                                    )}
-                                    {element.order < moduleElementElements.length && (
-                                        <button type="button" onClick={() => handleSwapElementsOrder(element.order, element.order - 1)}>^</button>
-                                    )}
-                                    <button type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Remove</button>
-                                </div>
-                            ))}
+                    > */}
+                        <div className="edit-element-bottom-right">
+                            {moduleElementElements
+                                .sort((a, b) => a.order - b.order)
+                                .map((element, i) => (
+                                    <div
+                                        className={element.type + '-element any-element element-margin my-elements-element-margin'}
+                                        key={i}
+                                    >
+                                        {element.name}
+                                        <br />
+                                        <a href={`/element/${element.id}/edit`} target='_blank'>
+                                            <button className={`edit-course-button edit-course-button-border-${element.type}-element`}>
+                                                Edit
+                                            </button>
+                                        </a>
+                                        {element.order > 1 && (
+                                            <button className={`edit-course-button edit-course-button-border-${element.type}-element`} type="button" onClick={() => handleSwapElementsOrder(element.order, element.order - 1)}>Move up</button>
+                                        )}
+                                        {element.order < moduleElementElements.length && (
+                                            <button className={`edit-course-button edit-course-button-border-${element.type}-element`} type="button" onClick={() => handleSwapElementsOrder(element.order, element.order + 1)}>Move down</button>
+                                        )}
+                                        <button className={`edit-course-button edit-course-button-border-${element.type}-element`} type="button" onClick={() => handleRemoveElementFromModule(element.order)}>Detach</button>
+                                    </div>
+                                ))}
+                        </div>
                     </div>
                 </>
                 : ""}
-            <br />
-            <button type="button" onClick={handleCreateElement}>Save</button>
-        </>
+        </div>
     )
 }
