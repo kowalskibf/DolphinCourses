@@ -5,6 +5,7 @@ import { formatAmount, formatDateTimeLocal, formatDateToBackend, intToPrice, pri
 import { CURRENCIES, LANGUAGES, MEDIA_URL } from '../constants';
 import { useParams } from 'react-router-dom';
 import ContentRenderer from '../components/ContentRenderer';
+import "../styles/ViewCourseAccessPage.css";
 
 type Params = {
     id: string;
@@ -62,6 +63,8 @@ export default function ViewCourseAccessPage() {
         fetchCourseAccess();
     }, []);
 
+    useEffect(() => console.log(hasAccess), [hasAccess]);
+
     if (!courseAccess) {
         return (
             <>Loading...</>
@@ -69,25 +72,49 @@ export default function ViewCourseAccessPage() {
     }
 
     return (
-        <>
-            <a href={`/course/${id}/view/info`}>Back to course info</a>
-            <br />
+        <div id="create-course-main" className="text-align-center">
+            <div className="create-course-label-box">
+                <h2>
+                    <span className="gray">
+                        Status of Your access to
+                        {hasAccess ? (
+                            <>&nbsp;</>
+                        ) : (
+                            <> the course</>
+                        )}
+                    </span>
+                    {courseAccess.course && (
+                        <>{courseAccess.course.name}</>
+                    )}
+                </h2>
+            </div>
             {hasAccess ? (
                 <>
-                    You have access till {new Date(courseAccess.expires).toLocaleString()}
+                    You <span className="blue">have</span> access till {new Date(courseAccess.expires).toLocaleString()}
+                    <br />
                     <br />
                     Extend access till:
                 </>
             ) : (
                 <>
-                    You do not have access.
+                    You <span className="red">do not have</span> access.
+                    <br />
                     <br />
                     Buy course till:
                 </>
             )}
+            <br />
+            <br />
             <input type="datetime-local" value={formatDateTimeLocal(new Date(expires))} onChange={(e) => setExpires(new Date(e.target.value))} />
-            <button type="button" onClick={handleExtendAccess}>Extend</button>
+            <br />
+            <br />
+            <button className="create-course-step-button" type="button" onClick={handleExtendAccess}>Extend</button>
+            <a href={`/course/${id}/view/info`}>
+                <button className="create-course-step-button">
+                    Back to course info
+                </button>
+            </a>
 
-        </>
+        </div>
     )
 };
