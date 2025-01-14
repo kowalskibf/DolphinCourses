@@ -78,4 +78,10 @@
         margin: 6px;
         width: 90%;
     }
+
+    .view-course-info-review-box {
+        width: 98%;
+        font-size: 10px;
+    }
+
 }

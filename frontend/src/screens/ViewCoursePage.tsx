@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import "../styles/ViewCoursePage.css";
 import { useLocation, useNavigate } from 'react-router-dom';
 import ContentRenderer from '../components/ContentRenderer';
+import "../styles/ViewCoursePage.css";
 
 type Params = {
     id: string;
@@ -427,7 +428,12 @@ export default function ViewCoursePage() {
     }
 
     return (
-        <div id="main-container">
+        <div id="view-course-main-container">
+            <a href={`/course/${courseStructure.id}/view/info`}>
+                <button className="view-course-button">
+                    Back to course info
+                </button>
+            </a>
             {view == "root" ?
                 <>
                     <h1>{courseStructure.name}</h1>
@@ -437,7 +443,7 @@ export default function ViewCoursePage() {
                         .map((module, i) => (
                             <div key={i}>
                                 <div
-                                    className={module.module.type + '-element any-element element-margin module-container'}
+                                    className={module.module.type + '-element any-element element-margin module-container my-elements-element-margin'}
                                     onClick={() => handleChangeLocationInto(module.order)}
                                 >
                                     {module.module.type == "module" &&
@@ -454,12 +460,12 @@ export default function ViewCoursePage() {
                 </>
                 :
                 <>
-                    <span onClick={handleChangeLocationOneUp}>Back</span>
+                    <span className="cursor-pointer" onClick={handleChangeLocationOneUp}>Back</span>
                     <br />
-                    <span onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
+                    <span className="cursor-pointer" onClick={() => handleChangeLocationBack(-1)}>{courseStructure.name}</span>
                     <br />
                     {path.map((module, i) => (
-                        <div key={i}>
+                        <div className="cursor-pointer" key={i}>
                             {" > "}<span onClick={() => handleChangeLocationBack(i)}>{module.title}</span>
                         </div>
                     ))}
@@ -470,7 +476,7 @@ export default function ViewCoursePage() {
                         .map((element, i) => (
                             <div
                                 key={i}
-                                className={element.element_data.type + '-element any-element element-margin'}
+                                className={element.element_data.type + '-element any-element element-margin my-elements-element-margin'}
                             >
                                 {element.element_data.type == "text" && (
                                     <>
