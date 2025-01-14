@@ -1360,6 +1360,8 @@ class CourseAccessView(APIView):
             course = Course.objects.get(id=course_id)
         except Course.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+        if CourseAccess.objects.filter(account=account, course=course, expires__lt=timezone.now()).exists():
+            return Response(status=status.HTTP_410_GONE)
         hasAccess = CourseAccess.objects.filter(account=account, course=course, is_active=True, expires__gt=timezone.now()).exists()
         if (not hasAccess or not course.is_public) and not course.author == account:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -1418,6 +1420,7 @@ class CourseAccessGiftView(APIView):
         if not body["expires"]:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         #if body["expires"] < timezone.now():
+        print(1)
         if datetime.strptime(body["expires"], "%Y-%m-%d %H:%M:%S") < timezone.now():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         try:

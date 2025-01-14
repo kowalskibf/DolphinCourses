@@ -1,0 +1,81 @@
+#view-course-info-main-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+    text-align: center;
+}
+
+.view-course-info-button {
+    border: 2px solid #0059ff;
+    padding: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.view-course-info-button:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.view-course-info-my-review-box {
+    text-align: center;
+    margin: auto;
+    align-items: center;
+}
+
+.view-course-info-my-review-stars-box {
+    text-align: center;
+    margin: auto;
+    width: 100px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.resize-none {
+    resize: none;
+}
+
+.view-course-info-reviews-box {
+    text-align: center;
+    margin: auto;
+    align-items: center;
+}
+
+.view-course-info-review-box {
+    text-align: center;
+    margin: auto;
+    align-items: center;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    width: 50%;
+    max-width: 600px;
+}
+
+.view-course-info-review-stars-box {
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.view-course-info-img {
+    max-width: 80%;
+    max-height: 400px;
+}
+
+@media only screen and (max-width: 650px) {
+    .view-course-info-button {
+        padding: 6px;
+        font-size: 12px;
+        margin: 6px;
+        width: 90%;
+    }
+}
