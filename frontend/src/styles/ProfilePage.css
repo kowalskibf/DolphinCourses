@@ -1,0 +1,84 @@
+#my-profile-main-container {
+    width: 100%;
+    max-width: 1280px;
+    margin: auto;
+    text-align: center;
+    margin-top: 80px;
+}
+
+#my-profile-header {
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+    margin: auto;
+}
+
+.my-profile-header-half {
+    width: 50%;
+    margin: 0;
+    float: left;
+}
+
+.my-profile-avatar-img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 50%;
+}
+
+.my-profile-header-text {
+    font-size: 24px;
+}
+
+.blue {
+    color: #0059ff;
+}
+
+.my-profile-upload-new-avatar-box {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+}
+
+.my-profile-button {
+    border: 2px solid #0059ff;
+    padding: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px;
+}
+
+.my-profile-button:hover {
+    background-color: #0059ff;
+    color: white;
+    transition: 0.5s;
+}
+
+.profile-page-right-half {
+    margin-top: 40px;
+}
+
+.profile-page-courses-header {
+    font-size: 24px;
+}
+
+@media only screen and (max-width: 700px) {
+    #my-profile-main-container {
+        margin-top: 20px;
+    }
+
+    .my-profile-header-half {
+        width: 100%;
+        margin-bottom: 40px;
+    }
+
+    .my-profile-button {
+        padding: 6px;
+        margin: 6px;
+        width: 90%;
+    }
+}
