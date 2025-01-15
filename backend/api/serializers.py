@@ -60,6 +60,46 @@ class ElementSerializer(serializers.ModelSerializer):
             return ModuleElementSerializer(obj.moduleelement).data
         return None
 
+class ElementWithUsesSerializer(serializers.ModelSerializer):
+    author = AccountSerializer(read_only=True)
+    data = serializers.SerializerMethodField()
+    uses = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Element
+        fields = ('id', 'name', 'author', 'type', 'data', 'uses')
+
+    def get_data(self, obj):
+        if obj.type == 'text':
+            return TextElementSerializer(obj.textelement).data
+        elif obj.type == 'image':
+            return ImageElementSerializer(obj.imageelement).data
+        elif obj.type == 'video':
+            return VideoElementSerializer(obj.videoelement).data
+        elif obj.type == 'example':
+            return ExampleElementSerializer(obj.exampleelement).data
+        elif obj.type == 'assignment':
+            return AssignmentElementSerializer(obj.assignmentelement).data
+        elif obj.type == 'exam':
+            return ExamElementSerializer(obj.examelement).data
+        elif obj.type == 'module':
+            return ModuleElementSerializer(obj.moduleelement).data
+        return None
+
+    def get_uses(self, obj):
+        if obj.type in ('text', 'image', 'video', 'example', 'exam'):
+            uses_in_modules = ElementToModule.objects.filter(element=obj).count()
+            return uses_in_modules
+        elif obj.type == 'assignment':
+            uses_in_modules = ElementToModule.objects.filter(element=obj).count()
+            uses_in_exams = ExamQuestion.objects.filter(question=obj).count()
+            return uses_in_modules + uses_in_exams
+        elif obj.type == 'module':
+            uses_in_modules = ElementToModule.objects.filter(element=obj).count()
+            uses_in_courses = ModuleToCourse.objects.filter(module=obj).count()
+            return uses_in_modules + uses_in_courses
+        return 0
+
 
 class ModuleElementSerializer(serializers.ModelSerializer):
     class Meta:

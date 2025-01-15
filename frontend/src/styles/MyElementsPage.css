@@ -111,6 +111,11 @@
     margin-bottom: 4px;
 }
 
+.my-elements-button-disabled {
+    border: 2px solid gray;
+    cursor: not-allowed;
+}
+
 @media only screen and (max-width: 1200px) {
     #my-elements-main-container {
         display: flex;

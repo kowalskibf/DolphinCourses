@@ -6,10 +6,12 @@ import { MEDIA_URL, TYPES } from '../constants';
 import ContentRenderer from '../components/ContentRenderer';
 import { sendUserBackToLoginPageIfNotLoggedIn } from '../functions';
 
-
+type CourseElementWithUses = CourseElement & {
+    uses: number;
+};
 
 export default function MyElementsPage() {
-    const [elements, setElements] = useState<CourseElement[]>([]);
+    const [elements, setElements] = useState<CourseElementWithUses[]>([]);
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [filterTypes, setFilterTypes] = useState<string[]>(["text", "image", "video", "example", "assignment", "exam", "module"]);
@@ -239,7 +241,7 @@ export default function MyElementsPage() {
                             {['text', 'image', 'video', 'example', 'assignment'].includes(element.type) ?
                                 <button className={`edit-course-button edit-course-button-border-${element.type}-element`} type="button" onClick={() => handleCopyElement(element.id)}>Copy</button>
                                 : ""}
-                            <button className={`edit-course-button edit-course-button-border-${element.type}-element`} type="button" onClick={() => handleDeleteElement(element.id)}>Delete</button>
+                            <button className={`edit-course-button ${element.uses ? "my-elements-button-disabled" : `edit-course-button-border-${element.type}-element`}`} type="button" onClick={() => handleDeleteElement(element.id)}>Delete</button>
                         </div>
                     ))}
             </div>
