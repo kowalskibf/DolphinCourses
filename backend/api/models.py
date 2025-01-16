@@ -116,8 +116,7 @@ class CourseAccess(models.Model):
     OBTAINING_TYPES = [
         ('author', 'Author'),
         ('gifted', 'Gifted'),
-        ('bought', 'Bought'),
-        ('free', 'Free')
+        ('bought', 'Bought')
     ]
     account = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='course_accesses')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_accesses')
