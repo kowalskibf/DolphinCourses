@@ -1561,7 +1561,10 @@ class ReviewView(APIView):
             comment = ""
         if len(comment) > 1023:
             return Response({"error": "Comment too long."}, status=status.HTTP_400_BAD_REQUEST)
-        rating = int(body["rating"])
+        try:
+            rating = int(body["rating"])
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         if rating < 1 or rating > 5:
             return Response({"error": "Rating must be from 1 to 5."}, status=status.HTTP_400_BAD_REQUEST)
         review = Review(
@@ -1624,7 +1627,10 @@ class ReviewView(APIView):
             comment = ""
         if len(comment) > 1023:
             return Response({"error": "Comment too long."}, status=status.HTTP_400_BAD_REQUEST)
-        rating = int(body["rating"])
+        try:
+            rating = int(body["rating"])
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         if rating < 1 or rating > 5:
             return Response({"error": "Rating must be from 1 to 5."}, status=status.HTTP_400_BAD_REQUEST)
         review = Review.objects.get(author=account, course=course)
