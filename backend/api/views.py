@@ -24,25 +24,18 @@ class RegisterView(APIView):
             body = json.loads(request.body)
             username, email, password = body["username"], body["email"], body["password"]
         except (KeyError, json.JSONDecodeError):
-            print('invalid body')
             return Response({"error": "Invalid request body."}, status=status.HTTP_400_BAD_REQUEST)
         if not username:
-            print('puste username')
             return Response({"error": "Username required."}, status=status.HTTP_400_BAD_REQUEST)
         if len(username) > 25:
-            print('za dlugi login')
             return Response({"error": "Username must be at most 25 characters long."}, status=status.HTTP_400_BAD_REQUEST)
         if not email:
-            print('puste email')
             return Response({"error": "Email required."}, status=status.HTTP_400_BAD_REQUEST)
         if not password:
-            print('puste pw')
             return Response({"error": "Password required."}, status=status.HTTP_400_BAD_REQUEST)
         if User.objects.filter(username=username).exists():
-            print('username zajete')
             return Response({"error": "Username already taken."}, status=status.HTTP_409_CONFLICT)
         if User.objects.filter(email=email).exists():
-            print('email zajete')
             return Response({"error": "Email already used."}, status=status.HTTP_409_CONFLICT)
         user = User(username=username, email=email)
         # try:
@@ -55,7 +48,6 @@ class RegisterView(APIView):
         # except ValidationError as e:
         #     print('email zle')
         #     return Response({"error": e.messages}, status=status.HTTP_400_BAD_REQUEST)
-        print('ok')
         user.set_password(password)
         user.save()
         accountSocials = AccountSocials()
@@ -102,7 +94,6 @@ class ProfileAvatarView(APIView):
             account = Account.objects.get(user=user)
             account.avatar = request.data.get("avatar")
             account.save()
-            print("ok")
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -371,7 +362,6 @@ class ElementView(APIView):
                                 if Type.objects.filter(id=int(rawElement["id"])).exists():
                                     element = Type.objects.get(id=int(rawElement["id"]))
                                     break
-                            #element = Element.objects.get(id=int(element["id"]))
                         except Element.DoesNotExist:
                             return Response(status=status.HTTP_404_NOT_FOUND)
                         if not element.author == account:
@@ -546,11 +536,6 @@ class ElementView(APIView):
                 return Response({"error": "Detach module from all courses to delete it."}, status=status.HTTP_400_BAD_REQUEST)
         element.delete()
         return Response(status=status.HTTP_200_OK)
-
-
-        
-            
-        
 
 class ElementCopyView(APIView):
     def post(self, request, element_id):
@@ -728,23 +713,6 @@ class CourseStructureView(APIView):
         process_child(module)
         return list(set(childModulesIds))
 
-    # def get_all_children_modules_for_modules(self, modulesIds):
-    #     def process_child(parent):
-    #         for elementToModule in ElementToModule.objects.filter(module=parent):
-    #             child = elementToModule.element
-    #             if child.type == "module":
-    #                 childModulesIds.append(child.id)
-    #                 process_child(child)
-    #     childModulesIds = []
-    #     for moduleId in modulesIds:
-    #         if ModuleElement.objects.filter(id=moduleId).exists():
-    #             childModulesIds.append(moduleId)
-    #     for moduleId in modulesIds:
-    #         if ModuleElement.objects.filter(id=moduleId).exists():
-    #             currParent = ModuleElement.objects.get(id=moduleId)
-    #             process_child(currParent)
-    #     return list(set(childModulesIds))
-
     def attaching_would_cause_infinite_recursion(self, parent_module, child_module):
         parent_modules = self.get_all_parent_modules(parent_module)
         children_modules = self.get_all_children_modules(child_module)
@@ -874,7 +842,6 @@ class ModuleToCourseView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 class ElementToModuleView(APIView):
-    # def post(self, request, course_id, module_id, element_id):
     def post(self, request, module_id, element_id):
         try:
             user = request.user
@@ -891,64 +858,27 @@ class ElementToModuleView(APIView):
                 element = Element.objects.get(id=element_id)
             except Element.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            # try:
-            #     course = Course.objects.get(id=course_id)
-            # except Course.DoesNotExist:
-            #     return Response(status=status.HTTP_404_NOT_FOUND)
             if module.type != "module":
                 return Response({"error": "Module is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
             if not module.author == account or not element.author == account:
                 return Response(status=status.HTTP_401_UNAUTHORIZED)
             if ElementToModule.objects.filter(module=module, element=element).exists():
                 return Response({"message": "Element is already added to this module"}, status=status.HTTP_400_BAD_REQUEST)
-            #if not body["copy"]:
             if element.type == "module":
                 courseStructureView = CourseStructureView()
                 if courseStructureView.attaching_would_cause_infinite_recursion(module, element):
                     return Response({"error": "This action would cause infinite recursion."}, status=status.HTTP_400_BAD_REQUEST)
-            if True:
-                elementToModule = ElementToModule(
-                    module=module,
-                    element=element,
-                    #course=course,
-                    order=ElementToModule.objects.filter(module=module).count() + 1
-                )
-                elementToModule.save()
-            else:
-                newElement = element
-                newElement.pk = None
-                newElement.name += ' (copy)'
-                newElement.save()
-                elementToModule = ElementToModule(
-                    module=module,
-                    element=newElement,
-                    #course=course,
-                    order=ElementToModule.objects.filter(module=module).count() + 1
-                )
-                elementToModule.save()
-
+            elementToModule = ElementToModule(
+                module=module,
+                element=element,
+                order=ElementToModule.objects.filter(module=module).count() + 1
+            )
+            elementToModule.save()
             courseStructureView = CourseStructureView()
             assignmentWeightsView = AssignmentWeightsView()
             for course in Course.objects.filter(author=account):
                 for assignmentId in courseStructureView.get_all_assignments(course):
                     assignmentWeightsView.initialize_weights_for_assignment(AssignmentElement.objects.get(id=assignmentId), course)
-            # chyba odtad niepotrzebne
-            # if element.type == "assignment":
-            #     assignment = AssignmentElement.objects.get(id=element_id)
-            #     assignmentWeightsView = AssignmentWeightsView()
-            #     try:
-            #         assignmentWeightsView.initialize_weights_for_assignment(assignment, course)
-            #     except Exception as e:
-            #         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            # elif element.type == "exam":
-            #     assignmentWeightsView = AssignmentWeightsView()
-            #     try:
-            #         examQuestions = ExamQuestion.objects.filter(exam=element)
-            #         for examQuestion in examQuestions:
-            #             assignmentWeightsView.initialize_weights_for_assignment(examQuestion.question, course)
-            #     except Exception as e:
-            #         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-            # chyba dotad niepotrzebne
             return Response(status=status.HTTP_200_OK)
         except Exception as e:
             print(str(e))
@@ -1030,15 +960,6 @@ class ElementToModuleView(APIView):
             for assignmentId in assignmentIds2D[i]:
                 assignmentWeightsView.remove_weights_for_assignment(assignmentId, course.id)
             i += 1
-
-        #
-        # assignmentWeightsView = AssignmentWeightsView()
-        # if element.type == "assignment":
-        #     assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, element.id)
-        # elif element.type == "exam":
-        #     for examQuestion in ExamQuestion.objects.filter(exam=element):
-        #         assignmentWeightsView.remove_weights_for_assignment_in_every_course(account, examQuestion.question.id)
-        #
         return Response(status=status.HTTP_200_OK)
 
 class AssignmentWeightView(APIView):
@@ -1151,24 +1072,12 @@ class AssignmentWeightsView(APIView):
             courseStructureView = CourseStructureView()
             courses = Course.objects.filter(author=author)
             for course in courses:
-                print(f"przeszukkuje kurs {course.name}")
-                # if assignment_id not in courseStructureView.get_all_assignments(course):
-                #     print(f"nie ma assignment {assignment_id}")
-                #     if not self.remove_weights_for_assignment(assignment_id, course.id):
-                #         print("jakis blad")
-                #         return False
-                #     print("bez bledu")
-                print(f"nie ma assignment {assignment_id}")
                 if not self.remove_weights_for_assignment(assignment_id, course.id):
-                    print("jakis blad")
                     return False
-                print("bez bledu")
             return True
         except Exception as e:
             return False
-
-
-
+        
     def post(self, request, course_id, assignment_id): # dodanie zadania do kursu, zrobienie wag
         user = request.user
         try:
@@ -1205,7 +1114,6 @@ class AssignmentWeightsView(APIView):
         if not course.author == account:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         body = json.loads(request.body)
-        print(1)
         try:
             weights = body["weights"] # struktura [{topic_id, weight}, {topic_id, weight}, ...]
         except:
@@ -1280,7 +1188,6 @@ class CourseAccessView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not body["expires"]:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        #if body["expires"] < timezone.now():
         if datetime.strptime(body["expires"], "%Y-%m-%d %H:%M:%S") < timezone.now():
             return Response({"error": "Access expiration date cannot be in the past."}, status=status.HTTP_400_BAD_REQUEST)
         if CourseAccess.objects.filter(account=account, course=course).exists():
@@ -1370,9 +1277,6 @@ class CourseAccessView(APIView):
         courseAccess = CourseAccess.objects.get(account=account, course=course, is_active=True, expires__gt=timezone.now())
         serializer = CourseAccessSerializer(courseAccess)
         return Response(serializer.data)
-
-    
-    
     
 class CourseAccessesView(APIView):
     def get(self, request, course_id):
@@ -1421,8 +1325,6 @@ class CourseAccessGiftView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not body["expires"]:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        #if body["expires"] < timezone.now():
-        print(1)
         if datetime.strptime(body["expires"], "%Y-%m-%d %H:%M:%S") < timezone.now():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -1447,10 +1349,6 @@ class CourseAccessGiftView(APIView):
         )
         courseAccess.save()
         return Response(status=status.HTTP_201_CREATED)
-
-
-        
-        
   
 class MyCourseAccessesView(APIView):
     def get(self, request):
