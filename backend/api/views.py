@@ -874,7 +874,8 @@ class ModuleToCourseView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 class ElementToModuleView(APIView):
-    def post(self, request, course_id, module_id, element_id):
+    # def post(self, request, course_id, module_id, element_id):
+    def post(self, request, module_id, element_id):
         try:
             user = request.user
             account = Account.objects.get(user=user)
@@ -890,10 +891,10 @@ class ElementToModuleView(APIView):
                 element = Element.objects.get(id=element_id)
             except Element.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            try:
-                course = Course.objects.get(id=course_id)
-            except Course.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+            # try:
+            #     course = Course.objects.get(id=course_id)
+            # except Course.DoesNotExist:
+            #     return Response(status=status.HTTP_404_NOT_FOUND)
             if module.type != "module":
                 return Response({"error": "Module is not of type 'module'"}, status=status.HTTP_400_BAD_REQUEST)
             if not module.author == account or not element.author == account:

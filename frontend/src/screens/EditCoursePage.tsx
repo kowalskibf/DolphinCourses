@@ -201,7 +201,8 @@ export default function EditCoursePage() {
 
     const handleAddElement = async (element: CourseElement) => {
         assertModuleElementStructure(view);
-        const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/module/${view.id}/structure/${element.id}`, {
+        // const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/module/${view.id}/structure/${element.id}`, {
+        const response = await fetch(`http://127.0.0.1:8000/api/module/${view.id}/structure/${element.id}`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
