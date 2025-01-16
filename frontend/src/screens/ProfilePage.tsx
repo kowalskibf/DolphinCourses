@@ -53,6 +53,9 @@ export default function ProfilePage() {
                 </div>
             </div>
             <br />
+            <span className="gray">{account.bio}</span>
+            <br />
+            <br />
             {account.socials.facebook.length ? (
                 <a href={account.socials.facebook} target='_blank'>
                     <span className="blue">
@@ -60,7 +63,7 @@ export default function ProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>Facebook profile link not set.</span>
+                <span className="gray">Facebook profile link not set.</span>
             )}
             <br />
             {account.socials.instagram.length ? (
@@ -70,7 +73,7 @@ export default function ProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>Instagram profile link not set.</span>
+                <span className="gray">Instagram profile link not set.</span>
             )}
             <br />
             {account.socials.tiktok.length ? (
@@ -80,7 +83,7 @@ export default function ProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>Tiktok profile link not set.</span>
+                <span className="gray">Tiktok profile link not set.</span>
             )}
             <br />
             {account.socials.linkedin.length ? (
@@ -90,7 +93,7 @@ export default function ProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>LiniedIn profile link not set.</span>
+                <span className="gray">LiniedIn profile link not set.</span>
             )}
             <br />
             <br />

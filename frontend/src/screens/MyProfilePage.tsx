@@ -95,6 +95,9 @@ export default function MyProfilePage() {
                 </div>
             </div>
             <br />
+            <span className="gray">{account.bio}</span>
+            <br />
+            <br />
             <span className="gray">Email:&nbsp;</span>{account.user.email}
             <br />
             {account.socials.facebook.length ? (
@@ -104,7 +107,7 @@ export default function MyProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>Facebook profile link not set.</span>
+                <span className="gray">Facebook profile link not set.</span>
             )}
             <br />
             {account.socials.instagram.length ? (
@@ -114,7 +117,7 @@ export default function MyProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>Instagram profile link not set.</span>
+                <span className="gray">Instagram profile link not set.</span>
             )}
             <br />
             {account.socials.tiktok.length ? (
@@ -124,7 +127,7 @@ export default function MyProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>Tiktok profile link not set.</span>
+                <span className="gray">Tiktok profile link not set.</span>
             )}
             <br />
             {account.socials.linkedin.length ? (
@@ -134,7 +137,7 @@ export default function MyProfilePage() {
                     </span>
                 </a>
             ) : (
-                <span>LiniedIn profile link not set.</span>
+                <span className="gray">LiniedIn profile link not set.</span>
             )}
             <br />
             <br />
