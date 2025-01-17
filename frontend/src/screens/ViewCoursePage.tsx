@@ -486,7 +486,7 @@ export default function ViewCoursePage() {
                                 {element.element_data.type == "image" && (
                                     <>
                                         <div className="media-container">
-                                            <img src={MEDIA_URL + element.element_data.data.image} />
+                                            <img className="img-max-size" src={MEDIA_URL + element.element_data.data.image} />
                                         </div>
                                         <div className="media-description">
                                             <ContentRenderer content={element.element_data.data.description} />
@@ -496,7 +496,7 @@ export default function ViewCoursePage() {
                                 {element.element_data.type == "video" && (
                                     <>
                                         <div className="media-container">
-                                            <video src={MEDIA_URL + element.element_data.data.video} controls />
+                                            <video className="img-max-size" src={MEDIA_URL + element.element_data.data.video} controls />
                                         </div>
                                         <div className="media-description">
                                             <ContentRenderer content={element.element_data.data.description} />
@@ -511,7 +511,7 @@ export default function ViewCoursePage() {
                                             <>
                                                 <br />
                                                 <div className="media-container">
-                                                    <img src={MEDIA_URL + element.element_data.data.image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + element.element_data.data.image} />
                                                 </div>
                                                 <br />
                                             </>
@@ -523,7 +523,7 @@ export default function ViewCoursePage() {
                                             <>
                                                 <br />
                                                 <div className="media-container">
-                                                    <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + element.element_data.data.explanation_image} />
                                                 </div>
                                             </>
                                         )}
@@ -538,7 +538,7 @@ export default function ViewCoursePage() {
                                             <>
                                                 <br />
                                                 <div className="media-container">
-                                                    <img src={MEDIA_URL + element.element_data.data.image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + element.element_data.data.image} />
                                                 </div>
                                                 <br />
                                             </>
@@ -624,7 +624,7 @@ export default function ViewCoursePage() {
                                                                     <>
                                                                         <br />
                                                                         <div className="media-container">
-                                                                            <img src={MEDIA_URL + element.element_data.data.explanation_image} />
+                                                                            <img className="img-max-size" src={MEDIA_URL + element.element_data.data.explanation_image} />
                                                                         </div>
                                                                     </>
                                                                 )}
@@ -707,7 +707,7 @@ export default function ViewCoursePage() {
                                                             const correctAnswerIndices = (examQuestion.question as AssignmentElementStructure).correct_answer_indices;
 
                                                             return (
-                                                                <div className="assignment-element any-element element-margin">
+                                                                <div className="assignment-element any-element element-margin margin-top-bottom-10">
                                                                     <span className="gray">Marks: {examQuestion.marks}</span>
                                                                     <br />
                                                                     <span className="gray">Question</span>
@@ -715,7 +715,7 @@ export default function ViewCoursePage() {
                                                                     {examQuestion.question.image && (
                                                                         <>
                                                                             <div className="media-container">
-                                                                                <img src={MEDIA_URL + examQuestion.question.image} />
+                                                                                <img className="img-max-size" src={MEDIA_URL + examQuestion.question.image} />
                                                                             </div>
                                                                         </>
                                                                     )}
@@ -802,7 +802,7 @@ export default function ViewCoursePage() {
                                                                                                 <>
                                                                                                     <br />
                                                                                                     <div className="media-container">
-                                                                                                        <img src={MEDIA_URL + examQuestion.question.explanation_image} />
+                                                                                                        <img className="img-max-size" src={MEDIA_URL + examQuestion.question.explanation_image} />
                                                                                                     </div>
                                                                                                 </>
                                                                                             )}

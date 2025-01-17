@@ -80,7 +80,7 @@ export default function ExplorePage() {
                         className="explore-select"
                     >
                         <option value="highestRating">Highest Rating</option>
-                        <option value="lastUpdated">Last Updated</option>
+                        {/* <option value="lastUpdated">Last Updated</option> */}
                         <option value="alphabetical">Alphabetical</option>
                         <option value="alphabeticalDescending">Alphabetical (Descending)</option>
                         <option value="priceAscending">Price (Ascending)</option>

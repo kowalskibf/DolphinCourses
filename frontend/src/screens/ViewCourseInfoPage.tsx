@@ -197,7 +197,7 @@ export default function ViewCourseInfoPage() {
             {!hasAccess && loggedIn && (
                 <>
                     You <span className="red">do not have</span> access, go to
-                    {" "}<a href={`/course/${id}/view/access`}>Manage access</a>
+                    {" "}<a href={`/course/${id}/view/access`}><span className="blue">Manage access</span></a>
                     <br />
                 </>
             )}
@@ -263,7 +263,7 @@ export default function ViewCourseInfoPage() {
             <a href={`/profile/${course.author.user.username}`} target='_blank'>
                 <div className="explore-author">
                     <img className="explore-avatar-mini" src={MEDIA_URL + (course.author.avatar ? course.author.avatar : "/media/default_avatar.png")} />
-                    <div className="explore-course-author-username">{course.author.user.username}</div>
+                    <div className="explore-course-author-username blue">{course.author.user.username}</div>
                 </div>
             </a>
 

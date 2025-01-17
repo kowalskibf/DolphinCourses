@@ -131,7 +131,7 @@ export default function MyElementsPage() {
                                 {element.type === 'image' ?
                                     <div className="element-content-center text-align-center my-elements-element-margin">
                                         <img
-                                            className="element-media"
+                                            className="element-media img-max-size"
                                             src={MEDIA_URL + element.data.image}
                                         />
                                         <br />
@@ -143,7 +143,7 @@ export default function MyElementsPage() {
                                         <video
                                             controls
                                             src={MEDIA_URL + element.data.video}
-                                            className="element-media"
+                                            className="element-media img-max-size"
                                         />
                                         <br />
                                         <ContentRenderer content={element.data.description} />
@@ -156,7 +156,7 @@ export default function MyElementsPage() {
                                         <br />
                                         {element.data.image && (
                                             <div className="text-align-center">
-                                                <img src={MEDIA_URL + element.data.image} />
+                                                <img className="img-max-size" src={MEDIA_URL + element.data.image} />
                                                 <br />
                                                 <br />
                                             </div>
@@ -166,7 +166,7 @@ export default function MyElementsPage() {
                                         <br />
                                         {element.data.explanation_image && (
                                             <div className="text-align-center">
-                                                <img src={MEDIA_URL + element.data.explanation_image} />
+                                                <img className="img-max-size" src={MEDIA_URL + element.data.explanation_image} />
                                                 <br />
                                                 <br />
                                             </div>
@@ -181,7 +181,7 @@ export default function MyElementsPage() {
                                         <br />
                                         {element.data.image && (
                                             <div className="text-align-center">
-                                                <img src={MEDIA_URL + element.data.image} />
+                                                <img className="img-max-size" src={MEDIA_URL + element.data.image} />
                                                 <br />
                                                 <br />
                                             </div>
@@ -207,7 +207,7 @@ export default function MyElementsPage() {
                                         <br />
                                         {element.data.explanation_image && (
                                             <div className="text-align-center">
-                                                <img src={MEDIA_URL + element.data.explanation_image} />
+                                                <img className="img-max-size" src={MEDIA_URL + element.data.explanation_image} />
                                                 <br />
                                                 <br />
                                             </div>

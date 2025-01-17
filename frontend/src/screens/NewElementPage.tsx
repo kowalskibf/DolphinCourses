@@ -383,7 +383,7 @@ export default function NewElementPage() {
                     <div className="edit-element-label-box">
                         Image:&nbsp;
                     </div>
-                    <img className="edit-element-img" id="uploaded-image"></img>
+                    <img className="edit-element-img img-max-size" id="uploaded-image"></img>
                     <br />
                     Upload image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
@@ -399,7 +399,7 @@ export default function NewElementPage() {
                     <div className="edit-element-label-box">
                         Video:&nbsp;
                     </div>
-                    <video controls id="uploaded-video" />
+                    <video controls id="uploaded-video" className="img-max-size" />
                     <br />
                     Upload video:&nbsp;
                     <input className="edit-element-img" type="file" accept="video/*" onChange={(e) => handleFileChange(e)} />
@@ -419,7 +419,7 @@ export default function NewElementPage() {
                     <div className="edit-element-label-box">
                         Question image:&nbsp;
                     </div>
-                    <img className="edit-element-img" id="uploaded-example-image" />
+                    <img className="edit-element-img img-max-size" id="uploaded-example-image" />
                     <br />
                     Upload question image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
@@ -431,7 +431,7 @@ export default function NewElementPage() {
                     <div className="edit-element-label-box">
                         Explanation image:&nbsp;
                     </div>
-                    <img className="edit-element-img" id="uploaded-example-explanation-image" />
+                    <img className="edit-element-img img-max-size" id="uploaded-example-explanation-image" />
                     <br />
                     Upload explanation Image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "explanation")} />
@@ -446,7 +446,7 @@ export default function NewElementPage() {
                     <div className="edit-element-label-box">
                         Question image:&nbsp;
                     </div>
-                    <img id="uploaded-assignment-image" />
+                    <img id="uploaded-assignment-image" className="img-max-size" />
                     <br />
                     Upload question image:&nbsp;
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e)} />
@@ -503,7 +503,7 @@ export default function NewElementPage() {
                     <div className="edit-element-label-box">
                         Explanation image:&nbsp;
                         <br />
-                        <img id="uploaded-assignment-explanation-image" />
+                        <img id="uploaded-assignment-explanation-image" className="img-max-size" />
                     </div>
                     Upload explanation Image
                     <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, "explanation")} />
@@ -556,7 +556,7 @@ export default function NewElementPage() {
                                         <br />
                                         {element.data.image ?
                                             <>
-                                                <img src={MEDIA_URL + element.data.image} />
+                                                <img className="img-max-size" src={MEDIA_URL + element.data.image} />
                                                 <br />
                                                 <br />
                                             </>
@@ -582,7 +582,7 @@ export default function NewElementPage() {
                                         <br />
                                         {element.data.explanation_image ?
                                             <>
-                                                <img src={MEDIA_URL + element.data.explanation_image} />
+                                                <img className="img-max-size" src={MEDIA_URL + element.data.explanation_image} />
                                                 <br />
                                                 <br />
                                             </>
@@ -636,7 +636,7 @@ export default function NewElementPage() {
                                             <br />
                                             {assignment.data.image ?
                                                 <>
-                                                    <img src={MEDIA_URL + assignment.data.image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + assignment.data.image} />
                                                     <br />
                                                 </>
                                                 : ""}
@@ -662,7 +662,7 @@ export default function NewElementPage() {
                                             <br />
                                             {assignment.data.explanation_image ?
                                                 <>
-                                                    <img src={MEDIA_URL + assignment.data.explanation_image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + assignment.data.explanation_image} />
                                                     <br />
                                                 </>
                                                 : ""}
@@ -712,7 +712,7 @@ export default function NewElementPage() {
                             </div>
                             <button className="edit-element-button edit-element-button-wide" type="button" onClick={fetchAllElements}>Refresh</button>
 
-                            {allElements.map((element) => (
+                            {allElements.filter(e => e.name.includes(searchQuery)).map((element) => (
                                 <div
                                     draggable
                                     className={element.type + '-element any-element element-margin my-elements-element-margin'}
