@@ -71,6 +71,7 @@ export default function ViewCourseTopicsPage() {
                 <input
                     type="text"
                     className="view-course-topics-input-text "
+                    placeholder="Topic name"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />

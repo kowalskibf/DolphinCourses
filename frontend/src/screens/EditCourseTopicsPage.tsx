@@ -93,7 +93,7 @@ export default function EditCourseTopicsPage() {
             <div className="edit-course-topics-label-box">
                 Add a topic
             </div>
-            <input className="edit-course-topics-input-text" type="text" value={topic} onChange={(e) => setTopic(e.target.value)} />
+            <input className="edit-course-topics-input-text" type="text" placeholder="Topic name" value={topic} onChange={(e) => setTopic(e.target.value)} />
             <button className="edit-course-topics-button edit-course-topics-button-small" type="button" onClick={handleCreateTopic}>Create topic</button>
             <br />
             <div className="edit-course-topics-label-box">
@@ -101,7 +101,7 @@ export default function EditCourseTopicsPage() {
             </div>
             {topics.map((topic, i) => (
                 <>
-                    <input className="edit-course-topics-input-text" type="text" defaultValue={topic.topic} onBlur={(e) => handleEditTopic(topic.id, e.target.value)} />
+                    <input className="edit-course-topics-input-text" placeholder="Topic name" type="text" defaultValue={topic.topic} onBlur={(e) => handleEditTopic(topic.id, e.target.value)} />
                     <button className="edit-course-topics-button edit-course-topics-button-small edit-course-topics-button-red" type="button" onClick={() => handleDeleteTopic(topic.id)}>Delete</button>
                     <br />
                 </>

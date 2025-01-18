@@ -90,7 +90,7 @@ export default function MyElementsPage() {
                 </a>
                 <div className="my-elements-search-container">
                     Search by name&nbsp;
-                    <input type="text" className="my-elements-search-input" placeholder="Enter the name to search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                    <input type="text" className="my-elements-search-input" placeholder="Element name" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
                 <div className="my-elements-filter-container">
                     <div className="my-elements-filter-top">Filter by type</div>

@@ -68,7 +68,7 @@ export default function MyCoursesPage() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search"
+                        placeholder="Course name"
                         className="my-courses-search-input"
                     />
                 </div>

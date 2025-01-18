@@ -138,7 +138,7 @@ export default function EditCourseInfoPage() {
             </a>
             <div className="edit-course-info-header">Edit course information</div>
             <div className="edit-course-info-label-box">
-                Name:&nbsp;<input className="edit-course-info-input-text" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                Name:&nbsp;<input className="edit-course-info-input-text" placeholder="Course name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <div className="edit-course-info-label-box">
                 Description:&nbsp;

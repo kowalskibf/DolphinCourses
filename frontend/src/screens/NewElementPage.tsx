@@ -356,7 +356,7 @@ export default function NewElementPage() {
             <button className="edit-element-button" type="button" onClick={handleCreateElement}>Save</button>
             <br />
             <div className="edit-element-label-box">
-                Element name:&nbsp;<input className="edit-element-input-text" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+                Element name:&nbsp;<input className="edit-element-input-text" placeholder="Element name" type="text" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             <br />
             Element type:&nbsp;
@@ -534,6 +534,7 @@ export default function NewElementPage() {
                                 <input
                                     type="text"
                                     className="edit-element-search-input"
+                                    placeholder="Assignment name"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
@@ -688,7 +689,7 @@ export default function NewElementPage() {
             {elementType == "module" ?
                 <>
                     <div className="edit-element-label-box">
-                        Title:&nbsp;<input className="edit-element-input-text" type="text" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
+                        Title:&nbsp;<input className="edit-element-input-text" placeholder="Module title" type="text" value={moduleElementTitle} onChange={(e) => setModuleElementTitle(e.target.value)} />
                     </div>
                     <div className="edit-element-label-box">
                         Description:&nbsp;<TextEditor value={moduleElementDescription} onChange={(value) => setModuleElementDescription(value)} />
@@ -706,6 +707,7 @@ export default function NewElementPage() {
                                 <input
                                     type="text"
                                     className="edit-element-search-input"
+                                    placeholder="Element name"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />

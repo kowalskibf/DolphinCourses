@@ -13,7 +13,7 @@ export default function Navbar() {
         <>
             <div id="navbar-container">
                 <div id="navbar-left">
-                    <b>Learning App</b>
+                    <b>DolphinCourses</b>
                 </div>
                 <div id="navbar-right">
                     <div className="navbar-link">
@@ -38,7 +38,7 @@ export default function Navbar() {
             </div>
             <div id="m-navbar-container">
                 <div id="m-navbar-left">
-                    <b>Learning App</b>
+                    <b>DolphinCourses</b>
                 </div>
                 <div id="m-navbar-right">
                     <span

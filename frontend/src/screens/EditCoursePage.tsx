@@ -310,7 +310,7 @@ export default function EditCoursePage() {
                 </a>
                 <div className="edit-course-search-container">
                     Search by name
-                    <input type="text" className="edit-course-search-input" placeholder="Enter the name to search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+                    <input type="text" className="edit-course-search-input" placeholder="Element name" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                 </div>
                 <div className="edit-course-filter-container">
                     <div className="edit-course-filter-top">Filter by type</div>

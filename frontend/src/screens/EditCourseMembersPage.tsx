@@ -96,7 +96,7 @@ export default function EditCourseMembersPage() {
             </a>
             <div className="edit-course-members-header">Invite a new member</div>
             <div className="edit-course-members-label-box">
-                Username:&nbsp;<input className="edit-course-members-input-text" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+                Username:&nbsp;<input className="edit-course-members-input-text" placeholder="Username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
             </div>
             <div className="edit-course-members-label-box">
                 Expires:&nbsp;<input type="datetime-local" value={formatDateTimeLocal(new Date(expires))} onChange={(e) => setExpires(new Date(e.target.value))} />

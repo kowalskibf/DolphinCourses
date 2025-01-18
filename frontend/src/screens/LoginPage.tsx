@@ -44,11 +44,11 @@ export default function LoginPage() {
             <div className="create-course-label-box">
                 Username
             </div>
-            <input className="create-course-input-text" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
             <div className="create-course-label-box">
                 Password
             </div>
-            <input className="create-course-input-text" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
             <br />
             {error && (
                 <span className="red">

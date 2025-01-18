@@ -151,7 +151,7 @@ export default function CreateCoursePage() {
                             <div className="create-course-label-box">
                                 Course name
                             </div>
-                            <input className="create-course-input-text" type="text" value={name} onChange={(e) => setName(e.target.value)} /> <br />
+                            <input className="create-course-input-text" placeholder="Course name" type="text" value={name} onChange={(e) => setName(e.target.value)} /> <br />
                             {errorName ? errorName : ""} <br />
                             <div className="create-course-label-box">
                                 Course description

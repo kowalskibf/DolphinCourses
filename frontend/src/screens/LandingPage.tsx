@@ -7,7 +7,7 @@ export default function LandingPage() {
         <div id="landing-page-main-container">
             <div id="landing-page-header">
                 Hello,<br />
-                Welcome to <span className="landing-page-app-name">LearningApp</span>!
+                Welcome to <span className="landing-page-app-name">DolphinCourses</span>!
             </div>
             <div id="landing-page-sub-header">
                 Try our users' courses!

@@ -79,31 +79,31 @@ export default function ProfileSetupPage() {
             <div className="create-course-label-box">
                 First name
             </div>
-            <input className="create-course-input-text" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+            <input className="create-course-input-text" placeholder="First name" type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
             <div className="create-course-label-box">
                 Last name
             </div>
-            <input className="create-course-input-text" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Last name" type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
             <div className="create-course-label-box">
                 Bio
             </div>
-            <input className="create-course-input-text" type="text" value={bio} onChange={(e) => setBio(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Bio" type="text" value={bio} onChange={(e) => setBio(e.target.value)} />
             <div className="create-course-label-box">
                 Facebook full link
             </div>
-            <input className="create-course-input-text" type="text" value={facebook} onChange={(e) => setFacebook(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Facebook link" type="text" value={facebook} onChange={(e) => setFacebook(e.target.value)} />
             <div className="create-course-label-box">
                 Instagram full link
             </div>
-            <input className="create-course-input-text" type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Instagram link" type="text" value={instagram} onChange={(e) => setInstagram(e.target.value)} />
             <div className="create-course-label-box">
                 Tiktok full link
             </div>
-            <input className="create-course-input-text" type="text" value={tiktok} onChange={(e) => setTiktok(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Tiktok link" type="text" value={tiktok} onChange={(e) => setTiktok(e.target.value)} />
             <div className="create-course-label-box">
                 LinkedIn full link
             </div>
-            <input className="create-course-input-text" type="text" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} />
+            <input className="create-course-input-text" placeholder="LinkedIn link" type="text" value={linkedin} onChange={(e) => setLinkedin(e.target.value)} />
             <br />
             <button className="create-course-step-button" type="button" onClick={handleSetup}>Save</button>
             <a href="/profile/me">

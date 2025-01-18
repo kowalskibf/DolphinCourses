@@ -47,7 +47,7 @@ export default function LearnPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search"
+                    placeholder="Course name"
                     className="learn-search-input"
                 />
             </div>

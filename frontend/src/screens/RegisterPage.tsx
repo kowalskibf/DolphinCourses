@@ -109,7 +109,7 @@ export default function RegisterPage() {
             <div className="create-course-label-box">
                 Username
             </div>
-            <input className="create-course-input-text" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
             {errorUsername && (
                 <span className="red">
                     <br />
@@ -119,7 +119,7 @@ export default function RegisterPage() {
             <div className="create-course-label-box">
                 Email
             </div>
-            <input className="create-course-input-text" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             {errorEmail && (
                 <span className="red">
                     <br />
@@ -129,7 +129,7 @@ export default function RegisterPage() {
             <div className="create-course-label-box">
                 Password
             </div>
-            <input className="create-course-input-text" type="password" value={password1} onChange={(e) => setPassword1(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Password" type="password" value={password1} onChange={(e) => setPassword1(e.target.value)} />
             {errorPassword1 && (
                 <span className="red">
                     <br />
@@ -139,7 +139,7 @@ export default function RegisterPage() {
             <div className="create-course-label-box">
                 Repeat password
             </div>
-            <input className="create-course-input-text" type="password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Repeat password" type="password" value={password2} onChange={(e) => setPassword2(e.target.value)} />
             {errorPassword2 && (
                 <span className="red">
                     <br />
