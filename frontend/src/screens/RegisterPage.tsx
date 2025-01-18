@@ -109,7 +109,7 @@ export default function RegisterPage() {
             <div className="create-course-label-box">
                 Username
             </div>
-            <input className="create-course-input-text" placeholder="Username" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Username, ex. johndoe123" type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
             {errorUsername && (
                 <span className="red">
                     <br />
@@ -119,7 +119,7 @@ export default function RegisterPage() {
             <div className="create-course-label-box">
                 Email
             </div>
-            <input className="create-course-input-text" placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input className="create-course-input-text" placeholder="Email, ex. john.doe123@gmail.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
             {errorEmail && (
                 <span className="red">
                     <br />
