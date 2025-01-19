@@ -93,7 +93,7 @@ export default function ViewCourseTopicsPage() {
             <br />
             {sortTopics(accountTopics.filter(accountTopic => accountTopic.course_topic.topic.includes(searchQuery))).map((topic, i) => (
                 <>
-                    {topic.course_topic.topic} {topic.value.toFixed(2)}
+                    <span className="gray">{topic.course_topic.topic}</span> {topic.value.toFixed(2)}
                     <ProgressBar value={topic.value} />
                     <br />
                 </>

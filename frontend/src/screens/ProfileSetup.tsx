@@ -73,7 +73,7 @@ export default function ProfileSetupPage() {
     };
 
     return (
-        <div id="create-course-main" className="text-align-center">
+        <div id="create-course-main" className="text-align-center margin-bottom-20">
             <h1>Hello, <span className="blue">{account.user.username}</span></h1>
             <br />
             <div className="create-course-label-box">
