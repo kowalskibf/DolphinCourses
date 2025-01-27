@@ -99,9 +99,12 @@ class ProfileAvatarView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
 class MyProfileView(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request):
+        if not request.user:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         user = request.user
+        if not Account.objects.filter(user=user).exists():
+            return Response(status=status.HTTP_404_NOT_FOUND)
         account = Account.objects.get(user=user)
         serializer = AccountSerializer(account)
         return Response(serializer.data, status=status.HTTP_200_OK)
