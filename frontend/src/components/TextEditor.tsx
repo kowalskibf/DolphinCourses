@@ -25,7 +25,7 @@ const TextEditor = ({ value, onChange }: { value: string, onChange: (value: stri
                 modules={modules}
             />
             <div>
-                {/* <h3>Preview:</h3> */}<br />
+                <br />
                 <div>{renderContent(value)}</div>
             </div>
         </div>
