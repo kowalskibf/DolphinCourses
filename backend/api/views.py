@@ -99,12 +99,11 @@ class ProfileAvatarView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
 class MyProfileView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        if not request.user:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
         user = request.user
         if not Account.objects.filter(user=user).exists():
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         account = Account.objects.get(user=user)
         serializer = AccountSerializer(account)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -231,12 +230,13 @@ class CourseView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class MyCoursesView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         user = request.user
         author = Account.objects.get(user=user)
         courses = Course.objects.filter(author=author)
         serializer = CourseSerializer(courses, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class MyElementsView(APIView):
     def get(self, request):
@@ -612,10 +612,13 @@ class CourseTopicView(APIView):
         if not courseTopic.course.author == account:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         serializer = CourseTopicSerializer(courseTopic)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def put(self, request, id):
-        user = request.user
+        try:
+            user = request.user
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         body = json.loads(request.body)
         try:
             account = Account.objects.get(user=user)
@@ -733,13 +736,13 @@ class CourseStructureView(APIView):
         for new_module_id in new_modules_ids:
             if ModuleElement.objects.filter(id=new_module_id).exists():
                 curr_module = ModuleElement.objects.get(id=new_module_id)
-                if curr_module.id == parent_module.id:
+                if curr_module.id == parent_module:#.id:
                     return True
                 if curr_module.id in parent_modules:
                     return True
                 for curr_child_id in self.get_all_children_modules(curr_module):
                     curr_child = ModuleElement.objects.get(id=curr_child_id)
-                    if curr_child.id == parent_module.id:
+                    if curr_child.id == parent_module:#.id:
                         return True
                     if curr_child.id in parent_modules:
                         return True
@@ -1302,7 +1305,7 @@ class CourseAccessesView(APIView):
             expires__gt=datetime.now()
         )
         serializer = CourseAccessDetailSerializer(courseAccesses, many=True)
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 class CourseAccessGiftView(APIView):
     def post(self, request, course_id):

@@ -16,6 +16,8 @@ export default function EditCourseTopicsPage() {
     const [topics, setTopics] = useState<CourseTopic[]>([]);
     const [topic, setTopic] = useState<string>("");
 
+    const [errorTopicName, setErrorTopicName] = useState<string>("");
+
     const fetchTopics = async () => {
         fetch(`http://127.0.0.1:8000/api/course/${id}/topics`, {
             method: "GET",
@@ -29,6 +31,11 @@ export default function EditCourseTopicsPage() {
     };
 
     const handleCreateTopic = async () => {
+        setErrorTopicName("");
+        if (!topic.length) {
+            setErrorTopicName("Topic name cannot be empty.");
+            return;
+        }
         const response = await fetch(`http://127.0.0.1:8000/api/course/${id}/topic`, {
             method: "POST",
             headers: {
@@ -96,6 +103,11 @@ export default function EditCourseTopicsPage() {
             <input className="edit-course-topics-input-text" type="text" placeholder="Topic name" value={topic} onChange={(e) => setTopic(e.target.value)} />
             <button className="edit-course-topics-button edit-course-topics-button-small" type="button" onClick={handleCreateTopic}>Create topic</button>
             <br />
+            {errorTopicName && (
+                <>
+                    {errorTopicName}<br />
+                </>
+            )}
             <div className="edit-course-topics-label-box">
                 Edit existing topics
             </div>

@@ -681,7 +681,7 @@ export default function EditElementPage() {
                                             <br />
                                             {assignment.data.image ?
                                                 <>
-                                                    <img src={MEDIA_URL + assignment.data.image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + assignment.data.image} />
                                                     <br />
                                                     <br />
                                                 </>
@@ -707,7 +707,7 @@ export default function EditElementPage() {
                                             <br />
                                             {assignment.data.explanation_image ?
                                                 <>
-                                                    <img src={MEDIA_URL + assignment.data.explanation_image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + assignment.data.explanation_image} />
                                                     <br />
                                                     <br />
                                                 </>
@@ -752,7 +752,7 @@ export default function EditElementPage() {
                                             <br />
                                             {examQuestion.question.data.image ?
                                                 <>
-                                                    <img src={MEDIA_URL + examQuestion.question.data.image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + examQuestion.question.data.image} />
                                                     <br />
                                                 </>
                                                 : ""}
@@ -778,7 +778,7 @@ export default function EditElementPage() {
                                             <br />
                                             {examQuestion.question.data.explanation_image ?
                                                 <>
-                                                    <img src={MEDIA_URL + examQuestion.question.data.explanation_image} />
+                                                    <img className="img-max-size" src={MEDIA_URL + examQuestion.question.data.explanation_image} />
                                                     <br />
                                                 </>
                                                 : ""}

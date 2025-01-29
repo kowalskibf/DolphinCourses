@@ -106,32 +106,20 @@ export default function CreateCoursePage() {
         resetErrors();
         switch (step) {
             case 1:
-                if (true) { // warunki czy dobre name i desc
+                if (name.length > 0) {
                     setStep(step + 1);
                 } else {
-                    console.log();
+                    setErrorName("Course name cannot be empty.");
                 }
                 break;
             case 2:
-                if (true) { // warunki czy dobre zdjecie
-                    setStep(step + 1);
-                } else {
-                    console.log();
-                }
+                setStep(step + 1);
                 break;
             case 3:
-                if (true) { // warunki czy dobry jezyk i dlugosc
-                    setStep(step + 1);
-                } else {
-                    console.log();
-                }
+                setStep(step + 1);
                 break;
             case 4:
-                if (true) { // warunki
-                    setStep(step + 1);
-                } else {
-                    console.log();
-                }
+                setStep(step + 1);
                 break;
         }
     }
