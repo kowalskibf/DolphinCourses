@@ -21,21 +21,22 @@ Aplikacja jest przeznaczona dla osób i organizacji, które chcą tworzyć, sprz
 
 ### Instalacja
 
-#### 1. Instalacja wymaganych paczek do back-endu:
+#### 1. Pobranie repozytorium:
   ```
+  git clone https://github.com/kowalskibf/DolphinCourses.git
+  ```
+
+#### 2. Instalacja wymaganych paczek do back-endu:
+  ```
+  cd DolphinCourses
   pip install -r requirements.txt
   ```
 
-#### 2. Instalacja wymagań od front-endu:
+#### 3. Instalacja wymagań od front-endu:
   ```
   npm install -g npm
   npm install react-quill
   npm install react-katex
-  ```
-
-#### 3. Pobranie repozytorium:
-  ```
-  git clone https://github.com/kowalskibf/DolphinCourses.git
   ```
 
 #### 4. Migracja bazy danych:
