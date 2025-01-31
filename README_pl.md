@@ -32,7 +32,7 @@ Aplikacja jest przeznaczona dla osób i organizacji, które chcą tworzyć, sprz
   pip install -r requirements.txt
   ```
 
-#### 3. Instalacja wymagań od front-endu:
+#### 3. Instalacja wymagań do front-endu:
   ```
   npm install -g npm
   npm install react-quill
