@@ -16,7 +16,7 @@ Aplikacja jest przeznaczona dla osób i organizacji, które chcą tworzyć, sprz
 
 ## Wymagania
 
-- **Python**: 3.9 or newer
+- **Python**: 3.9
 - **pip**
 
 ### Instalacja
