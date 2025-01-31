@@ -1,0 +1,5 @@
+django>=3.9,<4.0
+djangorestframework>=3.12,<4.0
+django-cors-headers>=3.7,<4.0
+djoser>=2.0,<3.0
+django-rest-auth-token>=1.0,<2.0
