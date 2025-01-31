@@ -14,3 +14,46 @@ Celem aplikacji jest stworzenie platformy edukacyjnej typu "marketplace", umożl
 
 Aplikacja jest przeznaczona dla osób i organizacji, które chcą tworzyć, sprzedawać i zarządzać kursami online. Dzięki intuicyjnej platformie, użytkownicy mogą tworzyć kursy o różnej strukturze, a także przeglądać kursy innych użytkowników i śledzić swoje postępy. Idealna dla każdej osoby chcącej udostępnić swoje materiały edukacyjne szerokiemu gronu odbiorców.
 
+## Wymagania
+
+- **Python**: 3.9 or newer
+
+### Instalacja
+
+#### 1. Instalacja wymaganych paczek do back-endu:
+  ```
+  pip install -r requirements.txt
+  ```
+
+#### 2. Instalacja wymagań od front-endu:
+  ```
+  npm install -g npm
+  npm install react-quill
+  npm install react-katex
+  ```
+
+#### 3. Pobranie repozytorium:
+  ```
+  git clone https://github.com/kowalskibf/DolphinCourses.git
+  ```
+
+#### 4. Migracja bazy danych:
+  ```
+  cd backend
+  python manage.py makemigrations
+  python manage.py migrate
+  ```
+
+### Uruchomienie
+
+#### Back-end:
+  ```
+  cd backend
+  python manage.py runserver
+  ```
+
+#### Front-end:
+  ```
+  cd frontend
+  npm run dev
+  ```
